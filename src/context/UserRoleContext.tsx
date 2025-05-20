@@ -1,5 +1,5 @@
 
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useContext, useEffect, useCallback } from "react";
 import { useUser } from "@clerk/clerk-react";
 
 // Tipos para perfis de usuário
@@ -33,52 +33,58 @@ const UserRoleContext = createContext<UserRoleContextType | undefined>(undefined
 
 export const UserRoleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user } = useUser();
-  const [userRoles, setUserRoles] = useState<UserRole[]>(defaultRoles);
-  const [currentUserRole, setCurrentUserRole] = useState<UserRole | null>(null);
-
-  // Carregar perfis salvos do localStorage
-  useEffect(() => {
+  const [userRoles, setUserRoles] = useState<UserRole[]>(() => {
+    // Inicialização do estado a partir do localStorage
     const savedRoles = localStorage.getItem("userRoles");
-    if (savedRoles) {
-      setUserRoles(JSON.parse(savedRoles));
-    }
+    return savedRoles ? JSON.parse(savedRoles) : defaultRoles;
+  });
+  
+  const [currentUserRole, setCurrentUserRole] = useState<UserRole | null>(null);
+  const [initialized, setInitialized] = useState(false);
 
-    // Verificar se o usuário atual é um administrador (primeiro usuário)
-    if (user) {
-      const userRoleMapping = localStorage.getItem("userRoleMapping");
-      if (userRoleMapping) {
-        const mappings = JSON.parse(userRoleMapping);
-        const userRoleId = mappings[user.id];
-        if (userRoleId) {
-          const role = userRoles.find(r => r.id === userRoleId);
-          if (role) {
-            setCurrentUserRole(role);
-          }
-        } else {
-          // Se não tem perfil atribuído e é o primeiro usuário, atribui como admin
-          const isFirstUser = Object.keys(mappings).length === 0;
-          if (isFirstUser) {
-            const adminRole = userRoles.find(r => r.id === "admin");
-            if (adminRole) {
-              setCurrentUserRole(adminRole);
-              const newMapping = { [user.id]: "admin" };
-              localStorage.setItem("userRoleMapping", JSON.stringify(newMapping));
-            }
-          }
-        }
-      } else {
-        // Se não existe mapeamento, este é o primeiro usuário (admin)
-        const adminRole = userRoles.find(r => r.id === "admin");
-        if (adminRole) {
-          setCurrentUserRole(adminRole);
-          const newMapping = { [user.id]: "admin" };
-          localStorage.setItem("userRoleMapping", JSON.stringify(newMapping));
-        }
+  // Função para carregar o perfil do usuário atual
+  const loadCurrentUserRole = useCallback(() => {
+    if (!user) return;
+
+    const userRoleMapping = localStorage.getItem("userRoleMapping");
+    let mappings = userRoleMapping ? JSON.parse(userRoleMapping) : {};
+    
+    // Verificar se o usuário tem um perfil atribuído
+    if (Object.keys(mappings).includes(user.id)) {
+      const userRoleId = mappings[user.id];
+      const role = userRoles.find(r => r.id === userRoleId);
+      if (role) {
+        setCurrentUserRole(role);
+      }
+    } else {
+      // Se não tem perfil atribuído, é o primeiro usuário (admin)
+      const adminRole = userRoles.find(r => r.id === "admin");
+      if (adminRole) {
+        setCurrentUserRole(adminRole);
+        mappings[user.id] = "admin";
+        localStorage.setItem("userRoleMapping", JSON.stringify(mappings));
       }
     }
+    
+    setInitialized(true);
   }, [user, userRoles]);
 
-  // Salvar perfis no localStorage quando atualizados
+  // Efeito para carregar o perfil do usuário quando o componente montar
+  // ou quando o usuário ou perfis mudarem
+  useEffect(() => {
+    if (!initialized || !user) return;
+    
+    loadCurrentUserRole();
+  }, [user, initialized, loadCurrentUserRole]);
+
+  // Efeito para inicializar o contexto quando o componente montar
+  useEffect(() => {
+    if (!initialized && user) {
+      loadCurrentUserRole();
+    }
+  }, [initialized, user, loadCurrentUserRole]);
+
+  // Efeito para salvar perfis no localStorage quando forem atualizados
   useEffect(() => {
     localStorage.setItem("userRoles", JSON.stringify(userRoles));
   }, [userRoles]);
@@ -87,19 +93,19 @@ export const UserRoleProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const addRole = (role: Omit<UserRole, "id">) => {
     const id = Date.now().toString();
     const newRole = { ...role, id };
-    setUserRoles([...userRoles, newRole]);
+    setUserRoles(prevRoles => [...prevRoles, newRole]);
   };
 
   // Atualizar perfil existente
   const updateRole = (id: string, roleUpdate: Partial<UserRole>) => {
-    setUserRoles(userRoles.map(role => 
-      role.id === id ? { ...role, ...roleUpdate } : role
-    ));
+    setUserRoles(prevRoles => 
+      prevRoles.map(role => role.id === id ? { ...role, ...roleUpdate } : role)
+    );
   };
 
   // Remover perfil
   const deleteRole = (id: string) => {
-    setUserRoles(userRoles.filter(role => role.id !== id));
+    setUserRoles(prevRoles => prevRoles.filter(role => role.id !== id));
   };
 
   // Atribuir perfil a um usuário

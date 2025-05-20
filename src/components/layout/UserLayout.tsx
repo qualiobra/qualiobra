@@ -3,10 +3,16 @@ import { Outlet } from "react-router-dom";
 import SiteHeader from "./SiteHeader";
 import { useUserRole } from "@/context/UserRoleContext";
 import { Navigate } from "react-router-dom";
+import { useUser } from "@clerk/clerk-react";
 
 const UserLayout = () => {
-  // Remover a verificação que está causando o loop infinito
-  // e usar uma abordagem mais simples para verificar a autenticação
+  const { isSignedIn } = useUser();
+  const { currentUserRole } = useUserRole();
+  
+  // Verificar se o usuário está autenticado, sem causar loop infinito
+  if (!isSignedIn) {
+    return <Navigate to="/login" replace />;
+  }
   
   return (
     <div className="min-h-screen flex flex-col">
