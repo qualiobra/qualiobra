@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "@/hooks/use-toast";
 import ObraForm from "./ObraForm";
 import { type ObraFormValues } from "./ObraFormSchema";
+import { format } from "date-fns";
 
 interface EditarObraDialogProps {
   open: boolean;
@@ -37,8 +38,8 @@ export default function EditarObraDialog({ open, onOpenChange, obraId }: EditarO
         descricao: values.descricao,
         localizacao: values.localizacao,
         cepCodigoPostal: values.cepCodigoPostal,
-        dataInicio: values.dataInicio,
-        dataPrevistaTermino: values.dataPrevistaTermino,
+        dataInicio: format(values.dataInicio, 'yyyy-MM-dd'),
+        dataPrevistaTermino: values.dataPrevistaTermino ? format(values.dataPrevistaTermino, 'yyyy-MM-dd') : '',
         status: values.status,
         nivelPBQPH: values.nivelPBQPH,
         documentos: values.documentos,
@@ -86,12 +87,12 @@ export default function EditarObraDialog({ open, onOpenChange, obraId }: EditarO
             dataPrevistaTermino: obra.dataPrevistaTermino ? new Date(obra.dataPrevistaTermino) : undefined,
             status: obra.status,
             nivelPBQPH: obra.nivelPBQPH || "Não Aplicável",
-            documentos: obra.documentos,
+            documentos: obra.documentos || [],
             anexosObra: obra.anexosObra || [],
             responsavelEngenheiroNome: obra.responsavelEngenheiroNome || "",
-            responsavelEngenheiroEmail: obra.responsavelEngenheiroEmail,
-            responsavelEngenheiroTelefone: obra.responsavelEngenheiroTelefone,
-            observacoesGerais: obra.observacoesGerais,
+            responsavelEngenheiroEmail: obra.responsavelEngenheiroEmail || "",
+            responsavelEngenheiroTelefone: obra.responsavelEngenheiroTelefone || "",
+            observacoesGerais: obra.observacoesGerais || "",
           }}
           onSubmit={handleSubmit}
           submitButtonText="Salvar Alterações"

@@ -30,4 +30,15 @@ export type Obra = {
   nivelPBQPH: NivelPBQPH;
   usuarios: ObraUsuario[];
   anexosObra?: ObraAnexo[];
+  
+  // Adding missing fields that are being used in the components
+  cepCodigoPostal?: string;
+  documentos?: string[];
+  responsavelEngenheiroNome?: string;
+  responsavelEngenheiroEmail?: string;
+  responsavelEngenheiroTelefone?: string;
+  observacoesGerais?: string;
 };
+
+// Type definition for the gerarCodigoObra function
+export function gerarCodigoObra(): string;

@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { toast } from "@/hooks/use-toast";
 import ObraForm from "./ObraForm";
 import { type ObraFormValues } from "./ObraFormSchema";
+import { format } from "date-fns";
 
 interface NovaObraDialogProps {
   open: boolean;
@@ -12,7 +13,7 @@ interface NovaObraDialogProps {
 }
 
 export default function NovaObraDialog({ open, onOpenChange }: NovaObraDialogProps) {
-  const { adicionarObra } = useObras();
+  const { criarObra } = useObras();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSubmit = async (values: ObraFormValues) => {
@@ -27,16 +28,16 @@ export default function NovaObraDialog({ open, onOpenChange }: NovaObraDialogPro
       })) || [];
       
       // Make sure all required properties are passed
-      adicionarObra({
+      criarObra({
         codigoDaObra: values.codigoDaObra,
         nome: values.nome,
         descricao: values.descricao,
         localizacao: values.localizacao,
-        cepCodigoPostal: values.cepCodigoPostal,
-        dataInicio: values.dataInicio,
-        dataPrevistaTermino: values.dataPrevistaTermino,
+        dataInicio: format(values.dataInicio, 'yyyy-MM-dd'),
+        dataPrevistaTermino: values.dataPrevistaTermino ? format(values.dataPrevistaTermino, 'yyyy-MM-dd') : '',
         status: values.status,
         nivelPBQPH: values.nivelPBQPH,
+        cepCodigoPostal: values.cepCodigoPostal,
         documentos: values.documentos || [],
         anexosObra: anexosObra,
         responsavelEngenheiroNome: values.responsavelEngenheiroNome,

@@ -1,49 +1,8 @@
+
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { useUserRole } from "./UserRoleContext";
 import type { Obra, ObraStatus, NivelPBQPH, ObraUsuario, ObraAnexo } from "../types/obra";
-
-// Re-export the types for convenience
-export type { Obra, ObraStatus, NivelPBQPH, ObraUsuario, ObraAnexo };
-
-// Tipos para obras e usuários de obras
-export type ObraStatus = "planejamento" | "em_andamento" | "concluida" | "suspensa" | "arquivada";
-export type NivelPBQPH = "Nível A" | "Nível B" | "Não Aplicável";
-
-export type ObraUsuario = {
-  userId: string;
-  nome: string;
-  email: string;
-  funcao: string;
-};
-
-export type ObraAnexo = {
-  nome: string;
-  url: string;
-  tipo: string;
-};
-
-export type Obra = {
-  id: string;
-  codigoDaObra: string;
-  nome: string;
-  descricao: string;
-  localizacao: string;
-  cepCodigoPostal?: string;
-  dataInicio: Date;
-  dataPrevistaTermino?: Date;
-  status: ObraStatus;
-  nivelPBQPH?: NivelPBQPH;
-  documentos: string[]; // URLs para documentos/imagens
-  anexosObra?: Array<ObraAnexo>;
-  usuarios: ObraUsuario[];
-  responsavelEngenheiroNome?: string;
-  responsavelEngenheiroEmail?: string;
-  responsavelEngenheiroTelefone?: string;
-  observacoesGerais?: string;
-  criadaEm: Date;
-  criadaPor: string;
-};
 
 // Tipo para o contexto
 type ObrasContextType = {
@@ -97,8 +56,6 @@ export const ObrasProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const novaObra: Obra = {
       ...obraData,
       id: Date.now().toString(),
-      criadaEm: new Date(),
-      criadaPor: user.id,
     };
     
     setObras(prevObras => [...prevObras, novaObra]);

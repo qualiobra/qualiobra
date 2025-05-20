@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { useUserRole } from "@/context/UserRoleContext";
@@ -20,7 +21,7 @@ const mockObras: Obra[] = [
         nome: "João da Silva",
         email: "joao.silva@example.com",
         funcao: "Engenheiro Responsável",
-		roleId: "engenheiro_gestor",
+        roleId: "engenheiro_gestor",
         telefoneWhatsApp: "+5511999999999",
       },
       {
@@ -28,7 +29,7 @@ const mockObras: Obra[] = [
         nome: "Maria Souza",
         email: "maria.souza@example.com",
         funcao: "Arquiteta",
-		roleId: "equipe_inspecao",
+        roleId: "equipe_inspecao",
         telefoneWhatsApp: "+5511988888888",
       },
     ],
@@ -61,7 +62,7 @@ const mockObras: Obra[] = [
         nome: "Carlos Pereira",
         email: "carlos.pereira@example.com",
         funcao: "Engenheiro Civil",
-		roleId: "engenheiro_gestor",
+        roleId: "engenheiro_gestor",
         telefoneWhatsApp: "+5511977777777",
       },
     ],
@@ -89,7 +90,7 @@ const mockObras: Obra[] = [
         nome: "Ana Clara",
         email: "ana.clara@example.com",
         funcao: "Mestre de Obras",
-		roleId: "equipe_inspecao",
+        roleId: "equipe_inspecao",
         telefoneWhatsApp: "+5511966666666",
       },
     ],
@@ -172,14 +173,32 @@ export const useObras = () => {
       obra.usuarios.some((usuario) => usuario.email === user.emailAddresses[0].emailAddress)
     );
   };
+  
+  // Adding gerarCodigoObra function
+  const gerarCodigoObra = () => {
+    const anoAtual = new Date().getFullYear();
+    const numeroExistente = obras.length > 0 
+      ? Math.max(...obras.map(o => {
+        const match = o.codigoDaObra?.match(/OBRA-\d{4}-(\d{3})/);
+        return match ? parseInt(match[1], 10) : 0;
+      }))
+      : 0;
+    const proximoNumero = (numeroExistente + 1).toString().padStart(3, '0');
+    return `OBRA-${anoAtual}-${proximoNumero}`;
+  };
+  
+  // Adding alias for backward compatibility
+  const adicionarObra = criarObra;
 
   return {
     obras,
     criarObra,
     atualizarObra,
     arquivarObra,
-	atribuirUsuario,
-	removerUsuario,
+    atribuirUsuario,
+    removerUsuario,
     getObrasDoUsuario,
+    gerarCodigoObra,
+    adicionarObra, // Alias for criarObra
   };
 };
