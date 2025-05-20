@@ -51,6 +51,56 @@ export type Database = {
         }
         Relationships: []
       }
+      respostas_diagnostico_usuario: {
+        Row: {
+          created_at: string
+          data_hora_resposta: string
+          id_diagnostico_agrupador: string
+          id_obra_avaliada: string | null
+          id_questao_respondida: string
+          id_resposta_diagnostico: string
+          id_usuario_avaliador: string
+          nivel_diagnostico_realizado: string
+          observacoes_usuario: string | null
+          pontuacao_usuario: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          data_hora_resposta?: string
+          id_diagnostico_agrupador: string
+          id_obra_avaliada?: string | null
+          id_questao_respondida: string
+          id_resposta_diagnostico?: string
+          id_usuario_avaliador: string
+          nivel_diagnostico_realizado: string
+          observacoes_usuario?: string | null
+          pontuacao_usuario: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          data_hora_resposta?: string
+          id_diagnostico_agrupador?: string
+          id_obra_avaliada?: string | null
+          id_questao_respondida?: string
+          id_resposta_diagnostico?: string
+          id_usuario_avaliador?: string
+          nivel_diagnostico_realizado?: string
+          observacoes_usuario?: string | null
+          pontuacao_usuario?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "respostas_diagnostico_usuario_id_questao_respondida_fkey"
+            columns: ["id_questao_respondida"]
+            isOneToOne: false
+            referencedRelation: "questoes_diagnostico"
+            referencedColumns: ["id_questao"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never

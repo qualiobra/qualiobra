@@ -9,9 +9,12 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "@/components/ui/use-toast";
-import { Check, AlertCircle, Info } from "lucide-react";
+import { Check, AlertCircle, Info, Loader2 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { useUser } from "@clerk/clerk-react";
+import { supabase } from "@/integrations/supabase/client";
+import { v4 as uuidv4 } from 'uuid';
 
 interface QuestoesDiagnosticoListProps {
   questoes: QuestoesDiagnostico[];
@@ -22,6 +25,11 @@ interface QuestoesDiagnosticoListProps {
 const QuestoesDiagnosticoList = ({ questoes, isLoading, nivel }: QuestoesDiagnosticoListProps) => {
   const [respostas, setRespostas] = useState<Record<string, { pontuacao: number; observacao: string }>>({});
   const [progresso, setProgresso] = useState(0);
+  const [isSaving, setIsSaving] = useState(false);
+  const { user } = useUser();
+  
+  // Gerar um ID único para este diagnóstico quando o componente é montado
+  const [diagnosticoId] = useState(() => uuidv4());
 
   const handleRespostaChange = (idQuestao: string, pontuacao: number) => {
     setRespostas(prev => ({
@@ -47,15 +55,56 @@ const QuestoesDiagnosticoList = ({ questoes, isLoading, nivel }: QuestoesDiagnos
     }));
   };
 
-  const handleSalvar = () => {
-    // Aqui seria implementada a lógica para salvar as respostas no banco de dados
-    console.log("Respostas salvas:", respostas);
+  const handleSalvar = async () => {
+    if (!user) {
+      toast({
+        title: "Erro",
+        description: "Você precisa estar logado para salvar respostas.",
+        variant: "destructive",
+      });
+      return;
+    }
     
-    toast({
-      title: "Respostas salvas",
-      description: "Suas respostas foram salvas com sucesso.",
-      duration: 3000,
-    });
+    setIsSaving(true);
+    
+    try {
+      // Preparar os dados para inserção
+      const respostasArray = Object.entries(respostas).map(([id_questao, { pontuacao, observacao }]) => ({
+        id_resposta_diagnostico: uuidv4(),
+        id_usuario_avaliador: user.id,
+        id_questao_respondida: id_questao,
+        nivel_diagnostico_realizado: nivel === 'Ambos os Níveis' ? 'Nível B' : nivel,
+        pontuacao_usuario: pontuacao,
+        observacoes_usuario: observacao || null,
+        data_hora_resposta: new Date().toISOString(),
+        id_diagnostico_agrupador: diagnosticoId,
+      }));
+      
+      // Inserir respostas no banco de dados
+      const { error } = await supabase
+        .from('respostas_diagnostico_usuario')
+        .insert(respostasArray);
+      
+      if (error) {
+        console.error("Erro ao salvar respostas:", error);
+        throw error;
+      }
+      
+      toast({
+        title: "Respostas salvas",
+        description: "Suas respostas foram salvas com sucesso.",
+        duration: 3000,
+      });
+    } catch (error) {
+      console.error("Erro ao salvar respostas:", error);
+      toast({
+        title: "Erro",
+        description: "Ocorreu um erro ao salvar suas respostas. Por favor, tente novamente.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const getPontuacaoLabel = (pontuacao: number, tipoPontuacao: string) => {
@@ -210,8 +259,17 @@ const QuestoesDiagnosticoList = ({ questoes, isLoading, nivel }: QuestoesDiagnos
       </Accordion>
 
       <div className="flex justify-end mt-6">
-        <Button onClick={handleSalvar} disabled={Object.keys(respostas).length === 0}>
-          Salvar Respostas
+        <Button 
+          onClick={handleSalvar} 
+          disabled={Object.keys(respostas).length === 0 || isSaving}
+        >
+          {isSaving ? (
+            <>
+              <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Salvando...
+            </>
+          ) : (
+            "Salvar Respostas"
+          )}
         </Button>
       </div>
     </div>
