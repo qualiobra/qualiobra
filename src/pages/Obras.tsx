@@ -27,7 +27,7 @@ import { PlusCircle, FileEdit, Users, ArchiveIcon, Search, Filter, FileUp } from
 import NovaObraDialog from "@/components/obras/NovaObraDialog";
 import EditarObraDialog from "@/components/obras/EditarObraDialog";
 import AtribuirUsuariosDialog from "@/components/obras/AtribuirUsuariosDialog";
-import { type Obra, type ObraStatus, type NivelPBQPH } from "@/context/ObrasContext";
+import type { Obra, ObraStatus, NivelPBQPH } from "@/types/obra";
 import { toast } from "@/hooks/use-toast";
 import {
   Popover,

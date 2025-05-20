@@ -1,7 +1,10 @@
-
 import React, { createContext, useState, useContext, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { useUserRole } from "./UserRoleContext";
+import type { Obra, ObraStatus, NivelPBQPH, ObraUsuario, ObraAnexo } from "../types/obra";
+
+// Re-export the types for convenience
+export type { Obra, ObraStatus, NivelPBQPH, ObraUsuario, ObraAnexo };
 
 // Tipos para obras e usuários de obras
 export type ObraStatus = "planejamento" | "em_andamento" | "concluida" | "suspensa" | "arquivada";
@@ -12,6 +15,12 @@ export type ObraUsuario = {
   nome: string;
   email: string;
   funcao: string;
+};
+
+export type ObraAnexo = {
+  nome: string;
+  url: string;
+  tipo: string;
 };
 
 export type Obra = {
@@ -26,7 +35,7 @@ export type Obra = {
   status: ObraStatus;
   nivelPBQPH?: NivelPBQPH;
   documentos: string[]; // URLs para documentos/imagens
-  anexosObra?: Array<{nome: string, url: string, tipo: string}>;
+  anexosObra?: Array<ObraAnexo>;
   usuarios: ObraUsuario[];
   responsavelEngenheiroNome?: string;
   responsavelEngenheiroEmail?: string;

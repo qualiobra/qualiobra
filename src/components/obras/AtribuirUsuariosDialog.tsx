@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useObras } from "@/hooks/useObras";
 import { useUserRole } from "@/context/UserRoleContext";
@@ -13,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { toast } from "@/hooks/use-toast";
 import { Trash2, HelpCircle } from "lucide-react";
-import { ObraUsuario } from "@/context/ObrasContext";
+import { ObraUsuario } from "@/types/obra";
 import {
   Tooltip,
   TooltipContent,
@@ -100,8 +99,8 @@ export default function AtribuirUsuariosDialog({ open, onOpenChange, obraId }: A
       nome: values.nome,
       email: values.email,
       funcao: values.funcao,
-      telefoneWhatsApp: values.telefoneWhatsApp || "",
       roleId: roleId, // Adicionando roleId mapeado da função
+      telefoneWhatsApp: values.telefoneWhatsApp || "",
     };
     
     atribuirUsuario(obraId, novoUsuario);
