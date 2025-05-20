@@ -19,9 +19,15 @@ export default function NovaObraDialog({ open, onOpenChange }: NovaObraDialogPro
     try {
       setIsSubmitting(true);
       
+      // Make sure all required properties are passed
       adicionarObra({
-        ...values,
-        usuarios: [], // Inicializa sem usuários
+        nome: values.nome,
+        descricao: values.descricao,
+        localizacao: values.localizacao,
+        dataInicio: values.dataInicio,
+        status: values.status,
+        documentos: values.documentos || [],
+        usuarios: [], // Initialize with empty array
       });
       
       toast({
