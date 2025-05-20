@@ -86,7 +86,7 @@ const userFormSchema = z.object({
   telefoneWhatsApp: z.string().optional(),
   password: z.string().min(6, {
     message: "Senha deve ter pelo menos 6 caracteres.",
-  }),
+  }).optional(), // Tornando senha opcional na edição
   roleId: z.string({
     required_error: "Por favor, selecione um perfil.",
   }),
@@ -155,7 +155,7 @@ const UserManagement = () => {
       name: "",
       email: "",
       telefoneWhatsApp: "",
-      password: "",
+      password: "", // Senha vazia por padrão
       roleId: "",
       avatar: "",
       status: "active",
@@ -169,7 +169,7 @@ const UserManagement = () => {
         name: editingUser.name,
         email: editingUser.email,
         telefoneWhatsApp: editingUser.telefoneWhatsApp || "",
-        password: "", // Não preencher senha na edição
+        password: "", // Senha vazia na edição
         roleId: editingUser.roleId,
         avatar: editingUser.avatar || "",
         status: editingUser.status,
@@ -282,10 +282,10 @@ const UserManagement = () => {
     });
   };
 
-  // Função para abrir o diálogo de edição
+  // Função para abrir o diálogo de edição - Corrigido para abrir o diálogo
   const handleEditUser = (user: UserData) => {
     setEditingUser(user);
-    setIsDialogOpen(true);
+    setIsDialogOpen(true); // Adiciona esta linha para garantir que o diálogo abrirá
   };
 
   // Função para abrir o diálogo de criação
@@ -316,7 +316,7 @@ const UserManagement = () => {
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={() => setEditingUser(null)}>
+            <Button onClick={handleAddUser}>
               <UserPlus className="mr-2 h-4 w-4" /> Novo Usuário
             </Button>
           </DialogTrigger>
@@ -528,7 +528,7 @@ const UserManagement = () => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => setEditingUser(user)}>
+                        <DropdownMenuItem onClick={() => handleEditUser(user)}>
                           <Pencil className="mr-2 h-4 w-4" /> Editar
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => toggleUserStatus(user.id)}>
