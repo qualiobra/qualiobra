@@ -1,8 +1,8 @@
 
-import { ComplianceChart } from "@/components/dashboard/ComplianceChart";
-import { NonConformitiesChart } from "@/components/dashboard/NonConformitiesChart";
-import { RecentInspections } from "@/components/dashboard/RecentInspections";
-import { PendingTasks } from "@/components/dashboard/PendingTasks";
+import ComplianceChart from "@/components/dashboard/ComplianceChart";
+import NonConformitiesChart from "@/components/dashboard/NonConformitiesChart";
+import RecentInspections from "@/components/dashboard/RecentInspections";
+import PendingTasks from "@/components/dashboard/PendingTasks";
 import { SeedDiagnosticoData } from "@/components/diagnostico/SeedDiagnosticoData";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
