@@ -17,17 +17,22 @@ export function useDiagnosticoRespostas(totalQuestoes: number, nivel: NivelDiagn
   const [diagnosticoId] = useState(() => uuidv4());
 
   const handleRespostaChange = (idQuestao: string, pontuacao: number) => {
-    setRespostas(prev => ({
-      ...prev,
-      [idQuestao]: { 
-        pontuacao, 
-        observacao: prev[idQuestao]?.observacao || "" 
-      }
-    }));
-    
-    // Atualizar progresso
-    const totalRespondidas = Object.keys(respostas).length + (respostas[idQuestao] ? 0 : 1);
-    setProgresso(Math.round((totalRespondidas / totalQuestoes) * 100));
+    setRespostas(prev => {
+      const novasRespostas = {
+        ...prev,
+        [idQuestao]: { 
+          pontuacao, 
+          observacao: prev[idQuestao]?.observacao || "" 
+        }
+      };
+      
+      // Atualizar progresso
+      const totalRespondidas = Object.keys(novasRespostas).length;
+      const novoProgresso = totalQuestoes > 0 ? Math.round((totalRespondidas / totalQuestoes) * 100) : 0;
+      setProgresso(novoProgresso);
+      
+      return novasRespostas;
+    });
   };
 
   const handleObservacaoChange = (idQuestao: string, observacao: string) => {
@@ -80,11 +85,11 @@ export function useDiagnosticoRespostas(totalQuestoes: number, nivel: NivelDiagn
         description: "Suas respostas foram salvas com sucesso.",
         duration: 3000,
       });
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao salvar respostas:", error);
       toast({
         title: "Erro",
-        description: "Ocorreu um erro ao salvar suas respostas. Por favor, tente novamente.",
+        description: `Ocorreu um erro ao salvar suas respostas: ${error.message || "Erro desconhecido"}`,
         variant: "destructive",
       });
     } finally {

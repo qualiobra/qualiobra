@@ -4,6 +4,7 @@ import { Accordion } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
 import { useUser } from "@clerk/clerk-react";
+import { toast } from "@/components/ui/use-toast";
 
 import DiagnosticoProgress from "./DiagnosticoProgress";
 import DiagnosticoLoading from "./DiagnosticoLoading";
@@ -15,10 +16,18 @@ interface QuestoesDiagnosticoListProps {
   questoes: QuestoesDiagnostico[];
   isLoading: boolean;
   nivel: NivelDiagnostico;
+  error?: string | null;
+  onRetry?: () => void;
 }
 
-const QuestoesDiagnosticoList = ({ questoes, isLoading, nivel }: QuestoesDiagnosticoListProps) => {
-  const { user } = useUser();
+const QuestoesDiagnosticoList = ({ 
+  questoes, 
+  isLoading, 
+  nivel, 
+  error, 
+  onRetry 
+}: QuestoesDiagnosticoListProps) => {
+  const { user, isSignedIn } = useUser();
   const { 
     respostas, 
     progresso, 
@@ -30,6 +39,15 @@ const QuestoesDiagnosticoList = ({ questoes, isLoading, nivel }: QuestoesDiagnos
   } = useDiagnosticoRespostas(questoes.length, nivel);
   
   const handleSalvar = () => {
+    if (!isSignedIn) {
+      toast({
+        title: "Atenção",
+        description: "Você precisa estar logado para salvar respostas. Faça login e tente novamente.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     if (user) {
       salvarRespostas(user.id);
     }
@@ -37,6 +55,10 @@ const QuestoesDiagnosticoList = ({ questoes, isLoading, nivel }: QuestoesDiagnos
 
   if (isLoading) {
     return <DiagnosticoLoading />;
+  }
+
+  if (error) {
+    return <DiagnosticoEmptyState nivel={nivel} error={error} onRetry={onRetry} />;
   }
 
   if (questoes.length === 0) {

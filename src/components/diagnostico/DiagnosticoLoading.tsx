@@ -5,13 +5,16 @@ import { Skeleton } from "@/components/ui/skeleton";
 const DiagnosticoLoading = () => {
   return (
     <div className="space-y-4">
-      {[1, 2, 3].map((i) => (
-        <Card key={i}>
+      {[1, 2, 3, 4].map((i) => (
+        <Card key={i} className="overflow-hidden">
           <CardHeader>
             <Skeleton className="h-6 w-3/4" />
           </CardHeader>
           <CardContent>
-            <Skeleton className="h-20 w-full" />
+            <div className="space-y-3">
+              <Skeleton className="h-20 w-full" />
+              <Skeleton className="h-12 w-3/4" />
+            </div>
           </CardContent>
         </Card>
       ))}
