@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { ArrowRight, Gauge, MessageSquare, Users } from "lucide-react";
+import { ArrowRight, Gauge, MessageSquare, Users, ClipboardCheck } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Index = () => {
