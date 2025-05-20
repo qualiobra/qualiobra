@@ -25,8 +25,8 @@ export default function Obras() {
   const formatarStatus = (status: string) => {
     switch (status) {
       case 'em_andamento': return { label: 'Em andamento', variant: 'default' as const };
-      case 'concluida': return { label: 'Concluída', variant: 'success' as const };
-      case 'paralisada': return { label: 'Paralisada', variant: 'warning' as const };
+      case 'concluida': return { label: 'Concluída', variant: 'secondary' as const };
+      case 'paralisada': return { label: 'Paralisada', variant: 'outline' as const };
       case 'arquivada': return { label: 'Arquivada', variant: 'secondary' as const };
       default: return { label: status, variant: 'default' as const };
     }

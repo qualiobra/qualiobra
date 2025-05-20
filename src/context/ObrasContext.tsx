@@ -1,6 +1,6 @@
 
 import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
-import { Obra, Usuario, UsuarioObra, StatusObra } from "../types/obra";
+import { Obra, Usuario, UsuarioObra, StatusObra, Documento } from "../types/obra";
 import { useUserRole } from "./UserRoleContext";
 import { useUser } from "@clerk/clerk-react";
 
@@ -127,7 +127,7 @@ export const ObrasProvider: React.FC<{children: ReactNode}> = ({ children }) => 
   };
 
   const adicionarDocumento = (obraId: string, documento: Omit<Documento, "id" | "dataUpload">) => {
-    const novoDocumento = {
+    const novoDocumento: Documento = {
       ...documento,
       id: Date.now().toString(),
       dataUpload: new Date().toISOString().split('T')[0]

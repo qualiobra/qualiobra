@@ -57,7 +57,15 @@ const AvaliacaoInicial = () => {
       const codigoVerificacao = Math.random().toString(36).substring(2, 8).toUpperCase();
       
       const lead: LeadCadastro = {
-        ...data,
+        nome: data.nome,
+        email: data.email,
+        telefone: data.telefone,
+        cargo: data.cargo,
+        empresa: data.empresa,
+        porteEmpresa: data.porteEmpresa,
+        numeroObras: data.numeroObras,
+        segmentoAtuacao: data.segmentoAtuacao,
+        interesseEmCertificacao: data.interesseEmCertificacao,
         emailVerificado: false,
         codigoVerificacao: codigoVerificacao,
       };

@@ -56,11 +56,18 @@ export function NovaObraDialog({ open, onOpenChange }: NovaObraDialogProps) {
   });
 
   function onSubmit(data: NovaObraFormValues) {
-    adicionarObra({
-      ...data,
+    // Make sure all required fields are provided
+    const novaObra = {
+      nome: data.nome,
+      descricao: data.descricao,
+      localizacao: data.localizacao,
+      dataInicio: data.dataInicio.toISOString().split('T')[0], // Convert to string format
+      status: data.status,
       documentos: [],
       usuarios: [],
-    });
+    };
+
+    adicionarObra(novaObra);
     
     toast({
       title: "Obra criada com sucesso",
