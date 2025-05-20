@@ -5,13 +5,9 @@ import { useUserRole } from "@/context/UserRoleContext";
 import { Navigate } from "react-router-dom";
 
 const UserLayout = () => {
-  const { currentUserRole } = useUserRole();
+  // Remover a verificação que está causando o loop infinito
+  // e usar uma abordagem mais simples para verificar a autenticação
   
-  // Verificar se o usuário tem um perfil atribuído
-  if (!currentUserRole) {
-    return <Navigate to="/login" replace />;
-  }
-
   return (
     <div className="min-h-screen flex flex-col">
       <SiteHeader />

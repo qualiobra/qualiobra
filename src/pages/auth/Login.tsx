@@ -59,7 +59,11 @@ const Login = () => {
           title: "Login realizado com sucesso",
           description: "Bem-vindo ao QualiObra!",
         });
-        navigate("/dashboard");
+        
+        // Adicionando um pequeno delay para garantir que o Clerk finalize o processo
+        setTimeout(() => {
+          navigate("/dashboard");
+        }, 300);
       } else {
         toast({
           title: "Algo deu errado",
