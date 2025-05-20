@@ -1,6 +1,6 @@
 
 import React, { useState } from "react";
-import { useObras } from "@/context/ObrasContext";
+import { useObras } from "@/hooks/useObras";
 import { useUserRole } from "@/context/UserRoleContext";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
