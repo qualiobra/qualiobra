@@ -223,14 +223,14 @@ export default function Diagnostico() {
           <div className="space-y-2 md:w-1/3">
             <Label htmlFor="obra-diagnostico">Obra (Opcional)</Label>
             <Select 
-              value={selectedObraId || ""} 
-              onValueChange={setSelectedObraId}
+              value={selectedObraId || "diagnostico_geral"} 
+              onValueChange={(value) => setSelectedObraId(value === "diagnostico_geral" ? null : value)}
             >
               <SelectTrigger id="obra-diagnostico">
                 <SelectValue placeholder="Selecione uma obra" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">Diagnóstico Geral (Sem Obra)</SelectItem>
+                <SelectItem value="diagnostico_geral">Diagnóstico Geral (Sem Obra)</SelectItem>
                 {obras.map((obra) => (
                   <SelectItem key={obra.id} value={obra.id}>
                     {obra.nome}
