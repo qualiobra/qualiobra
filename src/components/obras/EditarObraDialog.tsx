@@ -24,6 +24,13 @@ export default function EditarObraDialog({ open, onOpenChange, obraId }: EditarO
     try {
       setIsSubmitting(true);
       
+      // Ensure all anexosObra items have required fields
+      const anexosObra = values.anexosObra?.map(anexo => ({
+        nome: anexo.nome,
+        url: anexo.url,
+        tipo: anexo.tipo
+      })) || [];
+      
       atualizarObra(obraId, {
         codigoDaObra: values.codigoDaObra,
         nome: values.nome,
@@ -35,7 +42,7 @@ export default function EditarObraDialog({ open, onOpenChange, obraId }: EditarO
         status: values.status,
         nivelPBQPH: values.nivelPBQPH,
         documentos: values.documentos,
-        anexosObra: values.anexosObra,
+        anexosObra: anexosObra,
         responsavelEngenheiroNome: values.responsavelEngenheiroNome,
         responsavelEngenheiroEmail: values.responsavelEngenheiroEmail,
         responsavelEngenheiroTelefone: values.responsavelEngenheiroTelefone,

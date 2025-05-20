@@ -22,7 +22,7 @@ interface ObraFormProps {
 
 export default function ObraForm({ defaultValues, onSubmit, submitButtonText, isEdit = false }: ObraFormProps) {
   const { gerarCodigoObra } = useObras();
-  const [anexos, setAnexos] = useState<Array<{nome: string, url: string, tipo: string}>>(defaultValues?.anexosObra || []);
+  const [anexos, setAnexos] = useState<Array<{nome: string, url: string, tipo: string}>>((defaultValues?.anexosObra || []) as Array<{nome: string, url: string, tipo: string}>);
   
   // Generate a new code only for new obras
   const codigoObra = !isEdit ? gerarCodigoObra() : defaultValues?.codigoDaObra || "";

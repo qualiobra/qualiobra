@@ -19,6 +19,13 @@ export default function NovaObraDialog({ open, onOpenChange }: NovaObraDialogPro
     try {
       setIsSubmitting(true);
       
+      // Ensure all anexosObra items have required fields
+      const anexosObra = values.anexosObra?.map(anexo => ({
+        nome: anexo.nome,
+        url: anexo.url,
+        tipo: anexo.tipo
+      })) || [];
+      
       // Make sure all required properties are passed
       adicionarObra({
         codigoDaObra: values.codigoDaObra,
@@ -31,7 +38,7 @@ export default function NovaObraDialog({ open, onOpenChange }: NovaObraDialogPro
         status: values.status,
         nivelPBQPH: values.nivelPBQPH,
         documentos: values.documentos || [],
-        anexosObra: values.anexosObra || [],
+        anexosObra: anexosObra,
         responsavelEngenheiroNome: values.responsavelEngenheiroNome,
         responsavelEngenheiroEmail: values.responsavelEngenheiroEmail,
         responsavelEngenheiroTelefone: values.responsavelEngenheiroTelefone,
