@@ -1,4 +1,3 @@
-
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -11,7 +10,7 @@ import { useObras } from "@/hooks/useObras";
 import { useState } from "react";
 import { FileUp } from "lucide-react";
 import { obraFormSchema, type ObraFormValues } from "./ObraFormSchema";
-import { NivelPBQPH } from "@/context/ObrasContext";
+import { type NivelPBQPH } from "@/types/obra"; // Updated import to use the types file
 
 interface ObraFormProps {
   defaultValues?: Partial<ObraFormValues>;

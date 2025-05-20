@@ -16,6 +16,7 @@ type ObrasContextType = {
   getObrasDoUsuario: () => Obra[];
   // Função para gerar código único para obra
   gerarCodigoObra: () => string;
+  criarObra: (novaObra: Omit<Obra, "id">) => void; // Added to match the signature used in NovaObraDialog
 };
 
 // Criação do contexto
@@ -49,8 +50,8 @@ export const ObrasProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return `OBRA-${anoAtual}-${proximoNumero}`;
   };
 
-  // Adicionar nova obra
-  const adicionarObra = (obraData: Omit<Obra, "id" | "criadaEm" | "criadaPor">) => {
+  // Adicionar nova obra - renamed to criarObra to match the usage in NovaObraDialog
+  const criarObra = (obraData: Omit<Obra, "id">) => {
     if (!user) return;
     
     const novaObra: Obra = {
@@ -126,6 +127,9 @@ export const ObrasProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     );
   };
 
+  // Use adicionarObra as an alias for criarObra for backward compatibility
+  const adicionarObra = criarObra;
+
   return (
     <ObrasContext.Provider
       value={{
@@ -137,7 +141,8 @@ export const ObrasProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         atribuirUsuario,
         removerUsuario,
         getObrasDoUsuario,
-        gerarCodigoObra
+        gerarCodigoObra,
+        criarObra
       }}
     >
       {children}

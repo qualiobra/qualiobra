@@ -1,7 +1,7 @@
 
 import { FormControl, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { type ObraStatus } from "@/context/ObrasContext";
+import { type ObraStatus } from "@/types/obra"; // Updated import to use the types file
 import { Control } from "react-hook-form";
 import { type ObraFormValues } from "./ObraFormSchema";
 
