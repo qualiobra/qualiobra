@@ -12,7 +12,7 @@ import { type ObraFormValues } from "./ObraFormSchema";
 
 interface ObraDatePickerProps {
   control: Control<ObraFormValues>;
-  name: "dataInicio";
+  name: keyof Pick<ObraFormValues, "dataInicio" | "dataPrevistaTermino">;
   label: string;
 }
 
