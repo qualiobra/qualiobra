@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { Menu, User, Bell, Settings, LogOut, UserCog } from "lucide-react";
+import { Menu, User, Bell, Settings, LogOut, UserCog, Building } from "lucide-react";
 import { useUser, useClerk } from "@clerk/clerk-react";
 import { useUserRole } from "@/context/UserRoleContext";
 import { toast } from "@/hooks/use-toast";
@@ -59,6 +59,7 @@ const SiteHeader = () => {
             <Link to="/dashboard" className="text-gray-700 hover:text-primary font-medium">Dashboard</Link>
             <Link to="/inspections" className="text-gray-700 hover:text-primary font-medium">Inspeções</Link>
             <Link to="/team" className="text-gray-700 hover:text-primary font-medium">Equipe</Link>
+            <Link to="/obras" className="text-gray-700 hover:text-primary font-medium">Obras</Link>
             <Link to="/reports" className="text-gray-700 hover:text-primary font-medium">Relatórios</Link>
             {currentUserRole?.id === "admin" && (
               <Link to="/admin" className="text-gray-700 hover:text-primary font-medium">Administração</Link>
@@ -136,6 +137,9 @@ const SiteHeader = () => {
                 <DropdownMenuItem>
                   <Settings className="mr-2 h-4 w-4" /> Configurações
                 </DropdownMenuItem>
+                <DropdownMenuItem onClick={() => navigate("/obras")}>
+                  <Building className="mr-2 h-4 w-4" /> Minhas Obras
+                </DropdownMenuItem>
                 {currentUserRole?.id === "admin" && (
                   <DropdownMenuItem onClick={() => navigate("/admin")}>
                     <UserCog className="mr-2 h-4 w-4" /> Administração
@@ -165,6 +169,7 @@ const SiteHeader = () => {
               <Link to="/dashboard" className="px-4 py-2 hover:bg-gray-100 rounded-md">Dashboard</Link>
               <Link to="/inspections" className="px-4 py-2 hover:bg-gray-100 rounded-md">Inspeções</Link>
               <Link to="/team" className="px-4 py-2 hover:bg-gray-100 rounded-md">Equipe</Link>
+              <Link to="/obras" className="px-4 py-2 hover:bg-gray-100 rounded-md">Obras</Link>
               <Link to="/reports" className="px-4 py-2 hover:bg-gray-100 rounded-md">Relatórios</Link>
               {currentUserRole?.id === "admin" && (
                 <Link to="/admin" className="px-4 py-2 hover:bg-gray-100 rounded-md">Administração</Link>
