@@ -61,13 +61,17 @@ export function useDiagnosticoRespostas(totalQuestoes: number, nivel: NivelDiagn
       // Log para depuração
       console.log("Iniciando salvamento de respostas com usuário ID:", userId);
       
+      // Mapear valores do enum para os valores aceitos no banco de dados
+      const nivelNormalizado = getNivelNormalizado(nivel);
+      console.log("Nivel normalizado:", nivelNormalizado);
+      
       // Preparar os dados para inserção com formato simplificado
       const respostasArray = Object.entries(respostas).map(([id_questao, { pontuacao, observacao }]) => {
         const itemResposta = {
           id_resposta_diagnostico: uuidv4(),
           id_usuario_avaliador: userId, // Agora será tratado como texto
           id_questao_respondida: id_questao,
-          nivel_diagnostico_realizado: nivel,
+          nivel_diagnostico_realizado: nivelNormalizado,
           pontuacao_usuario: pontuacao,
           observacoes_usuario: observacao || null,
           data_hora_resposta: new Date().toISOString(),
@@ -103,6 +107,20 @@ export function useDiagnosticoRespostas(totalQuestoes: number, nivel: NivelDiagn
       });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  // Nova função para normalizar os valores do nível conforme esperado pelo banco de dados
+  const getNivelNormalizado = (nivel: NivelDiagnostico): string => {
+    switch (nivel) {
+      case "Nível A":
+        return "Nivel A";
+      case "Nível B":
+        return "Nivel B";
+      case "Ambos os Níveis":
+        return "Ambos os Niveis";
+      default:
+        return "Ambos os Niveis"; // Valor padrão seguro
     }
   };
 
