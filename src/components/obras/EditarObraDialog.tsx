@@ -1,3 +1,4 @@
+
 import React, { useEffect } from "react";
 import { useObras } from "@/hooks/useObras";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
@@ -44,6 +45,7 @@ interface EditarObraDialogProps {
 
 export function EditarObraDialog({ obraId, open, onOpenChange }: EditarObraDialogProps) {
   const { obras, atualizarObra } = useObras();
+  const obra = obras.find(o => o.id === obraId);
   
   const form = useForm<EditarObraFormValues>({
     resolver: zodResolver(formSchema),
