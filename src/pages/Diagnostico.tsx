@@ -27,35 +27,70 @@ const Diagnostico = () => {
       setIsLoading(true);
       setError(null);
 
-      const { data, error } = await supabase
+      // Consulta simplificada para buscar questões ativas do nível selecionado
+      const { data, error: fetchError } = await supabase
         .from("questoes_diagnostico")
         .select("*")
         .eq("ativa", true)
         .or(`nivel_aplicavel.eq.${nivelSelecionado},nivel_aplicavel.eq.Ambos os Níveis`)
         .order("ordem_exibicao", { ascending: true });
 
-      if (error) throw error;
-      
-      // Se temos um usuário autenticado, vamos buscar também as respostas anteriores
-      if (user) {
-        const questoesComRespostas = await obterQuestoesComRespostas(data as QuestoesDiagnostico[]);
-        setQuestoes(questoesComRespostas);
-      } else {
-        setQuestoes(data as QuestoesDiagnostico[]);
+      if (fetchError) {
+        console.error("Erro ao buscar questões:", fetchError);
+        throw new Error(`Erro ao buscar questões: ${fetchError.message}`);
       }
       
+      if (!data || data.length === 0) {
+        console.log("Nenhuma questão encontrada para o nível", nivelSelecionado);
+      } else {
+        console.log(`Encontradas ${data.length} questões para o nível ${nivelSelecionado}`);
+      }
+      
+      // Buscamos as respostas do usuário atual apenas se ele estiver autenticado
+      if (user && isSignedIn && data) {
+        try {
+          const { data: respostas, error: respostasError } = await supabase
+            .from('respostas_diagnostico_usuario')
+            .select('*')
+            .eq('id_usuario_avaliador', user.id)
+            .eq('nivel_diagnostico_realizado', nivelSelecionado);
+            
+          if (respostasError) {
+            console.warn("Erro ao buscar respostas do usuário:", respostasError);
+            // Continuamos mesmo se houver erro nas respostas
+          }
+          
+          if (respostas && respostas.length > 0) {
+            // Mapeamos as respostas para as questões
+            const questoesComRespostas = data.map(questao => {
+              const resposta = respostas.find(r => r.id_questao_respondida === questao.id_questao);
+              return resposta ? { ...questao, resposta } : questao;
+            });
+            setQuestoes(questoesComRespostas);
+          } else {
+            setQuestoes(data);
+          }
+        } catch (respostasErr) {
+          console.error("Erro ao processar respostas:", respostasErr);
+          setQuestoes(data);
+        }
+      } else {
+        // Se não estiver autenticado, apenas definimos as questões
+        setQuestoes(data || []);
+      }
     } catch (err: any) {
       console.error("Erro ao carregar questões:", err);
-      setError(err.message || "Erro ao carregar as questões do diagnóstico");
+      setError(err.message || "Não foi possível carregar as questões do diagnóstico.");
       toast({
         title: "Erro",
         description: "Não foi possível carregar as questões do diagnóstico.",
         variant: "destructive",
       });
+      setQuestoes([]);
     } finally {
       setIsLoading(false);
     }
-  }, [nivelSelecionado, user]);
+  }, [nivelSelecionado, user, isSignedIn]);
 
   useEffect(() => {
     if (tabAtiva === 'nivelB' || tabAtiva === 'nivelA') {
@@ -69,46 +104,6 @@ const Diagnostico = () => {
       setNivelSelecionado("Nível B");
     } else if (value === 'nivelA') {
       setNivelSelecionado("Nível A");
-    }
-  };
-
-  const obterQuestoesComRespostas = async (questoes: QuestoesDiagnostico[]): Promise<QuestoesDiagnostico[]> => {
-    if (!user) return questoes;
-    
-    try {
-      // Buscar a última resposta de cada questão para este usuário
-      const { data: respostas, error } = await supabase
-        .from('respostas_diagnostico_usuario')
-        .select('*')
-        .eq('id_usuario_avaliador', user.id)
-        .eq('nivel_diagnostico_realizado', nivelSelecionado === 'Ambos os Níveis' ? 'Nível B' : nivelSelecionado);
-        
-      if (error) throw error;
-
-      if (respostas && respostas.length > 0) {
-        // Criar um mapa de respostas por ID de questão para obter a resposta mais recente
-        const mapaRespostas: Record<string, any> = {};
-        
-        respostas.forEach(resposta => {
-          const idQuestao = resposta.id_questao_respondida;
-          
-          // Verificar se já temos uma resposta para esta questão ou se esta é mais recente
-          if (!mapaRespostas[idQuestao] || new Date(resposta.data_hora_resposta) > new Date(mapaRespostas[idQuestao].data_hora_resposta)) {
-            mapaRespostas[idQuestao] = resposta;
-          }
-        });
-        
-        // Associar as respostas às questões
-        return questoes.map(questao => ({
-          ...questao,
-          resposta: mapaRespostas[questao.id_questao]
-        }));
-      }
-      
-      return questoes;
-    } catch (err) {
-      console.error("Erro ao buscar respostas:", err);
-      return questoes;
     }
   };
 
