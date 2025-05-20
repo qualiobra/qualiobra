@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { SignedIn, SignedOut, SignIn, SignUp, ClerkLoaded, ClerkLoading } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading } from "@clerk/clerk-react";
 import { UserRoleProvider } from "./context/UserRoleContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -18,7 +18,9 @@ import AdminPanel from "./pages/admin/AdminPanel";
 import Reports from "./pages/Reports";
 import UserLayout from "./components/layout/UserLayout";
 import { Loader2 } from "lucide-react";
+import React from "react";
 
+// Moved queryClient outside the component
 const queryClient = new QueryClient();
 
 // Componente para rota protegida
@@ -44,52 +46,60 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-const App = () => (
-  <QueryClientProvider client={queryClient}>
+// Separando a estrutura da aplicação em um componente próprio
+const AppRoutes = () => (
+  <UserRoleProvider>
     <TooltipProvider>
-      <UserRoleProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Rotas públicas */}
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={
-              <SignedOut>
-                <Login />
-              </SignedOut>
-            } />
-            <Route path="/register" element={
-              <SignedOut>
-                <Register />
-              </SignedOut>
-            } />
-            <Route path="/forgot-password" element={
-              <SignedOut>
-                <ForgotPassword />
-              </SignedOut>
-            } />
-            
-            {/* Rotas protegidas */}
-            <Route element={
-              <ProtectedRoute>
-                <UserLayout />
-              </ProtectedRoute>
-            }>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/inspections" element={<Inspections />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/admin" element={<AdminPanel />} />
-            </Route>
-            
-            {/* Rota de fallback para página não encontrada */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </UserRoleProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          {/* Rotas públicas */}
+          <Route path="/" element={<Index />} />
+          <Route path="/login" element={
+            <SignedOut>
+              <Login />
+            </SignedOut>
+          } />
+          <Route path="/register" element={
+            <SignedOut>
+              <Register />
+            </SignedOut>
+          } />
+          <Route path="/forgot-password" element={
+            <SignedOut>
+              <ForgotPassword />
+            </SignedOut>
+          } />
+          
+          {/* Rotas protegidas */}
+          <Route element={
+            <ProtectedRoute>
+              <UserLayout />
+            </ProtectedRoute>
+          }>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/inspections" element={<Inspections />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/admin" element={<AdminPanel />} />
+          </Route>
+          
+          {/* Rota de fallback para página não encontrada */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
     </TooltipProvider>
-  </QueryClientProvider>
+  </UserRoleProvider>
+);
+
+// Componente App principal com o QueryClientProvider como wrapper mais externo
+const App = () => (
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <AppRoutes />
+    </QueryClientProvider>
+  </React.StrictMode>
 );
 
 export default App;
