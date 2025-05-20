@@ -67,6 +67,7 @@ const Register = () => {
     try {
       setIsLoading(true);
       
+      // Criando usuário usando os campos corretos para o Clerk
       const result = await signUp.create({
         firstName,
         lastName,
@@ -74,6 +75,7 @@ const Register = () => {
         password,
       });
 
+      // Preparando para verificação de e-mail
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       
       toast({
@@ -86,22 +88,33 @@ const Register = () => {
         navigate("/dashboard");
       } else {
         // Verificação de e-mail necessária
-        // Em um caso real, seria redirecionado para uma página de verificação
-        // por simplicidade, vamos apenas navegar para o dashboard
+        // Por simplicidade, navegamos para o dashboard
         navigate("/dashboard");
       }
     } catch (err: any) {
       console.error("Erro no cadastro:", err);
-      const errorMessage = err.errors?.[0]?.message || "Ocorreu um erro durante o cadastro";
       
-      if (errorMessage.includes("password")) {
-        setPasswordError(errorMessage);
-      } else if (errorMessage.includes("email")) {
-        setEmailError(errorMessage);
+      // Tratamento de erros mais específicos do Clerk
+      if (err.errors && err.errors.length > 0) {
+        err.errors.forEach((error: any) => {
+          const errorMsg = error.longMessage || error.message;
+          
+          if (error.meta?.paramName === "password") {
+            setPasswordError(errorMsg);
+          } else if (error.meta?.paramName === "emailAddress" || errorMsg.includes("email")) {
+            setEmailError(errorMsg);
+          } else {
+            toast({
+              title: "Erro no cadastro",
+              description: errorMsg,
+              variant: "destructive",
+            });
+          }
+        });
       } else {
         toast({
           title: "Erro no cadastro",
-          description: errorMessage,
+          description: err.message || "Ocorreu um erro durante o cadastro",
           variant: "destructive",
         });
       }
