@@ -9,7 +9,48 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      questoes_diagnostico: {
+        Row: {
+          ativa: boolean
+          created_at: string
+          descricao_questao: string
+          id_questao: string
+          item_requisito: string
+          nivel_aplicavel: string
+          ordem_exibicao: number
+          referencial_normativo: string
+          tipo_pontuacao: string
+          titulo_requisito: string
+          updated_at: string
+        }
+        Insert: {
+          ativa?: boolean
+          created_at?: string
+          descricao_questao: string
+          id_questao?: string
+          item_requisito: string
+          nivel_aplicavel: string
+          ordem_exibicao: number
+          referencial_normativo?: string
+          tipo_pontuacao?: string
+          titulo_requisito: string
+          updated_at?: string
+        }
+        Update: {
+          ativa?: boolean
+          created_at?: string
+          descricao_questao?: string
+          id_questao?: string
+          item_requisito?: string
+          nivel_aplicavel?: string
+          ordem_exibicao?: number
+          referencial_normativo?: string
+          tipo_pontuacao?: string
+          titulo_requisito?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

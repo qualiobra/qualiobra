@@ -12,6 +12,7 @@ import Dashboard from "./pages/Dashboard";
 import Inspections from "./pages/Inspections";
 import Team from "./pages/Team";
 import Obras from "./pages/Obras";
+import Diagnostico from "./pages/Diagnostico";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -92,6 +93,7 @@ const AppRoutes = () => (
               <Route path="/inspections" element={<Inspections />} />
               <Route path="/team" element={<Team />} />
               <Route path="/obras" element={<Obras />} />
+              <Route path="/diagnostico" element={<Diagnostico />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/admin/users" element={<UserManagement />} />

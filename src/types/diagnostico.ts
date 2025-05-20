@@ -1,42 +1,40 @@
 
-/**
- * Calcula o percentual de conformidade baseado nas respostas do diagnóstico
- * 
- * @param totalQuestoesAplicaveis Total de questões aplicáveis (excluindo "Não se Aplica")
- * @param atendeTotalmente Número de questões que atendem totalmente
- * @param atendeParcialmente Número de questões que atendem parcialmente
- * @returns Percentual de conformidade (0-100)
- */
-export const calcularPercentualConformidade = (
-  totalQuestoesAplicaveis: number,
-  atendeTotalmente: number,
-  atendeParcialmente: number
-): number => {
-  if (totalQuestoesAplicaveis === 0) return 0;
-  
-  // Atende parcialmente conta como 50% de conformidade
-  const pontuacao = atendeTotalmente + (atendeParcialmente * 0.5);
-  return (pontuacao / totalQuestoesAplicaveis) * 100;
-};
-
-/**
- * Interface para resposta do diagnóstico
- */
-export interface RespostaDiagnostico {
-  IDQuestaoRespondida: string;
-  RespostaUsuario: string;
-  JustificativaEvidencias: string;
+export interface QuestoesDiagnostico {
+  id_questao: string;
+  referencial_normativo: string;
+  nivel_aplicavel: 'Nível B' | 'Nível A' | 'Ambos os Níveis';
+  item_requisito: string;
+  titulo_requisito: string;
+  descricao_questao: string;
+  tipo_pontuacao: 'Escala 1-5' | 'Sim/Não (1 ou 5)';
+  ordem_exibicao: number;
+  ativa: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
-/**
- * Interface para questão do diagnóstico
- */
-export interface QuestaoDiagnostico {
-  IDQuestao: string;
-  DescricaoQuestao: string;
-  CapituloRequisito: string;
-  NivelAplicavel: string;
-  OrdemExibicao: number;
-  ExigenciaNivelA?: string;
-  ExigenciaNivelB?: string;
+export interface RespostaDiagnostico {
+  id_resposta?: string;
+  id_questao: string;
+  id_obra: string;
+  id_usuario: string;
+  pontuacao: number;
+  observacao?: string;
+  evidencia?: string;
+  data_resposta: string;
+}
+
+export interface DiagnosticoComResposta extends QuestoesDiagnostico {
+  resposta?: RespostaDiagnostico;
+}
+
+export type NivelDiagnostico = 'Nível B' | 'Nível A' | 'Ambos os Níveis';
+
+export interface ResultadoDiagnostico {
+  pontuacaoTotal: number;
+  quantidadeQuestoes: number;
+  pontuacaoMedia: number;
+  percentualConformidade: number;
+  questoesComResposta: number;
+  questoesPendentes: number;
 }
