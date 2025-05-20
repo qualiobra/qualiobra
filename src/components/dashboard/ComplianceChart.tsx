@@ -3,12 +3,12 @@ import { Bar, BarChart, CartesianGrid, Legend, ResponsiveContainer, Tooltip, XAx
 
 // Sample data
 const data = [
-  { month: 'Jan', "Structure": 86, "Electrical": 92, "Plumbing": 78, "Finishing": 88 },
-  { month: 'Feb', "Structure": 82, "Electrical": 87, "Plumbing": 81, "Finishing": 90 },
-  { month: 'Mar', "Structure": 89, "Electrical": 91, "Plumbing": 85, "Finishing": 92 },
-  { month: 'Apr', "Structure": 87, "Electrical": 89, "Plumbing": 90, "Finishing": 87 },
-  { month: 'May', "Structure": 91, "Electrical": 94, "Plumbing": 88, "Finishing": 89 },
-  { month: 'Jun', "Structure": 93, "Electrical": 90, "Plumbing": 84, "Finishing": 91 },
+  { month: 'Jan', "Estrutura": 86, "Elétrico": 92, "Hidráulico": 78, "Acabamento": 88 },
+  { month: 'Fev', "Estrutura": 82, "Elétrico": 87, "Hidráulico": 81, "Acabamento": 90 },
+  { month: 'Mar', "Estrutura": 89, "Elétrico": 91, "Hidráulico": 85, "Acabamento": 92 },
+  { month: 'Abr', "Estrutura": 87, "Elétrico": 89, "Hidráulico": 90, "Acabamento": 87 },
+  { month: 'Mai', "Estrutura": 91, "Elétrico": 94, "Hidráulico": 88, "Acabamento": 89 },
+  { month: 'Jun', "Estrutura": 93, "Elétrico": 90, "Hidráulico": 84, "Acabamento": 91 },
 ];
 
 const ComplianceChart = () => {
@@ -29,10 +29,10 @@ const ComplianceChart = () => {
           }}
         />
         <Legend />
-        <Bar dataKey="Structure" fill="#9b87f5" radius={[4, 4, 0, 0]} barSize={20} />
-        <Bar dataKey="Electrical" fill="#7E69AB" radius={[4, 4, 0, 0]} barSize={20} />
-        <Bar dataKey="Plumbing" fill="#D6BCFA" radius={[4, 4, 0, 0]} barSize={20} />
-        <Bar dataKey="Finishing" fill="#1EAEDB" radius={[4, 4, 0, 0]} barSize={20} />
+        <Bar dataKey="Estrutura" fill="#9b87f5" radius={[4, 4, 0, 0]} barSize={20} />
+        <Bar dataKey="Elétrico" fill="#7E69AB" radius={[4, 4, 0, 0]} barSize={20} />
+        <Bar dataKey="Hidráulico" fill="#D6BCFA" radius={[4, 4, 0, 0]} barSize={20} />
+        <Bar dataKey="Acabamento" fill="#1EAEDB" radius={[4, 4, 0, 0]} barSize={20} />
       </BarChart>
     </ResponsiveContainer>
   );

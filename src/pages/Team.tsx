@@ -14,11 +14,11 @@ const teamMembers = [
   {
     id: 1,
     name: "João Silva",
-    role: "Site Engineer",
+    role: "Engenheiro de Obra",
     avatar: "",
     initials: "JS",
     points: 1250,
-    badges: ["Quality Champion", "Safety First", "Team Player"],
+    badges: ["Campeão de Qualidade", "Segurança em Primeiro", "Jogador de Equipe"],
     stats: {
       inspectionsCompleted: 45,
       complianceRate: 94,
@@ -28,11 +28,11 @@ const teamMembers = [
   {
     id: 2,
     name: "Maria Oliveira",
-    role: "Quality Inspector",
+    role: "Inspetora de Qualidade",
     avatar: "",
     initials: "MO",
     points: 980,
-    badges: ["Detail Master", "Documentation Pro"],
+    badges: ["Mestre de Detalhes", "Especialista em Documentação"],
     stats: {
       inspectionsCompleted: 37,
       complianceRate: 91,
@@ -42,11 +42,11 @@ const teamMembers = [
   {
     id: 3,
     name: "Carlos Santos",
-    role: "Project Manager",
+    role: "Gerente de Projeto",
     avatar: "",
     initials: "CS",
     points: 875,
-    badges: ["Leadership", "Communication Star"],
+    badges: ["Liderança", "Estrela de Comunicação"],
     stats: {
       inspectionsCompleted: 22,
       complianceRate: 88,
@@ -56,11 +56,11 @@ const teamMembers = [
   {
     id: 4,
     name: "Ana Pereira",
-    role: "Quality Inspector",
+    role: "Inspetora de Qualidade",
     avatar: "",
     initials: "AP",
     points: 760,
-    badges: ["Rising Star", "Detail Master"],
+    badges: ["Estrela em Ascensão", "Mestre de Detalhes"],
     stats: {
       inspectionsCompleted: 29,
       complianceRate: 86,
@@ -70,11 +70,11 @@ const teamMembers = [
   {
     id: 5,
     name: "Roberto Costa",
-    role: "Site Engineer",
+    role: "Engenheiro de Obra",
     avatar: "",
     initials: "RC",
     points: 640,
-    badges: ["Team Player"],
+    badges: ["Jogador de Equipe"],
     stats: {
       inspectionsCompleted: 18,
       complianceRate: 83,
@@ -85,10 +85,10 @@ const teamMembers = [
 
 // Sample data for team achievements
 const teamAchievements = [
-  { id: 1, title: "100 Inspections Milestone", date: "2023-05-10", points: 500 },
-  { id: 2, title: "90% Overall Compliance", date: "2023-04-15", points: 300 },
-  { id: 3, title: "Zero Accidents Month", date: "2023-03-31", points: 400 },
-  { id: 4, title: "Project Delivery - Ahead of Schedule", date: "2023-02-28", points: 350 },
+  { id: 1, title: "Marco de 100 Inspeções", date: "2023-05-10", points: 500 },
+  { id: 2, title: "90% de Conformidade Geral", date: "2023-04-15", points: 300 },
+  { id: 3, title: "Mês sem Acidentes", date: "2023-03-31", points: 400 },
+  { id: 4, title: "Entrega do Projeto - Antes do Prazo", date: "2023-02-28", points: 350 },
 ];
 
 const Team = () => {
@@ -101,15 +101,15 @@ const Team = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Team Engagement</h1>
-          <p className="text-gray-600">Track performance, achievements, and rewards for your quality management team</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Engajamento da Equipe</h1>
+          <p className="text-gray-600">Acompanhe desempenho, conquistas e recompensas para sua equipe de gestão de qualidade</p>
         </div>
         
         {/* Team Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Total Team Members</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-500">Total de Membros</CardTitle>
             </CardHeader>
             <CardContent className="pt-2">
               <div className="flex items-center">
@@ -120,18 +120,18 @@ const Team = () => {
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Team Points</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-500">Pontos da Equipe</CardTitle>
             </CardHeader>
             <CardContent className="pt-2">
               <div className="flex items-center">
                 <Star className="h-5 w-5 text-amber-500 mr-2" />
-                <span className="text-3xl font-bold">4,350</span>
+                <span className="text-3xl font-bold">4.350</span>
               </div>
             </CardContent>
           </Card>
           <Card>
             <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-gray-500">Average Compliance</CardTitle>
+              <CardTitle className="text-sm font-medium text-gray-500">Conformidade Média</CardTitle>
             </CardHeader>
             <CardContent className="pt-2">
               <div className="flex items-center">
@@ -146,13 +146,13 @@ const Team = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
           <TabsList className="grid grid-cols-3 w-[400px]">
             <TabsTrigger value="leaderboard">
-              <Award className="mr-2 h-4 w-4" /> Leaderboard
+              <Award className="mr-2 h-4 w-4" /> Classificação
             </TabsTrigger>
             <TabsTrigger value="members">
-              <Users className="mr-2 h-4 w-4" /> Members
+              <Users className="mr-2 h-4 w-4" /> Membros
             </TabsTrigger>
             <TabsTrigger value="achievements">
-              <Star className="mr-2 h-4 w-4" /> Achievements
+              <Star className="mr-2 h-4 w-4" /> Conquistas
             </TabsTrigger>
           </TabsList>
 
@@ -160,8 +160,8 @@ const Team = () => {
           <TabsContent value="leaderboard" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Points Leaderboard</CardTitle>
-                <CardDescription>Top performers ranked by quality management points</CardDescription>
+                <CardTitle>Classificação por Pontos</CardTitle>
+                <CardDescription>Melhores profissionais classificados por pontos de gestão de qualidade</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
@@ -197,8 +197,8 @@ const Team = () => {
             
             <Card>
               <CardHeader>
-                <CardTitle>Badge Showcase</CardTitle>
-                <CardDescription>Special recognitions awarded to team members</CardDescription>
+                <CardTitle>Mostruário de Medalhas</CardTitle>
+                <CardDescription>Reconhecimentos especiais concedidos aos membros da equipe</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
@@ -206,45 +206,45 @@ const Team = () => {
                     <div className="flex justify-center mb-2">
                       <Award className="h-8 w-8 text-amber-500" />
                     </div>
-                    <h3 className="font-semibold">Quality Champion</h3>
+                    <h3 className="font-semibold">Campeão de Qualidade</h3>
                     <p className="text-xs text-gray-500 mt-1">
-                      Awarded for maintaining 95%+ compliance
+                      Concedido por manter conformidade acima de 95%
                     </p>
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <div className="flex justify-center mb-2">
                       <Award className="h-8 w-8 text-blue-500" />
                     </div>
-                    <h3 className="font-semibold">Safety First</h3>
+                    <h3 className="font-semibold">Segurança em Primeiro</h3>
                     <p className="text-xs text-gray-500 mt-1">
-                      Zero safety incidents for 3+ months
+                      Zero incidentes de segurança por mais de 3 meses
                     </p>
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <div className="flex justify-center mb-2">
                       <Award className="h-8 w-8 text-purple-500" />
                     </div>
-                    <h3 className="font-semibold">Team Player</h3>
+                    <h3 className="font-semibold">Jogador de Equipe</h3>
                     <p className="text-xs text-gray-500 mt-1">
-                      Recognized for collaboration excellence
+                      Reconhecido por excelência em colaboração
                     </p>
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <div className="flex justify-center mb-2">
                       <Award className="h-8 w-8 text-green-500" />
                     </div>
-                    <h3 className="font-semibold">Detail Master</h3>
+                    <h3 className="font-semibold">Mestre de Detalhes</h3>
                     <p className="text-xs text-gray-500 mt-1">
-                      Thorough documentation and quality checks
+                      Documentação minuciosa e verificações de qualidade
                     </p>
                   </div>
                   <div className="p-4 border rounded-lg text-center">
                     <div className="flex justify-center mb-2">
                       <Award className="h-8 w-8 text-red-500" />
                     </div>
-                    <h3 className="font-semibold">Rising Star</h3>
+                    <h3 className="font-semibold">Estrela em Ascensão</h3>
                     <p className="text-xs text-gray-500 mt-1">
-                      Most improved team member
+                      Membro da equipe com maior melhoria
                     </p>
                   </div>
                 </div>
@@ -277,7 +277,7 @@ const Team = () => {
                   </CardHeader>
                   <CardContent>
                     <div className="mb-4">
-                      <h4 className="text-sm font-medium mb-2">Badges</h4>
+                      <h4 className="text-sm font-medium mb-2">Medalhas</h4>
                       <div className="flex flex-wrap gap-2">
                         {member.badges.map((badge, index) => (
                           <Badge key={index} variant="secondary">{badge}</Badge>
@@ -285,19 +285,19 @@ const Team = () => {
                       </div>
                     </div>
                     <div>
-                      <h4 className="text-sm font-medium mb-2">Statistics</h4>
+                      <h4 className="text-sm font-medium mb-2">Estatísticas</h4>
                       <div className="grid grid-cols-3 gap-4 text-center">
                         <div className="p-2 bg-gray-50 rounded-md">
                           <p className="text-lg font-semibold">{member.stats.inspectionsCompleted}</p>
-                          <p className="text-xs text-gray-500">Inspections</p>
+                          <p className="text-xs text-gray-500">Inspeções</p>
                         </div>
                         <div className="p-2 bg-gray-50 rounded-md">
                           <p className="text-lg font-semibold">{member.stats.complianceRate}%</p>
-                          <p className="text-xs text-gray-500">Compliance</p>
+                          <p className="text-xs text-gray-500">Conformidade</p>
                         </div>
                         <div className="p-2 bg-gray-50 rounded-md">
                           <p className="text-lg font-semibold">{member.stats.issuesResolved}</p>
-                          <p className="text-xs text-gray-500">Issues Resolved</p>
+                          <p className="text-xs text-gray-500">Problemas Resolvidos</p>
                         </div>
                       </div>
                     </div>
@@ -311,8 +311,8 @@ const Team = () => {
           <TabsContent value="achievements" className="space-y-6">
             <Card>
               <CardHeader>
-                <CardTitle>Team Achievements</CardTitle>
-                <CardDescription>Recent accomplishments and milestones</CardDescription>
+                <CardTitle>Conquistas da Equipe</CardTitle>
+                <CardDescription>Realizações e marcos recentes</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="space-y-6">
@@ -327,7 +327,7 @@ const Team = () => {
                           <Badge variant="outline">+{achievement.points} pts</Badge>
                         </div>
                         <p className="text-sm text-gray-500">
-                          Achieved on {new Date(achievement.date).toLocaleDateString()}
+                          Alcançado em {new Date(achievement.date).toLocaleDateString()}
                         </p>
                       </div>
                     </div>
@@ -338,53 +338,53 @@ const Team = () => {
             
             <Card>
               <CardHeader>
-                <CardTitle>Available Rewards</CardTitle>
-                <CardDescription>Rewards that can be redeemed with team points</CardDescription>
+                <CardTitle>Recompensas Disponíveis</CardTitle>
+                <CardDescription>Recompensas que podem ser resgatadas com pontos da equipe</CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                   <div className="border rounded-lg overflow-hidden">
                     <div className="bg-gray-100 p-4 text-center">
                       <Award className="h-8 w-8 mx-auto text-primary mb-2" />
-                      <h3 className="font-semibold">Team Lunch</h3>
+                      <h3 className="font-semibold">Almoço em Equipe</h3>
                     </div>
                     <div className="p-4">
                       <p className="text-sm text-gray-500 mb-4">
-                        Treat your team to lunch at a restaurant of choice
+                        Ofereça à sua equipe um almoço em um restaurante à escolha
                       </p>
                       <div className="flex justify-between items-center">
-                        <span className="font-medium text-primary">1000 points</span>
-                        <Button size="sm">Redeem</Button>
+                        <span className="font-medium text-primary">1000 pontos</span>
+                        <Button size="sm">Resgatar</Button>
                       </div>
                     </div>
                   </div>
                   <div className="border rounded-lg overflow-hidden">
                     <div className="bg-gray-100 p-4 text-center">
                       <Award className="h-8 w-8 mx-auto text-primary mb-2" />
-                      <h3 className="font-semibold">Professional Development</h3>
+                      <h3 className="font-semibold">Desenvolvimento Profissional</h3>
                     </div>
                     <div className="p-4">
                       <p className="text-sm text-gray-500 mb-4">
-                        Training course or workshop of your choice
+                        Curso de treinamento ou workshop de sua escolha
                       </p>
                       <div className="flex justify-between items-center">
-                        <span className="font-medium text-primary">2000 points</span>
-                        <Button size="sm">Redeem</Button>
+                        <span className="font-medium text-primary">2000 pontos</span>
+                        <Button size="sm">Resgatar</Button>
                       </div>
                     </div>
                   </div>
                   <div className="border rounded-lg overflow-hidden">
                     <div className="bg-gray-100 p-4 text-center">
                       <Award className="h-8 w-8 mx-auto text-primary mb-2" />
-                      <h3 className="font-semibold">Extra Day Off</h3>
+                      <h3 className="font-semibold">Dia de Folga Extra</h3>
                     </div>
                     <div className="p-4">
                       <p className="text-sm text-gray-500 mb-4">
-                        Enjoy an extra paid day off work
+                        Aproveite um dia adicional de folga remunerada
                       </p>
                       <div className="flex justify-between items-center">
-                        <span className="font-medium text-primary">3000 points</span>
-                        <Button size="sm">Redeem</Button>
+                        <span className="font-medium text-primary">3000 pontos</span>
+                        <Button size="sm">Resgatar</Button>
                       </div>
                     </div>
                   </div>

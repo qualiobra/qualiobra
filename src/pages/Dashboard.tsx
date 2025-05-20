@@ -23,20 +23,20 @@ const Dashboard = () => {
       <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
-            <DialogTitle>Welcome to QualiObra Dashboard</DialogTitle>
+            <DialogTitle>Bem-vindo ao Dashboard QualiObra</DialogTitle>
             <DialogDescription>
-              Here you can monitor quality metrics, track inspections, and manage your teams across all construction sites.
+              Aqui você pode monitorar métricas de qualidade, acompanhar inspeções e gerenciar suas equipes em todos os canteiros de obras.
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
-            <p>New features available:</p>
+            <p>Novos recursos disponíveis:</p>
             <ul className="list-disc list-inside space-y-1">
-              <li>Improved inspection forms with photo upload capability</li>
-              <li>WhatsApp notifications for urgent non-conformities</li>
-              <li>Team performance metrics and leaderboards</li>
+              <li>Formulários de inspeção aprimorados com capacidade de upload de fotos</li>
+              <li>Notificações por WhatsApp para não-conformidades urgentes</li>
+              <li>Métricas de desempenho da equipe e rankings</li>
             </ul>
             <Button onClick={() => setShowWelcome(false)} className="w-full">
-              Get Started
+              Começar
             </Button>
           </div>
         </DialogContent>
@@ -45,24 +45,24 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Page Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Quality Dashboard</h1>
-          <p className="text-gray-600">Monitor quality metrics across all your construction projects</p>
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard de Qualidade</h1>
+          <p className="text-gray-600">Monitore métricas de qualidade em todos os seus projetos de construção</p>
         </div>
         
         {/* Dashboard Tabs */}
         <Tabs value={selectedTab} onValueChange={setSelectedTab} className="mb-8">
           <TabsList className="grid grid-cols-4 md:w-[600px]">
             <TabsTrigger value="overview">
-              <Gauge className="mr-2 h-4 w-4" /> Overview
+              <Gauge className="mr-2 h-4 w-4" /> Visão Geral
             </TabsTrigger>
             <TabsTrigger value="inspections">
-              <ClipboardCheck className="mr-2 h-4 w-4" /> Inspections
+              <ClipboardCheck className="mr-2 h-4 w-4" /> Inspeções
             </TabsTrigger>
             <TabsTrigger value="team">
-              <Users className="mr-2 h-4 w-4" /> Team
+              <Users className="mr-2 h-4 w-4" /> Equipe
             </TabsTrigger>
             <TabsTrigger value="notifications">
-              <Bell className="mr-2 h-4 w-4" /> Notifications
+              <Bell className="mr-2 h-4 w-4" /> Notificações
             </TabsTrigger>
           </TabsList>
 
@@ -72,7 +72,7 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">Total Inspections</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-500">Total de Inspeções</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
@@ -86,7 +86,7 @@ const Dashboard = () => {
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">Compliance Rate</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-500">Taxa de Conformidade</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
@@ -100,7 +100,7 @@ const Dashboard = () => {
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">Non-Conformities</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-500">Não-Conformidades</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
@@ -114,7 +114,7 @@ const Dashboard = () => {
               </Card>
               <Card>
                 <CardHeader className="pb-2">
-                  <CardTitle className="text-sm font-medium text-gray-500">Pending Tasks</CardTitle>
+                  <CardTitle className="text-sm font-medium text-gray-500">Tarefas Pendentes</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="flex items-center justify-between">
@@ -132,8 +132,8 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card className="col-span-1">
                 <CardHeader>
-                  <CardTitle>Compliance Metrics</CardTitle>
-                  <CardDescription>Monthly compliance by category</CardDescription>
+                  <CardTitle>Métricas de Conformidade</CardTitle>
+                  <CardDescription>Conformidade mensal por categoria</CardDescription>
                 </CardHeader>
                 <CardContent className="h-[300px]">
                   <ComplianceChart />
@@ -141,8 +141,8 @@ const Dashboard = () => {
               </Card>
               <Card className="col-span-1">
                 <CardHeader>
-                  <CardTitle>Non-Conformities</CardTitle>
-                  <CardDescription>Issues by severity and status</CardDescription>
+                  <CardTitle>Não-Conformidades</CardTitle>
+                  <CardDescription>Problemas por gravidade e status</CardDescription>
                 </CardHeader>
                 <CardContent className="h-[300px]">
                   <NonConformitiesChart />
@@ -154,8 +154,8 @@ const Dashboard = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <Card className="col-span-1">
                 <CardHeader>
-                  <CardTitle>Recent Inspections</CardTitle>
-                  <CardDescription>Last 5 inspections across all sites</CardDescription>
+                  <CardTitle>Inspeções Recentes</CardTitle>
+                  <CardDescription>Últimas 5 inspeções em todos os canteiros</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <RecentInspections />
@@ -163,8 +163,8 @@ const Dashboard = () => {
               </Card>
               <Card className="col-span-1">
                 <CardHeader>
-                  <CardTitle>Pending Tasks</CardTitle>
-                  <CardDescription>Tasks requiring attention</CardDescription>
+                  <CardTitle>Tarefas Pendentes</CardTitle>
+                  <CardDescription>Tarefas que requerem atenção</CardDescription>
                 </CardHeader>
                 <CardContent>
                   <PendingTasks />
@@ -177,11 +177,11 @@ const Dashboard = () => {
           <TabsContent value="inspections">
             <Card>
               <CardHeader>
-                <CardTitle>Inspections</CardTitle>
-                <CardDescription>Manage all inspection forms and reports</CardDescription>
+                <CardTitle>Inspeções</CardTitle>
+                <CardDescription>Gerencie todos os formulários e relatórios de inspeção</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Inspection content will be displayed here...</p>
+                <p>O conteúdo das inspeções será exibido aqui...</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -190,11 +190,11 @@ const Dashboard = () => {
           <TabsContent value="team">
             <Card>
               <CardHeader>
-                <CardTitle>Team Performance</CardTitle>
-                <CardDescription>View team statistics and leaderboards</CardDescription>
+                <CardTitle>Desempenho da Equipe</CardTitle>
+                <CardDescription>Visualize estatísticas da equipe e classificações</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Team performance content will be displayed here...</p>
+                <p>O conteúdo de desempenho da equipe será exibido aqui...</p>
               </CardContent>
             </Card>
           </TabsContent>
@@ -203,11 +203,11 @@ const Dashboard = () => {
           <TabsContent value="notifications">
             <Card>
               <CardHeader>
-                <CardTitle>Notifications</CardTitle>
-                <CardDescription>Configure alerts and notification preferences</CardDescription>
+                <CardTitle>Notificações</CardTitle>
+                <CardDescription>Configure alertas e preferências de notificação</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Notification settings will be displayed here...</p>
+                <p>As configurações de notificação serão exibidas aqui...</p>
               </CardContent>
             </Card>
           </TabsContent>

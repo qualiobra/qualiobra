@@ -7,8 +7,8 @@ import { Link } from "react-router-dom";
 const Index = () => {
   const handleDemoClick = () => {
     toast({
-      title: "Demo Started",
-      description: "Welcome to QualiObra! Explore the features of our platform.",
+      title: "Demo Iniciada",
+      description: "Bem-vindo ao QualiObra! Explore as funcionalidades da nossa plataforma.",
     });
   };
 
@@ -24,12 +24,12 @@ const Index = () => {
             <h1 className="text-2xl font-bold text-gray-900">QualiObra</h1>
           </div>
           <nav className="hidden md:flex space-x-6">
-            <Link to="/" className="text-gray-700 hover:text-primary font-medium">Home</Link>
+            <Link to="/" className="text-gray-700 hover:text-primary font-medium">Início</Link>
             <Link to="/dashboard" className="text-gray-700 hover:text-primary font-medium">Dashboard</Link>
-            <Link to="/inspections" className="text-gray-700 hover:text-primary font-medium">Inspections</Link>
-            <Link to="/team" className="text-gray-700 hover:text-primary font-medium">Team</Link>
+            <Link to="/inspections" className="text-gray-700 hover:text-primary font-medium">Inspeções</Link>
+            <Link to="/team" className="text-gray-700 hover:text-primary font-medium">Equipe</Link>
           </nav>
-          <Button onClick={handleDemoClick}>Try Demo</Button>
+          <Button onClick={handleDemoClick}>Experimente Demo</Button>
         </div>
       </header>
 
@@ -38,19 +38,19 @@ const Index = () => {
         <div className="grid md:grid-cols-2 gap-12 items-center">
           <div>
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 leading-tight mb-6">
-              Simplify Construction Quality Management
+              Simplifique a Gestão de Qualidade na Construção
             </h2>
             <p className="text-lg text-gray-700 mb-8">
-              QualiObra helps construction teams automate inspections, track compliance, 
-              and engage team members while meeting ISO and PBQP-H standards.
+              O QualiObra ajuda equipes de construção a automatizar inspeções, monitorar conformidade
+              e engajar membros da equipe enquanto atende aos padrões ISO e PBQP-H.
             </p>
             <div className="flex flex-col sm:flex-row gap-4">
               <Button size="lg" className="font-medium">
-                Get Started <ArrowRight className="ml-2" size={18} />
+                Começar Agora <ArrowRight className="ml-2" size={18} />
               </Button>
               <Link to="/dashboard">
                 <Button variant="outline" size="lg" className="font-medium">
-                  View Demo Dashboard
+                  Ver Dashboard Demo
                 </Button>
               </Link>
             </div>
@@ -58,7 +58,7 @@ const Index = () => {
           <div className="bg-white p-6 rounded-xl shadow-lg">
             <img 
               src="https://images.unsplash.com/photo-1541888946425-d81bb19240f5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2670&q=80" 
-              alt="Construction site" 
+              alt="Canteiro de obras" 
               className="rounded-lg w-full h-auto"
             />
           </div>
@@ -68,37 +68,37 @@ const Index = () => {
       {/* Features Section */}
       <section className="bg-white py-16">
         <div className="container mx-auto px-4">
-          <h3 className="text-3xl font-bold text-center mb-12">Key Features</h3>
+          <h3 className="text-3xl font-bold text-center mb-12">Principais Recursos</h3>
           <div className="grid md:grid-cols-3 gap-8">
             <FeatureCard 
               icon={<ClipboardCheck size={24} />}
-              title="Standardized Inspections"
-              description="Pre-built and customizable checklists that ensure consistent quality inspections across all job sites."
+              title="Inspeções Padronizadas"
+              description="Checklists pré-fabricados e personalizáveis que garantem inspeções de qualidade consistentes em todos os canteiros de obra."
             />
             <FeatureCard 
               icon={<Gauge size={24} />}
-              title="Real-time Dashboards"
-              description="Interactive metrics for compliance, non-conformities, and productivity with detailed filtering options."
+              title="Dashboards em Tempo Real"
+              description="Métricas interativas para conformidade, não-conformidades e produtividade com opções detalhadas de filtragem."
             />
             <FeatureCard 
               icon={<Users size={24} />}
-              title="Team Engagement"
-              description="Gamification with points, leaderboards, and rewards to drive participation and improvement."
+              title="Engajamento da Equipe"
+              description="Gamificação com pontos, rankings e recompensas para impulsionar a participação e melhorias."
             />
             <FeatureCard 
               icon={<MessageSquare size={24} />}
-              title="WhatsApp Notifications"
-              description="Automatic alerts and reminders for pending tasks or new inspections via WhatsApp."
+              title="Notificações por WhatsApp"
+              description="Alertas automáticos e lembretes para tarefas pendentes ou novas inspeções via WhatsApp."
             />
             <FeatureCard 
               icon={<MessageSquare size={24} />}
-              title="AI Assistant"
-              description="Get answers to standards questions and generate automated reports with our AI chatbot."
+              title="Assistente de IA"
+              description="Obtenha respostas sobre normas e gere relatórios automatizados com nosso chatbot de IA."
             />
             <FeatureCard 
               icon={<ClipboardCheck size={24} />}
-              title="Comprehensive Records"
-              description="Centralized database with complete inspection history and evidence including photos and notes."
+              title="Registros Completos"
+              description="Banco de dados centralizado com histórico completo de inspeções e evidências, incluindo fotos e anotações."
             />
           </div>
         </div>
@@ -108,13 +108,13 @@ const Index = () => {
       <section className="container mx-auto px-4 py-16">
         <div className="bg-primary/10 rounded-xl p-8 md:p-12">
           <div className="text-center max-w-3xl mx-auto">
-            <h3 className="text-3xl font-bold mb-4">Ready to improve quality management?</h3>
+            <h3 className="text-3xl font-bold mb-4">Pronto para melhorar a gestão de qualidade?</h3>
             <p className="text-lg mb-8">
-              Join other construction companies already using QualiObra to enhance compliance, 
-              team engagement, and project outcomes.
+              Junte-se a outras construtoras que já usam o QualiObra para melhorar a conformidade,
+              o engajamento da equipe e os resultados dos projetos.
             </p>
             <Button size="lg" className="font-medium">
-              Start Your Free Trial
+              Inicie seu Período de Teste Gratuito
             </Button>
           </div>
         </div>
@@ -132,38 +132,38 @@ const Index = () => {
                 <h2 className="text-xl font-bold">QualiObra</h2>
               </div>
               <p className="mt-4 max-w-md text-gray-400">
-                Construction quality management platform for ISO and PBQP-H compliance.
+                Plataforma de gestão de qualidade para conformidade com ISO e PBQP-H na construção civil.
               </p>
             </div>
             <div className="grid grid-cols-2 md:grid-cols-3 gap-8">
               <div>
-                <h4 className="text-lg font-medium mb-4">Product</h4>
+                <h4 className="text-lg font-medium mb-4">Produto</h4>
                 <ul className="space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white">Features</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">Pricing</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">Case Studies</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Recursos</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Preços</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Estudos de Caso</a></li>
                 </ul>
               </div>
               <div>
-                <h4 className="text-lg font-medium mb-4">Resources</h4>
+                <h4 className="text-lg font-medium mb-4">Recursos</h4>
                 <ul className="space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white">Documentation</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">Guides</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">Support</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Documentação</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Guias</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Suporte</a></li>
                 </ul>
               </div>
               <div>
-                <h4 className="text-lg font-medium mb-4">Company</h4>
+                <h4 className="text-lg font-medium mb-4">Empresa</h4>
                 <ul className="space-y-2">
-                  <li><a href="#" className="text-gray-400 hover:text-white">About</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Sobre</a></li>
                   <li><a href="#" className="text-gray-400 hover:text-white">Blog</a></li>
-                  <li><a href="#" className="text-gray-400 hover:text-white">Contact</a></li>
+                  <li><a href="#" className="text-gray-400 hover:text-white">Contato</a></li>
                 </ul>
               </div>
             </div>
           </div>
           <div className="border-t border-gray-800 mt-12 pt-8 text-center text-gray-400">
-            <p>&copy; {new Date().getFullYear()} QualiObra. All rights reserved.</p>
+            <p>&copy; {new Date().getFullYear()} QualiObra. Todos os direitos reservados.</p>
           </div>
         </div>
       </footer>

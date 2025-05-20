@@ -14,19 +14,19 @@ import SiteHeader from "@/components/layout/SiteHeader";
 import { toast } from "@/hooks/use-toast";
 
 const inspectionTemplates = [
-  { id: 1, name: "Structural Inspection", category: "Structural", items: 24 },
-  { id: 2, name: "Electrical Systems", category: "Electrical", items: 18 },
-  { id: 3, name: "Plumbing Installation", category: "Plumbing", items: 15 },
-  { id: 4, name: "Finishing Works", category: "Finishing", items: 22 },
-  { id: 5, name: "Foundation Inspection", category: "Structural", items: 20 },
-  { id: 6, name: "Fire Safety Compliance", category: "Safety", items: 16 },
+  { id: 1, name: "Inspeção Estrutural", category: "Estrutural", items: 24 },
+  { id: 2, name: "Sistemas Elétricos", category: "Elétrico", items: 18 },
+  { id: 3, name: "Instalação Hidráulica", category: "Hidráulico", items: 15 },
+  { id: 4, name: "Serviços de Acabamento", category: "Acabamento", items: 22 },
+  { id: 5, name: "Inspeção de Fundação", category: "Estrutural", items: 20 },
+  { id: 6, name: "Conformidade com Segurança contra Incêndio", category: "Segurança", items: 16 },
 ];
 
 const sampleInspections = [
   { 
     id: 1, 
-    title: "Foundation Inspection", 
-    site: "Residential Tower A", 
+    title: "Inspeção de Fundação", 
+    site: "Torre Residencial A", 
     date: "2023-05-19", 
     status: "Completed", 
     compliance: 92,
@@ -34,8 +34,8 @@ const sampleInspections = [
   },
   { 
     id: 2, 
-    title: "Electrical Systems", 
-    site: "Office Building B", 
+    title: "Sistemas Elétricos", 
+    site: "Edifício Comercial B", 
     date: "2023-05-18", 
     status: "In Progress", 
     compliance: 78,
@@ -43,8 +43,8 @@ const sampleInspections = [
   },
   { 
     id: 3, 
-    title: "Plumbing Installation", 
-    site: "Residential Tower A", 
+    title: "Instalação Hidráulica", 
+    site: "Torre Residencial A", 
     date: "2023-05-17", 
     status: "Draft", 
     compliance: 0,
@@ -52,7 +52,7 @@ const sampleInspections = [
   },
   { 
     id: 4, 
-    title: "Structural Framing", 
+    title: "Estrutura", 
     site: "Shopping Center C", 
     date: "2023-05-16", 
     status: "Completed", 
@@ -61,8 +61,8 @@ const sampleInspections = [
   },
   { 
     id: 5, 
-    title: "Finishing Works", 
-    site: "Hotel Project D", 
+    title: "Serviços de Acabamento", 
+    site: "Projeto Hotel D", 
     date: "2023-05-15", 
     status: "Completed", 
     compliance: 88,
@@ -92,8 +92,8 @@ const Inspections = () => {
   const onSubmit = (data: NewInspectionFormValues) => {
     console.log(data);
     toast({
-      title: "Inspection Created",
-      description: `New inspection "${data.title}" has been created`,
+      title: "Inspeção Criada",
+      description: `Nova inspeção "${data.title}" foi criada`,
     });
     setOpenDialog(false);
     form.reset();
@@ -111,11 +111,11 @@ const Inspections = () => {
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "Completed":
-        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Completed</Badge>;
+        return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Concluída</Badge>;
       case "In Progress":
-        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">In Progress</Badge>;
+        return <Badge className="bg-blue-100 text-blue-800 hover:bg-blue-100">Em Andamento</Badge>;
       case "Draft":
-        return <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100">Draft</Badge>;
+        return <Badge className="bg-gray-100 text-gray-800 hover:bg-gray-100">Rascunho</Badge>;
       default:
         return <Badge>{status}</Badge>;
     }
@@ -129,20 +129,20 @@ const Inspections = () => {
         {/* Page Header */}
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-gray-900 mb-2">Inspections</h1>
-            <p className="text-gray-600">Manage and create quality inspections for all your projects</p>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Inspeções</h1>
+            <p className="text-gray-600">Gerencie e crie inspeções de qualidade para todos os seus projetos</p>
           </div>
           <Dialog open={openDialog} onOpenChange={setOpenDialog}>
             <DialogTrigger asChild>
               <Button>
-                <Plus className="mr-2 h-4 w-4" /> New Inspection
+                <Plus className="mr-2 h-4 w-4" /> Nova Inspeção
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
               <DialogHeader>
-                <DialogTitle>Create New Inspection</DialogTitle>
+                <DialogTitle>Criar Nova Inspeção</DialogTitle>
                 <DialogDescription>
-                  Fill out the details to start a new quality inspection
+                  Preencha os detalhes para iniciar uma nova inspeção de qualidade
                 </DialogDescription>
               </DialogHeader>
               <Form {...form}>
@@ -152,9 +152,9 @@ const Inspections = () => {
                     name="title"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Inspection Title</FormLabel>
+                        <FormLabel>Título da Inspeção</FormLabel>
                         <FormControl>
-                          <Input placeholder="Enter inspection title" {...field} />
+                          <Input placeholder="Digite o título da inspeção" {...field} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -164,9 +164,9 @@ const Inspections = () => {
                     name="site"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Construction Site</FormLabel>
+                        <FormLabel>Canteiro de Obras</FormLabel>
                         <FormControl>
-                          <Input placeholder="Select construction site" {...field} />
+                          <Input placeholder="Selecione o canteiro de obras" {...field} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -176,9 +176,9 @@ const Inspections = () => {
                     name="template"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Template</FormLabel>
+                        <FormLabel>Modelo</FormLabel>
                         <FormControl>
-                          <Input placeholder="Select inspection template" {...field} />
+                          <Input placeholder="Selecione o modelo de inspeção" {...field} />
                         </FormControl>
                       </FormItem>
                     )}
@@ -188,15 +188,15 @@ const Inspections = () => {
                     name="assignee"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Assigned Inspector</FormLabel>
+                        <FormLabel>Inspetor Designado</FormLabel>
                         <FormControl>
-                          <Input placeholder="Select inspector" {...field} />
+                          <Input placeholder="Selecione o inspetor" {...field} />
                         </FormControl>
                       </FormItem>
                     )}
                   />
                   <DialogFooter className="pt-4">
-                    <Button type="submit">Create Inspection</Button>
+                    <Button type="submit">Criar Inspeção</Button>
                   </DialogFooter>
                 </form>
               </Form>
@@ -208,13 +208,13 @@ const Inspections = () => {
         <Tabs value={activeTab} onValueChange={setActiveTab} className="mb-8">
           <TabsList className="grid grid-cols-3 w-[400px]">
             <TabsTrigger value="inspections">
-              <ClipboardCheck className="mr-2 h-4 w-4" /> Inspections
+              <ClipboardCheck className="mr-2 h-4 w-4" /> Inspeções
             </TabsTrigger>
             <TabsTrigger value="templates">
-              <FileText className="mr-2 h-4 w-4" /> Templates
+              <FileText className="mr-2 h-4 w-4" /> Modelos
             </TabsTrigger>
             <TabsTrigger value="reports">
-              <FileText className="mr-2 h-4 w-4" /> Reports
+              <FileText className="mr-2 h-4 w-4" /> Relatórios
             </TabsTrigger>
           </TabsList>
 
@@ -222,7 +222,7 @@ const Inspections = () => {
           <div className="flex items-center space-x-4 my-6">
             <div className="relative flex-1 max-w-sm">
               <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-gray-400" />
-              <Input placeholder="Search inspections..." className="pl-9" />
+              <Input placeholder="Buscar inspeções..." className="pl-9" />
             </div>
             <Button variant="outline" size="icon">
               <Filter className="h-4 w-4" />
@@ -250,22 +250,22 @@ const Inspections = () => {
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent align="end">
-                              <DropdownMenuItem>View Details</DropdownMenuItem>
-                              <DropdownMenuItem>Edit</DropdownMenuItem>
-                              <DropdownMenuItem>Download Report</DropdownMenuItem>
+                              <DropdownMenuItem>Ver Detalhes</DropdownMenuItem>
+                              <DropdownMenuItem>Editar</DropdownMenuItem>
+                              <DropdownMenuItem>Baixar Relatório</DropdownMenuItem>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
                       </div>
                       <div className="flex justify-between items-center mt-6">
                         <div className="flex items-center text-sm text-gray-600">
-                          <span>Date: {new Date(inspection.date).toLocaleDateString()}</span>
+                          <span>Data: {new Date(inspection.date).toLocaleDateString()}</span>
                           <span className="mx-2">•</span>
-                          <span>Inspector: {inspection.inspector}</span>
+                          <span>Inspetor: {inspection.inspector}</span>
                         </div>
                         {inspection.status === "Completed" && (
                           <div className="flex items-center">
-                            <span className="text-sm font-medium mr-2">Compliance:</span>
+                            <span className="text-sm font-medium mr-2">Conformidade:</span>
                             <Badge className="bg-green-100 text-green-800 hover:bg-green-100">
                               {inspection.compliance}%
                             </Badge>
@@ -275,17 +275,17 @@ const Inspections = () => {
                     </div>
                     {inspection.status === "Draft" && (
                       <div className="md:w-48 flex items-center justify-center p-6 bg-gray-50 border-t md:border-t-0 md:border-l">
-                        <Button>Continue</Button>
+                        <Button>Continuar</Button>
                       </div>
                     )}
                     {inspection.status === "In Progress" && (
                       <div className="md:w-48 flex items-center justify-center p-6 bg-gray-50 border-t md:border-t-0 md:border-l">
-                        <Button>Continue</Button>
+                        <Button>Continuar</Button>
                       </div>
                     )}
                     {inspection.status === "Completed" && (
                       <div className="md:w-48 flex items-center justify-center p-6 bg-gray-50 border-t md:border-t-0 md:border-l">
-                        <Button variant="outline">View Report</Button>
+                        <Button variant="outline">Ver Relatório</Button>
                       </div>
                     )}
                   </div>
@@ -304,13 +304,13 @@ const Inspections = () => {
                       <CardTitle>{template.name}</CardTitle>
                       <Badge variant="outline">{template.category}</Badge>
                     </div>
-                    <CardDescription>{template.items} inspection items</CardDescription>
+                    <CardDescription>{template.items} itens de inspeção</CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="flex justify-between items-center">
-                      <Button variant="outline" size="sm">Preview</Button>
+                      <Button variant="outline" size="sm">Visualizar</Button>
                       <Button size="sm" onClick={() => handleStartInspection(template.id)}>
-                        Start Inspection
+                        Iniciar Inspeção
                       </Button>
                     </div>
                   </CardContent>
@@ -321,11 +321,11 @@ const Inspections = () => {
                   <div className="bg-gray-100 rounded-full p-3 mb-4">
                     <Plus className="h-6 w-6 text-gray-500" />
                   </div>
-                  <h3 className="font-medium text-lg mb-2">Create Custom Template</h3>
+                  <h3 className="font-medium text-lg mb-2">Criar Modelo Personalizado</h3>
                   <p className="text-center text-gray-500 text-sm mb-4">
-                    Design a custom inspection template for your specific project needs
+                    Crie um modelo de inspeção personalizado para suas necessidades específicas de projeto
                   </p>
-                  <Button variant="outline">Create Template</Button>
+                  <Button variant="outline">Criar Modelo</Button>
                 </CardContent>
               </Card>
             </div>
@@ -335,11 +335,11 @@ const Inspections = () => {
           <TabsContent value="reports">
             <Card>
               <CardHeader>
-                <CardTitle>Inspection Reports</CardTitle>
-                <CardDescription>Generate and download inspection reports</CardDescription>
+                <CardTitle>Relatórios de Inspeção</CardTitle>
+                <CardDescription>Gere e baixe relatórios de inspeção</CardDescription>
               </CardHeader>
               <CardContent>
-                <p>Reports content will be displayed here...</p>
+                <p>O conteúdo dos relatórios será exibido aqui...</p>
               </CardContent>
             </Card>
           </TabsContent>
