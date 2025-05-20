@@ -24,21 +24,23 @@ const queryClient = new QueryClient();
 // Componente para rota protegida
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   return (
-    <ClerkLoading>
-      <div className="flex items-center justify-center min-h-screen">
-        <Loader2 className="h-8 w-8 animate-spin text-primary" />
-        <span className="ml-2 text-lg">Carregando...</span>
-      </div>
-    </ClerkLoading>
-    
-    <ClerkLoaded>
-      <SignedIn>
-        {children}
-      </SignedIn>
-      <SignedOut>
-        <Navigate to="/login" replace />
-      </SignedOut>
-    </ClerkLoaded>
+    <>
+      <ClerkLoading>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2 text-lg">Carregando...</span>
+        </div>
+      </ClerkLoading>
+      
+      <ClerkLoaded>
+        <SignedIn>
+          {children}
+        </SignedIn>
+        <SignedOut>
+          <Navigate to="/login" replace />
+        </SignedOut>
+      </ClerkLoaded>
+    </>
   );
 };
 
