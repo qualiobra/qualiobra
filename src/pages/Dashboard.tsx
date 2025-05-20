@@ -1,10 +1,10 @@
 
 import React from "react";
 import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { RecentInspections } from "@/components/dashboard/RecentInspections";
-import { ComplianceChart } from "@/components/dashboard/ComplianceChart";
-import { NonConformitiesChart } from "@/components/dashboard/NonConformitiesChart";
-import { PendingTasks } from "@/components/dashboard/PendingTasks";
+import RecentInspections from "@/components/dashboard/RecentInspections";
+import ComplianceChart from "@/components/dashboard/ComplianceChart";
+import NonConformitiesChart from "@/components/dashboard/NonConformitiesChart";
+import PendingTasks from "@/components/dashboard/PendingTasks";
 import { ObrasList } from "@/components/dashboard/ObrasList";
 import { useUser } from "@clerk/clerk-react";
 
