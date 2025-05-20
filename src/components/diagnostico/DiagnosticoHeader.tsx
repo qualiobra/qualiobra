@@ -13,7 +13,9 @@ const DiagnosticoHeader = () => {
         <Info className="h-4 w-4" />
         <AlertTitle>Informação</AlertTitle>
         <AlertDescription>
-          Este diagnóstico avaliará o grau de conformidade da sua empresa com os requisitos da norma PBQP-H SiAC, considerando tanto o Nível A quanto o Nível B.
+          Este diagnóstico avaliará o grau de conformidade da sua empresa com os requisitos da norma PBQP-H SiAC. 
+          As perguntas estão organizadas por seção da norma para facilitar o preenchimento. Ao final, será apresentado 
+          o grau de adesão considerando os requisitos do Nível A e do Nível B.
         </AlertDescription>
       </Alert>
     </div>

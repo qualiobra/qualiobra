@@ -12,7 +12,7 @@ const DiagnosticoTabs = ({ tabAtiva, onTabChange, children }: DiagnosticoTabsPro
     <Tabs value={tabAtiva} onValueChange={onTabChange} className="w-full">
       <TabsList className="grid w-full grid-cols-2 mb-4">
         <TabsTrigger value="instrucoes">Instruções</TabsTrigger>
-        <TabsTrigger value="diagnostico">Diagnóstico</TabsTrigger>
+        <TabsTrigger value="diagnostico">Diagnóstico por Requisito</TabsTrigger>
       </TabsList>
       {children}
     </Tabs>

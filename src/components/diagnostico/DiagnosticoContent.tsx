@@ -28,7 +28,7 @@ const DiagnosticoContent = ({
       <CardHeader>
         <CardTitle>Diagnóstico PBQP-H SiAC</CardTitle>
         <CardDescription>
-          Responda às questões para obter uma análise completa de conformidade considerando os requisitos do nível A e B.
+          Responda às questões agrupadas por requisito da norma para obter uma análise completa de conformidade.
         </CardDescription>
       </CardHeader>
       <CardContent>

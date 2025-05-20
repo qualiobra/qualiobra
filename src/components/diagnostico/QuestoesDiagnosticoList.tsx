@@ -9,8 +9,9 @@ import { toast } from "@/components/ui/use-toast";
 import DiagnosticoProgress from "./DiagnosticoProgress";
 import DiagnosticoLoading from "./DiagnosticoLoading";
 import DiagnosticoEmptyState from "./DiagnosticoEmptyState";
-import DiagnosticoQuestaoItem from "./DiagnosticoQuestaoItem";
+import DiagnosticoRequisitoGrupo from "./DiagnosticoRequisitoGrupo";
 import useDiagnosticoRespostas from "@/hooks/useDiagnosticoRespostas";
+import { agruparQuestoesPorRequisito } from "@/utils/diagnosticoGroupUtils";
 
 interface QuestoesDiagnosticoListProps {
   questoes: QuestoesDiagnostico[];
@@ -37,6 +38,9 @@ const QuestoesDiagnosticoList = ({
     handleObservacaoChange,
     salvarRespostas
   } = useDiagnosticoRespostas(questoes.length, nivel);
+  
+  // Agrupar questões por requisito
+  const gruposDeQuestoes = agruparQuestoesPorRequisito(questoes);
   
   const handleSalvar = () => {
     if (!isSignedIn) {
@@ -74,12 +78,11 @@ const QuestoesDiagnosticoList = ({
       />
 
       <Accordion type="single" collapsible className="w-full">
-        {questoes.map((questao) => (
-          <DiagnosticoQuestaoItem
-            key={questao.id_questao}
-            questao={questao}
-            pontuacao={respostas[questao.id_questao]?.pontuacao}
-            observacao={respostas[questao.id_questao]?.observacao}
+        {gruposDeQuestoes.map((grupo) => (
+          <DiagnosticoRequisitoGrupo
+            key={grupo.requisito}
+            grupo={grupo}
+            respostas={respostas}
             onPontuacaoChange={handleRespostaChange}
             onObservacaoChange={handleObservacaoChange}
           />
