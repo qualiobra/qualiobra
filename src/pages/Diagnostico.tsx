@@ -13,19 +13,6 @@ import QuestoesDiagnosticoList from "@/components/diagnostico/QuestoesDiagnostic
 import DiagnosticoInstructions from "@/components/diagnostico/DiagnosticoInstructions";
 import { useUser } from "@clerk/clerk-react";
 
-// Helper function to validate nivel_aplicavel values
-const isValidNivel = (nivel: string): nivel is NivelDiagnostico => {
-  return nivel === "Nível B" || nivel === "Nível A" || nivel === "Ambos os Níveis";
-};
-
-// Helper to convert database response to typed QuestoesDiagnostico
-const convertToQuestoesDiagnostico = (data: any[]): QuestoesDiagnostico[] => {
-  return data.filter(item => isValidNivel(item.nivel_aplicavel)).map(item => ({
-    ...item,
-    nivel_aplicavel: item.nivel_aplicavel as NivelDiagnostico,
-  }));
-};
-
 const Diagnostico = () => {
   const [questoes, setQuestoes] = useState<QuestoesDiagnostico[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -40,13 +27,11 @@ const Diagnostico = () => {
       setIsLoading(true);
       setError(null);
 
-      // Consulta simplificada para buscar questões ativas do nível selecionado
+      // Consulta para buscar questões baseada no nível selecionado
       const { data, error: fetchError } = await supabase
         .from("questoes_diagnostico")
         .select("*")
-        .eq("ativa", true)
-        .or(`nivel_aplicavel.eq.${nivelSelecionado},nivel_aplicavel.eq.Ambos os Níveis`)
-        .order("ordem_exibicao", { ascending: true });
+        .eq("ativa", true);
 
       if (fetchError) {
         console.error("Erro ao buscar questões:", fetchError);
@@ -54,45 +39,55 @@ const Diagnostico = () => {
       }
       
       if (!data || data.length === 0) {
-        console.log("Nenhuma questão encontrada para o nível", nivelSelecionado);
+        console.log("Nenhuma questão encontrada para o diagnóstico");
+        setQuestoes([]);
       } else {
-        console.log(`Encontradas ${data.length} questões para o nível ${nivelSelecionado}`);
-      }
-      
-      // Convert the raw data to the correct TypeScript type
-      const questoesTyped = data ? convertToQuestoesDiagnostico(data) : [];
-      
-      // Buscamos as respostas do usuário atual apenas se ele estiver autenticado
-      if (user && isSignedIn && questoesTyped.length > 0) {
-        try {
-          const { data: respostas, error: respostasError } = await supabase
-            .from('respostas_diagnostico_usuario')
-            .select('*')
-            .eq('id_usuario_avaliador', user.id)
-            .eq('nivel_diagnostico_realizado', nivelSelecionado);
+        console.log(`Encontradas ${data.length} questões para diagnóstico`);
+        
+        // Filtrar as questões baseadas no nível selecionado
+        const questoesDoNivel = data.filter(questao => {
+          if (nivelSelecionado === "Nível B") {
+            return questao.exigencia_siac_nivel_b !== 'N/A';
+          }
+          if (nivelSelecionado === "Nível A") {
+            return questao.exigencia_siac_nivel_a !== 'N/A';
+          }
+          // Para "Ambos os Níveis"
+          return true;
+        });
+        
+        // Buscamos as respostas do usuário atual apenas se ele estiver autenticado
+        if (user && isSignedIn && questoesDoNivel.length > 0) {
+          try {
+            const { data: respostas, error: respostasError } = await supabase
+              .from('respostas_diagnostico_usuario')
+              .select('*')
+              .eq('id_usuario_avaliador', user.id)
+              .eq('nivel_diagnostico_realizado', nivelSelecionado);
+              
+            if (respostasError) {
+              console.warn("Erro ao buscar respostas do usuário:", respostasError);
+              // Continuamos mesmo se houver erro nas respostas
+            }
             
-          if (respostasError) {
-            console.warn("Erro ao buscar respostas do usuário:", respostasError);
-            // Continuamos mesmo se houver erro nas respostas
+            if (respostas && respostas.length > 0) {
+              // Mapeamos as respostas para as questões
+              const questoesComRespostas = questoesDoNivel.map(questao => {
+                const resposta = respostas.find(r => r.id_questao_respondida === questao.id_questao);
+                return resposta ? { ...questao, resposta } : questao;
+              });
+              setQuestoes(questoesComRespostas);
+            } else {
+              setQuestoes(questoesDoNivel);
+            }
+          } catch (respostasErr) {
+            console.error("Erro ao processar respostas:", respostasErr);
+            setQuestoes(questoesDoNivel);
           }
-          
-          if (respostas && respostas.length > 0) {
-            // Mapeamos as respostas para as questões
-            const questoesComRespostas = questoesTyped.map(questao => {
-              const resposta = respostas.find(r => r.id_questao_respondida === questao.id_questao);
-              return resposta ? { ...questao, resposta } : questao;
-            });
-            setQuestoes(questoesComRespostas);
-          } else {
-            setQuestoes(questoesTyped);
-          }
-        } catch (respostasErr) {
-          console.error("Erro ao processar respostas:", respostasErr);
-          setQuestoes(questoesTyped);
+        } else {
+          // Se não estiver autenticado, apenas definimos as questões
+          setQuestoes(questoesDoNivel);
         }
-      } else {
-        // Se não estiver autenticado, apenas definimos as questões
-        setQuestoes(questoesTyped);
       }
     } catch (err: any) {
       console.error("Erro ao carregar questões:", err);
@@ -159,7 +154,7 @@ const Diagnostico = () => {
               
               <TabsContent value="nivelB">
                 <QuestoesDiagnosticoList 
-                  questoes={questoes.filter(q => q.nivel_aplicavel === "Nível B" || q.nivel_aplicavel === "Ambos os Níveis")}
+                  questoes={questoes}
                   isLoading={isLoading}
                   nivel="Nível B"
                   error={error}
@@ -169,7 +164,7 @@ const Diagnostico = () => {
               
               <TabsContent value="nivelA">
                 <QuestoesDiagnosticoList 
-                  questoes={questoes.filter(q => q.nivel_aplicavel === "Nível A" || q.nivel_aplicavel === "Ambos os Níveis")}
+                  questoes={questoes}
                   isLoading={isLoading}
                   nivel="Nível A"
                   error={error}

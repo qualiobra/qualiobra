@@ -2,12 +2,14 @@
 export interface QuestoesDiagnostico {
   id_questao: string;
   referencial_normativo: string;
-  nivel_aplicavel: 'Nível B' | 'Nível A' | 'Ambos os Níveis';
   item_requisito: string;
   titulo_requisito: string;
   descricao_questao: string;
   tipo_pontuacao: 'Escala 1-5' | 'Sim/Não (1 ou 5)';
   ordem_exibicao: number;
+  exigencia_siac_nivel_b: 'X' | 'E' | 'N/A';
+  exigencia_siac_nivel_a: 'X' | 'E' | 'N/A';
+  referencia_completa_siac?: string;
   ativa: boolean;
   created_at: string;
   updated_at: string;

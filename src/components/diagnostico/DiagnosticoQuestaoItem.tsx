@@ -4,6 +4,7 @@ import { QuestoesDiagnostico } from "@/types/diagnostico";
 import { Check } from "lucide-react";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Badge } from "@/components/ui/badge";
 import DiagnosticoEscalaPontuacao from "./DiagnosticoEscalaPontuacao";
 
 interface DiagnosticoQuestaoItemProps {
@@ -37,15 +38,32 @@ const DiagnosticoQuestaoItem = ({
     }
   };
 
+  const getExigenciaBadge = (tipo: 'X' | 'E' | 'N/A', nivel: string) => {
+    if (tipo === 'N/A') return null;
+    
+    return (
+      <Badge 
+        variant={tipo === 'X' ? "default" : "outline"} 
+        className={`ml-2 ${tipo === 'X' ? 'bg-blue-600' : 'border-blue-600 text-blue-600'}`}
+      >
+        {tipo === 'X' ? `${nivel} (X)` : `${nivel} (E)`}
+      </Badge>
+    );
+  };
+
   const respondida = !!pontuacao;
   
   return (
     <AccordionItem key={questao.id_questao} value={questao.id_questao}>
       <AccordionTrigger className="hover:no-underline">
         <div className="flex justify-between w-full items-center pr-4">
-          <span className="text-left">
-            {questao.item_requisito}: {questao.titulo_requisito}
-          </span>
+          <div className="flex items-center">
+            <span className="text-left">
+              {questao.item_requisito}: {questao.titulo_requisito}
+            </span>
+            {questao.exigencia_siac_nivel_b !== 'N/A' && getExigenciaBadge(questao.exigencia_siac_nivel_b, 'Nível B')}
+            {questao.exigencia_siac_nivel_a !== 'N/A' && getExigenciaBadge(questao.exigencia_siac_nivel_a, 'Nível A')}
+          </div>
           {respondida && (
             <span className="flex items-center text-green-600 text-sm ml-2">
               <Check className="h-4 w-4 mr-1" />
@@ -57,6 +75,12 @@ const DiagnosticoQuestaoItem = ({
       <AccordionContent>
         <div className="space-y-4 p-4">
           <p className="text-gray-700">{questao.descricao_questao}</p>
+          
+          {questao.referencia_completa_siac && (
+            <div className="mt-2 text-sm text-gray-500">
+              <strong>Referência SiAC:</strong> {questao.referencia_completa_siac}
+            </div>
+          )}
           
           <div className="mt-4">
             <Label>Avaliação</Label>

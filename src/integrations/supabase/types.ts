@@ -14,10 +14,12 @@ export type Database = {
           ativa: boolean
           created_at: string
           descricao_questao: string
+          exigencia_siac_nivel_a: string
+          exigencia_siac_nivel_b: string
           id_questao: string
           item_requisito: string
-          nivel_aplicavel: string
           ordem_exibicao: number
+          referencia_completa_siac: string | null
           referencial_normativo: string
           tipo_pontuacao: string
           titulo_requisito: string
@@ -27,10 +29,12 @@ export type Database = {
           ativa?: boolean
           created_at?: string
           descricao_questao: string
+          exigencia_siac_nivel_a?: string
+          exigencia_siac_nivel_b?: string
           id_questao?: string
           item_requisito: string
-          nivel_aplicavel: string
           ordem_exibicao: number
+          referencia_completa_siac?: string | null
           referencial_normativo?: string
           tipo_pontuacao?: string
           titulo_requisito: string
@@ -40,10 +44,12 @@ export type Database = {
           ativa?: boolean
           created_at?: string
           descricao_questao?: string
+          exigencia_siac_nivel_a?: string
+          exigencia_siac_nivel_b?: string
           id_questao?: string
           item_requisito?: string
-          nivel_aplicavel?: string
           ordem_exibicao?: number
+          referencia_completa_siac?: string | null
           referencial_normativo?: string
           tipo_pontuacao?: string
           titulo_requisito?: string
