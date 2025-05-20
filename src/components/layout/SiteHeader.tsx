@@ -1,6 +1,6 @@
 
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { 
   DropdownMenu, 
   DropdownMenuContent, 
@@ -9,18 +9,42 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { Menu, User, Bell, Settings } from "lucide-react";
+import { Menu, User, Bell, Settings, LogOut, UserCog } from "lucide-react";
+import { useUser, useClerk } from "@clerk/clerk-react";
+import { useUserRole } from "@/context/UserRoleContext";
+import { toast } from "@/hooks/use-toast";
 
 const SiteHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user } = useUser();
+  const { signOut } = useClerk();
+  const navigate = useNavigate();
+  const { currentUserRole } = useUserRole();
   
+  const handleSignOut = async () => {
+    try {
+      await signOut();
+      toast({
+        title: "Sessão encerrada",
+        description: "Você saiu do sistema com sucesso.",
+      });
+      navigate("/");
+    } catch (error) {
+      toast({
+        title: "Erro ao sair",
+        description: "Não foi possível encerrar a sessão.",
+        variant: "destructive",
+      });
+    }
+  };
+
   return (
     <header className="bg-white border-b sticky top-0 z-40">
       <div className="container mx-auto px-4">
         <div className="h-16 flex items-center justify-between">
           {/* Logo */}
           <div className="flex items-center">
-            <Link to="/" className="flex items-center">
+            <Link to="/dashboard" className="flex items-center">
               <img 
                 src="/lovable-uploads/0606c9b7-ff8b-45c2-93f5-0ce14a8cdab6.png" 
                 alt="QualiObra Logo" 
@@ -36,6 +60,9 @@ const SiteHeader = () => {
             <Link to="/inspections" className="text-gray-700 hover:text-primary font-medium">Inspeções</Link>
             <Link to="/team" className="text-gray-700 hover:text-primary font-medium">Equipe</Link>
             <Link to="/reports" className="text-gray-700 hover:text-primary font-medium">Relatórios</Link>
+            {currentUserRole?.id === "admin" && (
+              <Link to="/admin" className="text-gray-700 hover:text-primary font-medium">Administração</Link>
+            )}
           </nav>
           
           {/* User & Notification Dropdowns */}
@@ -80,12 +107,28 @@ const SiteHeader = () => {
             {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="p-1.5 rounded-full bg-gray-100 hover:bg-gray-200">
-                  <User size={20} />
+                <button className="p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center">
+                  {user?.imageUrl ? (
+                    <img 
+                      src={user.imageUrl} 
+                      alt={user.firstName || "Usuário"} 
+                      className="h-7 w-7 rounded-full object-cover"
+                    />
+                  ) : (
+                    <User size={20} />
+                  )}
+                  <span className="ml-2 hidden sm:inline text-sm font-medium">
+                    {user?.firstName || "Usuário"}
+                  </span>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
+                <DropdownMenuLabel>
+                  <div>
+                    <p className="font-medium">{user?.fullName || "Usuário"}</p>
+                    <p className="text-xs text-gray-500">{currentUserRole?.name || "Sem perfil"}</p>
+                  </div>
+                </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
                   <User className="mr-2 h-4 w-4" /> Perfil
@@ -93,8 +136,15 @@ const SiteHeader = () => {
                 <DropdownMenuItem>
                   <Settings className="mr-2 h-4 w-4" /> Configurações
                 </DropdownMenuItem>
+                {currentUserRole?.id === "admin" && (
+                  <DropdownMenuItem onClick={() => navigate("/admin")}>
+                    <UserCog className="mr-2 h-4 w-4" /> Administração
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Sair</DropdownMenuItem>
+                <DropdownMenuItem onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" /> Sair
+                </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             
@@ -116,6 +166,15 @@ const SiteHeader = () => {
               <Link to="/inspections" className="px-4 py-2 hover:bg-gray-100 rounded-md">Inspeções</Link>
               <Link to="/team" className="px-4 py-2 hover:bg-gray-100 rounded-md">Equipe</Link>
               <Link to="/reports" className="px-4 py-2 hover:bg-gray-100 rounded-md">Relatórios</Link>
+              {currentUserRole?.id === "admin" && (
+                <Link to="/admin" className="px-4 py-2 hover:bg-gray-100 rounded-md">Administração</Link>
+              )}
+              <button 
+                onClick={handleSignOut}
+                className="px-4 py-2 hover:bg-gray-100 rounded-md text-left flex items-center text-red-600"
+              >
+                <LogOut size={18} className="mr-2" /> Sair
+              </button>
             </nav>
           </div>
         )}
