@@ -21,6 +21,8 @@ import AdminPanel from "./pages/admin/AdminPanel";
 import UserManagement from "./pages/admin/UserManagement";
 import Reports from "./pages/Reports";
 import UserLayout from "./components/layout/UserLayout";
+import AvaliacaoInicial from "./pages/AvaliacaoInicial";
+import Diagnostico from "./pages/Diagnostico";
 import { Loader2 } from "lucide-react";
 import React from "react";
 
@@ -81,6 +83,8 @@ const AppRoutes = () => (
                 <ForgotPassword />
               </SignedOut>
             } />
+            <Route path="/avaliacao-inicial" element={<AvaliacaoInicial />} />
+            <Route path="/diagnostico" element={<Diagnostico />} />
             
             {/* Rotas protegidas */}
             <Route element={

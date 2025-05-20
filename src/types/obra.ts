@@ -31,3 +31,51 @@ export interface Documento {
   url: string;
   dataUpload: string;
 }
+
+// Interfaces para o sistema de avaliação PBQP-H
+export interface QuestaoAvaliacao {
+  id: string;
+  requisito: string;
+  item: string;
+  descricao: string;
+  tipoResposta: 'escala' | 'simNao';
+  observacoes?: string;
+}
+
+export interface RespostaAvaliacao {
+  questaoId: string;
+  valor: number; // 1-5 para escala, 1/5 para sim/não
+  observacoes?: string;
+}
+
+export interface SecaoAvaliacao {
+  id: string;
+  titulo: string;
+  subtitulo?: string;
+  questoes: QuestaoAvaliacao[];
+}
+
+export interface AvaliacaoPBQPH {
+  id: string;
+  usuarioId: string;
+  dataInicio: string;
+  dataConclusao?: string;
+  respostas: RespostaAvaliacao[];
+  concluida: boolean;
+  resultadoGeral?: number;
+  resultadosPorSecao?: Record<string, number>;
+}
+
+export interface LeadCadastro {
+  nome: string;
+  email: string;
+  telefone: string;
+  cargo: string;
+  empresa: string;
+  porteEmpresa: 'micro' | 'pequena' | 'media' | 'grande';
+  numeroObras: string;
+  segmentoAtuacao: string;
+  interesseEmCertificacao: boolean;
+  emailVerificado?: boolean;
+  codigoVerificacao?: string;
+}
