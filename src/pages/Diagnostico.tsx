@@ -8,6 +8,7 @@ import DiagnosticoHeader from "@/components/diagnostico/DiagnosticoHeader";
 import DiagnosticoTabs from "@/components/diagnostico/DiagnosticoTabs";
 import DiagnosticoContent from "@/components/diagnostico/DiagnosticoContent";
 import useDiagnosticoQuestoes from "@/hooks/useDiagnosticoQuestoes";
+import { toast } from "@/components/ui/use-toast";
 
 const Diagnostico = () => {
   const [tabAtiva, setTabAtiva] = useState('instrucoes');
@@ -25,14 +26,35 @@ const Diagnostico = () => {
     fetchQuestoesDiagnostico 
   } = useDiagnosticoQuestoes(nivelSelecionado, user?.id, !!isSignedIn);
 
+  // Verificar se usuário está logado quando tenta acessar o diagnóstico
+  useEffect(() => {
+    if (tabAtiva === 'diagnostico' && !isSignedIn) {
+      toast({
+        title: "Atenção",
+        description: "É necessário estar logado para acessar o diagnóstico.",
+        variant: "destructive",
+      });
+      setTabAtiva('instrucoes');
+    }
+  }, [tabAtiva, isSignedIn]);
+
   const handleTabChange = (value: string) => {
+    if (value === 'diagnostico' && !isSignedIn) {
+      toast({
+        title: "Atenção",
+        description: "É necessário estar logado para acessar o diagnóstico.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
     setTabAtiva(value);
     if (value === 'diagnostico') {
       fetchQuestoesDiagnostico();
     }
   };
 
-  // Carrega as questões quando a aba de diagnóstico é selecionada
+  // Verificação do usuário e carregamento das questões
   useEffect(() => {
     if (tabAtiva === 'diagnostico') {
       fetchQuestoesDiagnostico();

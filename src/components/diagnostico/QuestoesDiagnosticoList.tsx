@@ -43,7 +43,7 @@ const QuestoesDiagnosticoList = ({
   const gruposDeQuestoes = agruparQuestoesPorRequisito(questoes);
   
   const handleSalvar = () => {
-    if (!isSignedIn) {
+    if (!isSignedIn || !user) {
       toast({
         title: "Atenção",
         description: "Você precisa estar logado para salvar respostas. Faça login e tente novamente.",
@@ -52,9 +52,9 @@ const QuestoesDiagnosticoList = ({
       return;
     }
 
-    if (user) {
-      salvarRespostas(user.id);
-    }
+    // Usa o ID diretamente do Clerk
+    console.log("Salvando respostas para usuário:", user.id);
+    salvarRespostas(user.id);
   };
 
   if (isLoading) {

@@ -58,27 +58,35 @@ export function useDiagnosticoRespostas(totalQuestoes: number, nivel: NivelDiagn
     setIsSaving(true);
     
     try {
-      // Preparar os dados para inserção
-      const respostasArray = Object.entries(respostas).map(([id_questao, { pontuacao, observacao }]) => ({
-        id_resposta_diagnostico: uuidv4(),
-        id_usuario_avaliador: userId,
-        id_questao_respondida: id_questao,
-        nivel_diagnostico_realizado: "Ambos os Níveis",
-        pontuacao_usuario: pontuacao,
-        observacoes_usuario: observacao || null,
-        data_hora_resposta: new Date().toISOString(),
-        id_diagnostico_agrupador: diagnosticoId,
-        // Removendo a referência à id_obra_avaliada já que é nullable no banco
-      }));
+      // Log para depuração
+      console.log("Iniciando salvamento de respostas com usuário ID:", userId);
       
-      // Inserir respostas no banco de dados
-      const { error } = await supabase
-        .from('respostas_diagnostico_usuario')
-        .insert(respostasArray);
+      // Preparar os dados para inserção com formato simplificado
+      const respostasArray = Object.entries(respostas).map(([id_questao, { pontuacao, observacao }]) => {
+        const itemResposta = {
+          id_resposta_diagnostico: uuidv4(),
+          id_usuario_avaliador: userId,
+          id_questao_respondida: id_questao,
+          nivel_diagnostico_realizado: nivel,
+          pontuacao_usuario: pontuacao,
+          observacoes_usuario: observacao || null,
+          data_hora_resposta: new Date().toISOString(),
+          id_diagnostico_agrupador: diagnosticoId,
+        };
+        console.log("Preparando resposta:", itemResposta);
+        return itemResposta;
+      });
       
-      if (error) {
-        console.error("Erro ao salvar respostas:", error);
-        throw error;
+      // Inserir respostas no banco de dados uma por uma para melhor diagnóstico
+      for (const resposta of respostasArray) {
+        const { error } = await supabase
+          .from('respostas_diagnostico_usuario')
+          .insert([resposta]);
+        
+        if (error) {
+          console.error("Erro ao salvar resposta individual:", error);
+          throw error;
+        }
       }
       
       toast({
