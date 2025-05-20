@@ -58,7 +58,8 @@ import {
   Trash2, 
   MoreVertical, 
   ShieldCheck,
-  Mail
+  Mail,
+  Phone
 } from "lucide-react";
 
 // Dados mockados para simular usuários do sistema
@@ -66,6 +67,7 @@ interface UserData {
   id: string;
   name: string;
   email: string;
+  telefoneWhatsApp?: string;
   role: string;
   roleId: string;
   avatar?: string;
@@ -81,6 +83,7 @@ const userFormSchema = z.object({
   email: z.string().email({
     message: "Email inválido.",
   }),
+  telefoneWhatsApp: z.string().optional(),
   password: z.string().min(6, {
     message: "Senha deve ter pelo menos 6 caracteres.",
   }),
@@ -98,7 +101,8 @@ const UserManagement = () => {
       id: "1",
       name: "Admin Teste",
       email: "admin@teste.com",
-      role: "Administrador",
+      telefoneWhatsApp: "+55 11 99999-9999",
+      role: "Administrador QualiObra",
       roleId: "admin",
       avatar: "",
       status: "active",
@@ -108,8 +112,9 @@ const UserManagement = () => {
       id: "2",
       name: "João Silva",
       email: "joao@empresa.com",
-      role: "Engenheiro",
-      roleId: "eng1",
+      telefoneWhatsApp: "+55 11 98888-8888",
+      role: "Engenheiro Gestor de Obra",
+      roleId: "engenheiro_gestor",
       avatar: "",
       status: "active",
       lastLogin: "18/05/2025 14:15"
@@ -118,8 +123,9 @@ const UserManagement = () => {
       id: "3",
       name: "Maria Santos",
       email: "maria@empresa.com",
-      role: "Inspetor",
-      roleId: "insp1",
+      telefoneWhatsApp: "",
+      role: "Equipe de Inspeção",
+      roleId: "equipe_inspecao",
       avatar: "",
       status: "inactive",
       lastLogin: null
@@ -148,6 +154,7 @@ const UserManagement = () => {
     defaultValues: {
       name: "",
       email: "",
+      telefoneWhatsApp: "",
       password: "",
       roleId: "",
       avatar: "",
@@ -161,6 +168,7 @@ const UserManagement = () => {
       form.reset({
         name: editingUser.name,
         email: editingUser.email,
+        telefoneWhatsApp: editingUser.telefoneWhatsApp || "",
         password: "", // Não preencher senha na edição
         roleId: editingUser.roleId,
         avatar: editingUser.avatar || "",
@@ -170,6 +178,7 @@ const UserManagement = () => {
       form.reset({
         name: "",
         email: "",
+        telefoneWhatsApp: "",
         password: "",
         roleId: "",
         avatar: "",
@@ -188,6 +197,7 @@ const UserManagement = () => {
               ...user, 
               name: values.name, 
               email: values.email,
+              telefoneWhatsApp: values.telefoneWhatsApp,
               roleId: values.roleId,
               role: userRoles.find(r => r.id === values.roleId)?.name || user.role,
               status: values.status,
@@ -206,6 +216,7 @@ const UserManagement = () => {
         id: Date.now().toString(),
         name: values.name,
         email: values.email,
+        telefoneWhatsApp: values.telefoneWhatsApp,
         roleId: values.roleId,
         role: userRoles.find(r => r.id === values.roleId)?.name || "Usuário",
         avatar: values.avatar,
@@ -305,7 +316,7 @@ const UserManagement = () => {
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={handleAddUser}>
+            <Button onClick={() => setEditingUser(null)}>
               <UserPlus className="mr-2 h-4 w-4" /> Novo Usuário
             </Button>
           </DialogTrigger>
@@ -356,6 +367,20 @@ const UserManagement = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
+                    name="telefoneWhatsApp"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Telefone/WhatsApp</FormLabel>
+                        <FormControl>
+                          <Input placeholder="+55 00 00000-0000" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  
+                  <FormField
+                    control={form.control}
                     name="password"
                     render={({ field }) => (
                       <FormItem>
@@ -371,7 +396,9 @@ const UserManagement = () => {
                       </FormItem>
                     )}
                   />
-                  
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
                   <FormField
                     control={form.control}
                     name="roleId"
@@ -395,6 +422,28 @@ const UserManagement = () => {
                       </FormItem>
                     )}
                   />
+                  
+                  {editingUser && (
+                    <FormField
+                      control={form.control}
+                      name="status"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel>Status</FormLabel>
+                          <FormControl>
+                            <select
+                              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
+                              {...field}
+                            >
+                              <option value="active">Ativo</option>
+                              <option value="inactive">Inativo</option>
+                            </select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  )}
                 </div>
                 
                 <FormField
@@ -410,28 +459,6 @@ const UserManagement = () => {
                     </FormItem>
                   )}
                 />
-                
-                {editingUser && (
-                  <FormField
-                    control={form.control}
-                    name="status"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Status</FormLabel>
-                        <FormControl>
-                          <select
-                            className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
-                            {...field}
-                          >
-                            <option value="active">Ativo</option>
-                            <option value="inactive">Inativo</option>
-                          </select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                )}
                 
                 <DialogFooter>
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
@@ -461,6 +488,7 @@ const UserManagement = () => {
                 <TableHead className="w-[50px]">Foto</TableHead>
                 <TableHead>Nome</TableHead>
                 <TableHead>Email</TableHead>
+                <TableHead>Telefone</TableHead>
                 <TableHead>Perfil</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Último Acesso</TableHead>
@@ -478,6 +506,7 @@ const UserManagement = () => {
                   </TableCell>
                   <TableCell className="font-medium">{user.name}</TableCell>
                   <TableCell>{user.email}</TableCell>
+                  <TableCell>{user.telefoneWhatsApp || "-"}</TableCell>
                   <TableCell>{user.role}</TableCell>
                   <TableCell>
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
@@ -499,7 +528,7 @@ const UserManagement = () => {
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Ações</DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleEditUser(user)}>
+                        <DropdownMenuItem onClick={() => setEditingUser(user)}>
                           <Pencil className="mr-2 h-4 w-4" /> Editar
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => toggleUserStatus(user.id)}>

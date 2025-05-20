@@ -30,6 +30,29 @@ const UserLayout = () => {
         });
       }
     }
+    
+    // Verificar permissões para outras rotas baseado nos novos perfis
+    const checkPermissions = () => {
+      if (!currentUserRole) return true;
+      
+      if (location.pathname.startsWith('/obras')) {
+        // Para equipe de inspeção, verificar permissão de visualização
+        if (currentUserRole.id === 'equipe_inspecao' && 
+            !currentUserRole.permissions.includes('obras_view_own') &&
+            !currentUserRole.permissions.includes('all')) {
+          toast({
+            title: "Acesso Restrito",
+            description: "Você só pode visualizar obras às quais foi atribuído.",
+            variant: "destructive",
+          });
+        }
+      }
+      
+      // Adicionar verificações para outras rotas conforme forem implementadas
+      // Por exemplo: inspeções, não conformidades, etc.
+    };
+    
+    checkPermissions();
   }, [location.pathname, currentUserRole]);
   
   return (

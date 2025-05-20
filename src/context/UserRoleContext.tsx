@@ -19,12 +19,34 @@ type UserRoleContextType = {
   setUserRole: (userId: string, roleId: string) => void;
 };
 
-// Perfis padrão
+// Perfis padrão - atualizados para QualiObra
 const defaultRoles: UserRole[] = [
   {
     id: "admin",
-    name: "Administrador",
+    name: "Administrador QualiObra",
     permissions: ["all"]
+  },
+  {
+    id: "engenheiro_gestor",
+    name: "Engenheiro Gestor de Obra",
+    permissions: [
+      "dashboard_own", 
+      "obras_crud_own", 
+      "formularios_inspecao_crud", 
+      "nao_conformidades_crud_own", 
+      "inspecoes_approve_own", 
+      "view_dashboards_own"
+    ]
+  },
+  {
+    id: "equipe_inspecao",
+    name: "Equipe de Inspeção",
+    permissions: [
+      "obras_view_own", 
+      "inspecoes_submit", 
+      "inspecoes_view_own", 
+      "gamification_view"
+    ]
   }
 ];
 
