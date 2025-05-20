@@ -13,6 +13,26 @@ import QuestoesDiagnosticoList from "@/components/diagnostico/QuestoesDiagnostic
 import DiagnosticoInstructions from "@/components/diagnostico/DiagnosticoInstructions";
 import { useUser } from "@clerk/clerk-react";
 
+// Helper function to validate tipo_pontuacao
+const isValidTipoPontuacao = (value: string): value is 'Escala 1-5' | 'Sim/Não (1 ou 5)' => {
+  return value === 'Escala 1-5' || value === 'Sim/Não (1 ou 5)';
+};
+
+// Helper function to validate exigencia fields
+const isValidExigencia = (value: string): value is 'X' | 'E' | 'N/A' => {
+  return value === 'X' || value === 'E' || value === 'N/A';
+};
+
+// Helper function to convert raw data to the correct type
+const convertToQuestoesDiagnostico = (data: any): QuestoesDiagnostico => {
+  return {
+    ...data,
+    tipo_pontuacao: isValidTipoPontuacao(data.tipo_pontuacao) ? data.tipo_pontuacao : 'Escala 1-5',
+    exigencia_siac_nivel_b: isValidExigencia(data.exigencia_siac_nivel_b) ? data.exigencia_siac_nivel_b : 'N/A',
+    exigencia_siac_nivel_a: isValidExigencia(data.exigencia_siac_nivel_a) ? data.exigencia_siac_nivel_a : 'N/A',
+  };
+};
+
 const Diagnostico = () => {
   const [questoes, setQuestoes] = useState<QuestoesDiagnostico[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -44,8 +64,11 @@ const Diagnostico = () => {
       } else {
         console.log(`Encontradas ${data.length} questões para diagnóstico`);
         
+        // Convert raw data to the correct type
+        const questoesConvertidas: QuestoesDiagnostico[] = data.map(convertToQuestoesDiagnostico);
+        
         // Filtrar as questões baseadas no nível selecionado
-        const questoesDoNivel = data.filter(questao => {
+        const questoesDoNivel = questoesConvertidas.filter(questao => {
           if (nivelSelecionado === "Nível B") {
             return questao.exigencia_siac_nivel_b !== 'N/A';
           }
