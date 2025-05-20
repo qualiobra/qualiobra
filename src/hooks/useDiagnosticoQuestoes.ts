@@ -36,38 +36,9 @@ export function useDiagnosticoQuestoes(nivelSelecionado: NivelDiagnostico, userI
         // Converter os dados brutos para o tipo correto
         const questoesConvertidas: QuestoesDiagnostico[] = data.map(convertToQuestoesDiagnostico);
         
-        // Buscamos as respostas do usuário atual apenas se ele estiver autenticado
-        if (userId && isSignedIn && questoesConvertidas.length > 0) {
-          try {
-            const { data: respostas, error: respostasError } = await supabase
-              .from('respostas_diagnostico_usuario')
-              .select('*')
-              .eq('id_usuario_avaliador', userId)
-              .eq('nivel_diagnostico_realizado', nivelSelecionado);
-              
-            if (respostasError) {
-              console.warn("Erro ao buscar respostas do usuário:", respostasError);
-              // Continuamos mesmo se houver erro nas respostas
-            }
-            
-            if (respostas && respostas.length > 0) {
-              // Mapeamos as respostas para as questões
-              const questoesComRespostas = questoesConvertidas.map(questao => {
-                const resposta = respostas.find(r => r.id_questao_respondida === questao.id_questao);
-                return resposta ? { ...questao, resposta } : questao;
-              });
-              setQuestoes(questoesComRespostas);
-            } else {
-              setQuestoes(questoesConvertidas);
-            }
-          } catch (respostasErr) {
-            console.error("Erro ao processar respostas:", respostasErr);
-            setQuestoes(questoesConvertidas);
-          }
-        } else {
-          // Se não estiver autenticado, apenas definimos as questões
-          setQuestoes(questoesConvertidas);
-        }
+        // Para diagnóstico, usamos todas as questões sem verificar respostas anteriores
+        // isso evita erros de UUID inválido
+        setQuestoes(questoesConvertidas);
       }
     } catch (err: any) {
       console.error("Erro ao carregar questões:", err);
@@ -81,7 +52,7 @@ export function useDiagnosticoQuestoes(nivelSelecionado: NivelDiagnostico, userI
     } finally {
       setIsLoading(false);
     }
-  }, [nivelSelecionado, userId, isSignedIn]);
+  }, [nivelSelecionado]);
 
   return {
     questoes,

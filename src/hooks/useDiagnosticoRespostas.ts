@@ -63,11 +63,12 @@ export function useDiagnosticoRespostas(totalQuestoes: number, nivel: NivelDiagn
         id_resposta_diagnostico: uuidv4(),
         id_usuario_avaliador: userId,
         id_questao_respondida: id_questao,
-        nivel_diagnostico_realizado: "Ambos os Níveis", // Agora sempre salvamos como "Ambos os Níveis"
+        nivel_diagnostico_realizado: "Ambos os Níveis",
         pontuacao_usuario: pontuacao,
         observacoes_usuario: observacao || null,
         data_hora_resposta: new Date().toISOString(),
         id_diagnostico_agrupador: diagnosticoId,
+        // Removendo a referência à id_obra_avaliada já que é nullable no banco
       }));
       
       // Inserir respostas no banco de dados
