@@ -13,6 +13,19 @@ import QuestoesDiagnosticoList from "@/components/diagnostico/QuestoesDiagnostic
 import DiagnosticoInstructions from "@/components/diagnostico/DiagnosticoInstructions";
 import { useUser } from "@clerk/clerk-react";
 
+// Helper function to validate nivel_aplicavel values
+const isValidNivel = (nivel: string): nivel is NivelDiagnostico => {
+  return nivel === "Nível B" || nivel === "Nível A" || nivel === "Ambos os Níveis";
+};
+
+// Helper to convert database response to typed QuestoesDiagnostico
+const convertToQuestoesDiagnostico = (data: any[]): QuestoesDiagnostico[] => {
+  return data.filter(item => isValidNivel(item.nivel_aplicavel)).map(item => ({
+    ...item,
+    nivel_aplicavel: item.nivel_aplicavel as NivelDiagnostico,
+  }));
+};
+
 const Diagnostico = () => {
   const [questoes, setQuestoes] = useState<QuestoesDiagnostico[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -46,8 +59,11 @@ const Diagnostico = () => {
         console.log(`Encontradas ${data.length} questões para o nível ${nivelSelecionado}`);
       }
       
+      // Convert the raw data to the correct TypeScript type
+      const questoesTyped = data ? convertToQuestoesDiagnostico(data) : [];
+      
       // Buscamos as respostas do usuário atual apenas se ele estiver autenticado
-      if (user && isSignedIn && data) {
+      if (user && isSignedIn && questoesTyped.length > 0) {
         try {
           const { data: respostas, error: respostasError } = await supabase
             .from('respostas_diagnostico_usuario')
@@ -62,21 +78,21 @@ const Diagnostico = () => {
           
           if (respostas && respostas.length > 0) {
             // Mapeamos as respostas para as questões
-            const questoesComRespostas = data.map(questao => {
+            const questoesComRespostas = questoesTyped.map(questao => {
               const resposta = respostas.find(r => r.id_questao_respondida === questao.id_questao);
               return resposta ? { ...questao, resposta } : questao;
             });
             setQuestoes(questoesComRespostas);
           } else {
-            setQuestoes(data);
+            setQuestoes(questoesTyped);
           }
         } catch (respostasErr) {
           console.error("Erro ao processar respostas:", respostasErr);
-          setQuestoes(data);
+          setQuestoes(questoesTyped);
         }
       } else {
         // Se não estiver autenticado, apenas definimos as questões
-        setQuestoes(data || []);
+        setQuestoes(questoesTyped);
       }
     } catch (err: any) {
       console.error("Erro ao carregar questões:", err);
