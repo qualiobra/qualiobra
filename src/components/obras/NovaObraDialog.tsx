@@ -21,12 +21,21 @@ export default function NovaObraDialog({ open, onOpenChange }: NovaObraDialogPro
       
       // Make sure all required properties are passed
       adicionarObra({
+        codigoDaObra: values.codigoDaObra,
         nome: values.nome,
         descricao: values.descricao,
         localizacao: values.localizacao,
+        cepCodigoPostal: values.cepCodigoPostal,
         dataInicio: values.dataInicio,
+        dataPrevistaTermino: values.dataPrevistaTermino,
         status: values.status,
+        nivelPBQPH: values.nivelPBQPH,
         documentos: values.documentos || [],
+        anexosObra: values.anexosObra || [],
+        responsavelEngenheiroNome: values.responsavelEngenheiroNome,
+        responsavelEngenheiroEmail: values.responsavelEngenheiroEmail,
+        responsavelEngenheiroTelefone: values.responsavelEngenheiroTelefone,
+        observacoesGerais: values.observacoesGerais,
         usuarios: [], // Initialize with empty array
       });
       
@@ -49,7 +58,7 @@ export default function NovaObraDialog({ open, onOpenChange }: NovaObraDialogPro
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px]">
+      <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Nova Obra</DialogTitle>
         </DialogHeader>

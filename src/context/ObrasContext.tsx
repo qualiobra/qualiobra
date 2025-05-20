@@ -5,6 +5,7 @@ import { useUserRole } from "./UserRoleContext";
 
 // Tipos para obras e usuários de obras
 export type ObraStatus = "planejamento" | "em_andamento" | "concluida" | "suspensa" | "arquivada";
+export type NivelPBQPH = "Nível A" | "Nível B" | "Não Aplicável";
 
 export type ObraUsuario = {
   userId: string;
@@ -15,13 +16,22 @@ export type ObraUsuario = {
 
 export type Obra = {
   id: string;
+  codigoDaObra: string;
   nome: string;
   descricao: string;
   localizacao: string;
+  cepCodigoPostal?: string;
   dataInicio: Date;
+  dataPrevistaTermino?: Date;
   status: ObraStatus;
+  nivelPBQPH?: NivelPBQPH;
   documentos: string[]; // URLs para documentos/imagens
+  anexosObra?: Array<{nome: string, url: string, tipo: string}>;
   usuarios: ObraUsuario[];
+  responsavelEngenheiroNome?: string;
+  responsavelEngenheiroEmail?: string;
+  responsavelEngenheiroTelefone?: string;
+  observacoesGerais?: string;
   criadaEm: Date;
   criadaPor: string;
 };
@@ -36,6 +46,8 @@ type ObrasContextType = {
   atribuirUsuario: (obraId: string, usuario: ObraUsuario) => void;
   removerUsuario: (obraId: string, userId: string) => void;
   getObrasDoUsuario: () => Obra[];
+  // Função para gerar código único para obra
+  gerarCodigoObra: () => string;
 };
 
 // Criação do contexto
@@ -55,6 +67,19 @@ export const ObrasProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   useEffect(() => {
     localStorage.setItem("obras", JSON.stringify(obras));
   }, [obras]);
+  
+  // Função auxiliar para gerar código único para a obra
+  const gerarCodigoObra = () => {
+    const anoAtual = new Date().getFullYear();
+    const numeroExistente = obras.length > 0 
+      ? Math.max(...obras.map(o => {
+        const match = o.codigoDaObra?.match(/OBRA-\d{4}-(\d{3})/);
+        return match ? parseInt(match[1], 10) : 0;
+      }))
+      : 0;
+    const proximoNumero = (numeroExistente + 1).toString().padStart(3, '0');
+    return `OBRA-${anoAtual}-${proximoNumero}`;
+  };
 
   // Adicionar nova obra
   const adicionarObra = (obraData: Omit<Obra, "id" | "criadaEm" | "criadaPor">) => {
@@ -145,7 +170,8 @@ export const ObrasProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         arquivarObra,
         atribuirUsuario,
         removerUsuario,
-        getObrasDoUsuario
+        getObrasDoUsuario,
+        gerarCodigoObra
       }}
     >
       {children}

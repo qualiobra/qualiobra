@@ -25,7 +25,21 @@ export default function EditarObraDialog({ open, onOpenChange, obraId }: EditarO
       setIsSubmitting(true);
       
       atualizarObra(obraId, {
-        ...values,
+        codigoDaObra: values.codigoDaObra,
+        nome: values.nome,
+        descricao: values.descricao,
+        localizacao: values.localizacao,
+        cepCodigoPostal: values.cepCodigoPostal,
+        dataInicio: values.dataInicio,
+        dataPrevistaTermino: values.dataPrevistaTermino,
+        status: values.status,
+        nivelPBQPH: values.nivelPBQPH,
+        documentos: values.documentos,
+        anexosObra: values.anexosObra,
+        responsavelEngenheiroNome: values.responsavelEngenheiroNome,
+        responsavelEngenheiroEmail: values.responsavelEngenheiroEmail,
+        responsavelEngenheiroTelefone: values.responsavelEngenheiroTelefone,
+        observacoesGerais: values.observacoesGerais,
       });
       
       toast({
@@ -49,22 +63,32 @@ export default function EditarObraDialog({ open, onOpenChange, obraId }: EditarO
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[550px]">
+      <DialogContent className="sm:max-w-[650px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Editar Obra: {obra.nome}</DialogTitle>
         </DialogHeader>
         
         <ObraForm 
           defaultValues={{
+            codigoDaObra: obra.codigoDaObra,
             nome: obra.nome,
             descricao: obra.descricao,
             localizacao: obra.localizacao,
+            cepCodigoPostal: obra.cepCodigoPostal,
             dataInicio: new Date(obra.dataInicio),
+            dataPrevistaTermino: obra.dataPrevistaTermino ? new Date(obra.dataPrevistaTermino) : undefined,
             status: obra.status,
+            nivelPBQPH: obra.nivelPBQPH || "Não Aplicável",
             documentos: obra.documentos,
+            anexosObra: obra.anexosObra || [],
+            responsavelEngenheiroNome: obra.responsavelEngenheiroNome || "",
+            responsavelEngenheiroEmail: obra.responsavelEngenheiroEmail,
+            responsavelEngenheiroTelefone: obra.responsavelEngenheiroTelefone,
+            observacoesGerais: obra.observacoesGerais,
           }}
           onSubmit={handleSubmit}
           submitButtonText="Salvar Alterações"
+          isEdit={true}
         />
       </DialogContent>
     </Dialog>
