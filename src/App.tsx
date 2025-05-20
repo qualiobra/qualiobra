@@ -51,10 +51,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// Separando a estrutura da aplicação em um componente próprio
-const AppRoutes = () => (
-  <UserRoleProvider>
-    <ObrasProvider>
+// App component wraps everything with QueryClientProvider
+const App = () => (
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -86,7 +86,11 @@ const AppRoutes = () => (
             {/* Rotas protegidas */}
             <Route element={
               <ProtectedRoute>
-                <UserLayout />
+                <UserRoleProvider>
+                  <ObrasProvider>
+                    <UserLayout />
+                  </ObrasProvider>
+                </UserRoleProvider>
               </ProtectedRoute>
             }>
               <Route path="/dashboard" element={<Dashboard />} />
@@ -104,15 +108,6 @@ const AppRoutes = () => (
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
-    </ObrasProvider>
-  </UserRoleProvider>
-);
-
-// Componente App principal com o QueryClientProvider como wrapper mais externo
-const App = () => (
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
-      <AppRoutes />
     </QueryClientProvider>
   </React.StrictMode>
 );
