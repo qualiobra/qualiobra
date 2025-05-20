@@ -12,7 +12,6 @@ import Dashboard from "./pages/Dashboard";
 import Inspections from "./pages/Inspections";
 import Team from "./pages/Team";
 import Obras from "./pages/Obras";
-import Diagnostico from "./pages/Diagnostico";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -51,10 +50,10 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-// App component wraps everything with QueryClientProvider
-const App = () => (
-  <React.StrictMode>
-    <QueryClientProvider client={queryClient}>
+// Separando a estrutura da aplicação em um componente próprio
+const AppRoutes = () => (
+  <UserRoleProvider>
+    <ObrasProvider>
       <TooltipProvider>
         <Toaster />
         <Sonner />
@@ -86,18 +85,13 @@ const App = () => (
             {/* Rotas protegidas */}
             <Route element={
               <ProtectedRoute>
-                <UserRoleProvider>
-                  <ObrasProvider>
-                    <UserLayout />
-                  </ObrasProvider>
-                </UserRoleProvider>
+                <UserLayout />
               </ProtectedRoute>
             }>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/inspections" element={<Inspections />} />
               <Route path="/team" element={<Team />} />
               <Route path="/obras" element={<Obras />} />
-              <Route path="/diagnostico" element={<Diagnostico />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/admin" element={<AdminPanel />} />
               <Route path="/admin/users" element={<UserManagement />} />
@@ -108,6 +102,15 @@ const App = () => (
           </Routes>
         </BrowserRouter>
       </TooltipProvider>
+    </ObrasProvider>
+  </UserRoleProvider>
+);
+
+// Componente App principal com o QueryClientProvider como wrapper mais externo
+const App = () => (
+  <React.StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <AppRoutes />
     </QueryClientProvider>
   </React.StrictMode>
 );
