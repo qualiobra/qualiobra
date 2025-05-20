@@ -67,7 +67,7 @@ const Register = () => {
     try {
       setIsLoading(true);
       
-      // Criando usuário usando os campos corretos para o Clerk
+      // Clerk expects these exact parameter names
       const result = await signUp.create({
         firstName,
         lastName,
@@ -75,7 +75,6 @@ const Register = () => {
         password,
       });
 
-      // Preparando para verificação de e-mail
       await signUp.prepareEmailAddressVerification({ strategy: "email_code" });
       
       toast({
@@ -87,14 +86,12 @@ const Register = () => {
         await setActive({ session: result.createdSessionId });
         navigate("/dashboard");
       } else {
-        // Verificação de e-mail necessária
-        // Por simplicidade, navegamos para o dashboard
+        // Redirecionamento para o dashboard por simplicidade
         navigate("/dashboard");
       }
     } catch (err: any) {
       console.error("Erro no cadastro:", err);
       
-      // Tratamento de erros mais específicos do Clerk
       if (err.errors && err.errors.length > 0) {
         err.errors.forEach((error: any) => {
           const errorMsg = error.longMessage || error.message;
