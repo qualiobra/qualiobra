@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator, 
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
-import { ClipboardCheck, Menu, User, Bell, Settings } from "lucide-react";
+import { Menu, User, Bell, Settings } from "lucide-react";
 
 const SiteHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -21,9 +21,11 @@ const SiteHeader = () => {
           {/* Logo */}
           <div className="flex items-center">
             <Link to="/" className="flex items-center">
-              <div className="rounded-full bg-primary w-8 h-8 flex items-center justify-center mr-2">
-                <ClipboardCheck className="text-white" size={16} />
-              </div>
+              <img 
+                src="/lovable-uploads/0606c9b7-ff8b-45c2-93f5-0ce14a8cdab6.png" 
+                alt="QualiObra Logo" 
+                className="h-10 w-auto mr-2" 
+              />
               <span className="font-bold text-xl">QualiObra</span>
             </Link>
           </div>
@@ -31,9 +33,9 @@ const SiteHeader = () => {
           {/* Desktop Navigation */}
           <nav className="hidden md:flex items-center space-x-6">
             <Link to="/dashboard" className="text-gray-700 hover:text-primary font-medium">Dashboard</Link>
-            <Link to="/inspections" className="text-gray-700 hover:text-primary font-medium">Inspections</Link>
-            <Link to="/team" className="text-gray-700 hover:text-primary font-medium">Team</Link>
-            <Link to="/reports" className="text-gray-700 hover:text-primary font-medium">Reports</Link>
+            <Link to="/inspections" className="text-gray-700 hover:text-primary font-medium">Inspeções</Link>
+            <Link to="/team" className="text-gray-700 hover:text-primary font-medium">Equipe</Link>
+            <Link to="/reports" className="text-gray-700 hover:text-primary font-medium">Relatórios</Link>
           </nav>
           
           {/* User & Notification Dropdowns */}
@@ -46,31 +48,31 @@ const SiteHeader = () => {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-80">
-                <DropdownMenuLabel>Notifications</DropdownMenuLabel>
+                <DropdownMenuLabel>Notificações</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <div className="max-h-80 overflow-y-auto">
                   <NotificationItem 
-                    title="New non-conformity" 
-                    description="Critical issue reported on Site A - Foundation Inspection"
-                    time="2 hours ago"
+                    title="Nova não-conformidade" 
+                    description="Problema crítico reportado no Site A - Inspeção de Fundação"
+                    time="2 horas atrás"
                     isNew={true}
                   />
                   <NotificationItem 
-                    title="Inspection completed" 
-                    description="Marcos Silva completed the structural inspection"
-                    time="Yesterday"
+                    title="Inspeção concluída" 
+                    description="Marcos Silva concluiu a inspeção estrutural"
+                    time="Ontem"
                     isNew={false}
                   />
                   <NotificationItem 
-                    title="Task assigned" 
-                    description="You've been assigned to review the electrical inspection"
-                    time="2 days ago"
+                    title="Tarefa atribuída" 
+                    description="Você foi designado para revisar a inspeção elétrica"
+                    time="2 dias atrás"
                     isNew={false}
                   />
                 </div>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem className="justify-center text-center">
-                  <Link to="/notifications" className="w-full text-primary">View all notifications</Link>
+                  <Link to="/notifications" className="w-full text-primary">Ver todas notificações</Link>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -83,16 +85,16 @@ const SiteHeader = () => {
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <DropdownMenuLabel>Minha Conta</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem>
-                  <User className="mr-2 h-4 w-4" /> Profile
+                  <User className="mr-2 h-4 w-4" /> Perfil
                 </DropdownMenuItem>
                 <DropdownMenuItem>
-                  <Settings className="mr-2 h-4 w-4" /> Settings
+                  <Settings className="mr-2 h-4 w-4" /> Configurações
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>Log out</DropdownMenuItem>
+                <DropdownMenuItem>Sair</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
             
@@ -111,9 +113,9 @@ const SiteHeader = () => {
           <div className="md:hidden py-4 border-t">
             <nav className="flex flex-col space-y-4">
               <Link to="/dashboard" className="px-4 py-2 hover:bg-gray-100 rounded-md">Dashboard</Link>
-              <Link to="/inspections" className="px-4 py-2 hover:bg-gray-100 rounded-md">Inspections</Link>
-              <Link to="/team" className="px-4 py-2 hover:bg-gray-100 rounded-md">Team</Link>
-              <Link to="/reports" className="px-4 py-2 hover:bg-gray-100 rounded-md">Reports</Link>
+              <Link to="/inspections" className="px-4 py-2 hover:bg-gray-100 rounded-md">Inspeções</Link>
+              <Link to="/team" className="px-4 py-2 hover:bg-gray-100 rounded-md">Equipe</Link>
+              <Link to="/reports" className="px-4 py-2 hover:bg-gray-100 rounded-md">Relatórios</Link>
             </nav>
           </div>
         )}

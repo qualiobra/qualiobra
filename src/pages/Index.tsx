@@ -1,7 +1,7 @@
 
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
-import { ArrowRight, ClipboardCheck, Gauge, MessageSquare, Users } from "lucide-react";
+import { ArrowRight, Gauge, MessageSquare, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Index = () => {
@@ -18,9 +18,11 @@ const Index = () => {
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4 flex justify-between items-center">
           <div className="flex items-center">
-            <div className="rounded-full bg-primary w-10 h-10 flex items-center justify-center mr-3">
-              <ClipboardCheck className="text-white" size={20} />
-            </div>
+            <img 
+              src="/lovable-uploads/0606c9b7-ff8b-45c2-93f5-0ce14a8cdab6.png" 
+              alt="QualiObra Logo" 
+              className="h-12 w-auto mr-3" 
+            />
             <h1 className="text-2xl font-bold text-gray-900">QualiObra</h1>
           </div>
           <nav className="hidden md:flex space-x-6">
@@ -126,9 +128,11 @@ const Index = () => {
           <div className="flex flex-col md:flex-row justify-between">
             <div className="mb-8 md:mb-0">
               <div className="flex items-center">
-                <div className="rounded-full bg-white w-10 h-10 flex items-center justify-center mr-3">
-                  <ClipboardCheck className="text-primary" size={20} />
-                </div>
+                <img 
+                  src="/lovable-uploads/0606c9b7-ff8b-45c2-93f5-0ce14a8cdab6.png" 
+                  alt="QualiObra Logo" 
+                  className="h-10 w-auto bg-white rounded-full p-1 mr-3" 
+                />
                 <h2 className="text-xl font-bold">QualiObra</h2>
               </div>
               <p className="mt-4 max-w-md text-gray-400">
