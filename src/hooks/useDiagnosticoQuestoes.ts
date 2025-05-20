@@ -15,11 +15,12 @@ export function useDiagnosticoQuestoes(nivelSelecionado: NivelDiagnostico, userI
       setIsLoading(true);
       setError(null);
 
-      // Consulta para buscar questões baseada no nível selecionado
+      // Consulta para buscar todas as questões ativas
       const { data, error: fetchError } = await supabase
         .from("questoes_diagnostico")
         .select("*")
-        .eq("ativa", true);
+        .eq("ativa", true)
+        .order('ordem_exibicao', { ascending: true });
 
       if (fetchError) {
         console.error("Erro ao buscar questões:", fetchError);
@@ -32,23 +33,11 @@ export function useDiagnosticoQuestoes(nivelSelecionado: NivelDiagnostico, userI
       } else {
         console.log(`Encontradas ${data.length} questões para diagnóstico`);
         
-        // Convert raw data to the correct type
+        // Converter os dados brutos para o tipo correto
         const questoesConvertidas: QuestoesDiagnostico[] = data.map(convertToQuestoesDiagnostico);
         
-        // Filtrar as questões baseadas no nível selecionado
-        const questoesDoNivel = questoesConvertidas.filter(questao => {
-          if (nivelSelecionado === "Nível B") {
-            return questao.exigencia_siac_nivel_b !== 'N/A';
-          }
-          if (nivelSelecionado === "Nível A") {
-            return questao.exigencia_siac_nivel_a !== 'N/A';
-          }
-          // Para "Ambos os Níveis"
-          return true;
-        });
-        
         // Buscamos as respostas do usuário atual apenas se ele estiver autenticado
-        if (userId && isSignedIn && questoesDoNivel.length > 0) {
+        if (userId && isSignedIn && questoesConvertidas.length > 0) {
           try {
             const { data: respostas, error: respostasError } = await supabase
               .from('respostas_diagnostico_usuario')
@@ -63,21 +52,21 @@ export function useDiagnosticoQuestoes(nivelSelecionado: NivelDiagnostico, userI
             
             if (respostas && respostas.length > 0) {
               // Mapeamos as respostas para as questões
-              const questoesComRespostas = questoesDoNivel.map(questao => {
+              const questoesComRespostas = questoesConvertidas.map(questao => {
                 const resposta = respostas.find(r => r.id_questao_respondida === questao.id_questao);
                 return resposta ? { ...questao, resposta } : questao;
               });
               setQuestoes(questoesComRespostas);
             } else {
-              setQuestoes(questoesDoNivel);
+              setQuestoes(questoesConvertidas);
             }
           } catch (respostasErr) {
             console.error("Erro ao processar respostas:", respostasErr);
-            setQuestoes(questoesDoNivel);
+            setQuestoes(questoesConvertidas);
           }
         } else {
           // Se não estiver autenticado, apenas definimos as questões
-          setQuestoes(questoesDoNivel);
+          setQuestoes(questoesConvertidas);
         }
       }
     } catch (err: any) {

@@ -1,6 +1,5 @@
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { NivelDiagnostico } from "@/types/diagnostico";
 
 interface DiagnosticoTabsProps {
   tabAtiva: string;
@@ -11,10 +10,9 @@ interface DiagnosticoTabsProps {
 const DiagnosticoTabs = ({ tabAtiva, onTabChange, children }: DiagnosticoTabsProps) => {
   return (
     <Tabs value={tabAtiva} onValueChange={onTabChange} className="w-full">
-      <TabsList className="grid w-full grid-cols-3 mb-4">
+      <TabsList className="grid w-full grid-cols-2 mb-4">
         <TabsTrigger value="instrucoes">Instruções</TabsTrigger>
-        <TabsTrigger value="nivelB">Nível B</TabsTrigger>
-        <TabsTrigger value="nivelA">Nível A</TabsTrigger>
+        <TabsTrigger value="diagnostico">Diagnóstico</TabsTrigger>
       </TabsList>
       {children}
     </Tabs>

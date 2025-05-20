@@ -41,10 +41,19 @@ const DiagnosticoQuestaoItem = ({
   const getExigenciaBadge = (tipo: 'X' | 'E' | 'N/A', nivel: string) => {
     if (tipo === 'N/A') return null;
     
+    let colorClass = '';
+    let textColor = '';
+    
+    if (nivel === 'Nível B') {
+      colorClass = tipo === 'X' ? 'bg-blue-600' : 'border-blue-600 text-blue-600';
+    } else {
+      colorClass = tipo === 'X' ? 'bg-green-600' : 'border-green-600 text-green-600';
+    }
+    
     return (
       <Badge 
         variant={tipo === 'X' ? "default" : "outline"} 
-        className={`ml-2 ${tipo === 'X' ? 'bg-blue-600' : 'border-blue-600 text-blue-600'}`}
+        className={`ml-2 ${colorClass}`}
       >
         {tipo === 'X' ? `${nivel} (X)` : `${nivel} (E)`}
       </Badge>
@@ -57,15 +66,17 @@ const DiagnosticoQuestaoItem = ({
     <AccordionItem key={questao.id_questao} value={questao.id_questao}>
       <AccordionTrigger className="hover:no-underline">
         <div className="flex justify-between w-full items-center pr-4">
-          <div className="flex items-center">
-            <span className="text-left">
+          <div className="flex flex-wrap items-center">
+            <span className="text-left mr-2">
               {questao.item_requisito}: {questao.titulo_requisito}
             </span>
-            {questao.exigencia_siac_nivel_b !== 'N/A' && getExigenciaBadge(questao.exigencia_siac_nivel_b, 'Nível B')}
-            {questao.exigencia_siac_nivel_a !== 'N/A' && getExigenciaBadge(questao.exigencia_siac_nivel_a, 'Nível A')}
+            <div className="flex mt-1">
+              {questao.exigencia_siac_nivel_b !== 'N/A' && getExigenciaBadge(questao.exigencia_siac_nivel_b, 'Nível B')}
+              {questao.exigencia_siac_nivel_a !== 'N/A' && getExigenciaBadge(questao.exigencia_siac_nivel_a, 'Nível A')}
+            </div>
           </div>
           {respondida && (
-            <span className="flex items-center text-green-600 text-sm ml-2">
+            <span className="flex items-center text-green-600 text-sm ml-2 shrink-0">
               <Check className="h-4 w-4 mr-1" />
               {getPontuacaoLabel(pontuacao as number, questao.tipo_pontuacao)}
             </span>
@@ -75,6 +86,19 @@ const DiagnosticoQuestaoItem = ({
       <AccordionContent>
         <div className="space-y-4 p-4">
           <p className="text-gray-700">{questao.descricao_questao}</p>
+          
+          <div className="flex flex-wrap gap-2 mt-2">
+            {questao.exigencia_siac_nivel_b !== 'N/A' && (
+              <div className="text-sm bg-blue-50 p-2 rounded border border-blue-200">
+                <span className="font-medium text-blue-800">Nível B:</span> {questao.exigencia_siac_nivel_b === 'X' ? 'Requisito' : 'Evidência'}
+              </div>
+            )}
+            {questao.exigencia_siac_nivel_a !== 'N/A' && (
+              <div className="text-sm bg-green-50 p-2 rounded border border-green-200">
+                <span className="font-medium text-green-800">Nível A:</span> {questao.exigencia_siac_nivel_a === 'X' ? 'Requisito' : 'Evidência'}
+              </div>
+            )}
+          </div>
           
           {questao.referencia_completa_siac && (
             <div className="mt-2 text-sm text-gray-500">

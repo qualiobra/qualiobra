@@ -28,7 +28,7 @@ const DiagnosticoContent = ({
       <CardHeader>
         <CardTitle>Diagnóstico PBQP-H SiAC</CardTitle>
         <CardDescription>
-          Selecione o nível que deseja avaliar e responda às questões para obter uma análise de conformidade.
+          Responda às questões para obter uma análise completa de conformidade considerando os requisitos do nível A e B.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -36,21 +36,11 @@ const DiagnosticoContent = ({
           <DiagnosticoInstructions />
         </TabsContent>
         
-        <TabsContent value="nivelB">
+        <TabsContent value="diagnostico">
           <QuestoesDiagnosticoList 
             questoes={questoes}
             isLoading={isLoading}
-            nivel="Nível B"
-            error={error}
-            onRetry={onRetry}
-          />
-        </TabsContent>
-        
-        <TabsContent value="nivelA">
-          <QuestoesDiagnosticoList 
-            questoes={questoes}
-            isLoading={isLoading}
-            nivel="Nível A"
+            nivel={nivelSelecionado}
             error={error}
             onRetry={onRetry}
           />

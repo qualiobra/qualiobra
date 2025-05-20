@@ -10,10 +10,12 @@ import DiagnosticoContent from "@/components/diagnostico/DiagnosticoContent";
 import useDiagnosticoQuestoes from "@/hooks/useDiagnosticoQuestoes";
 
 const Diagnostico = () => {
-  const [nivelSelecionado, setNivelSelecionado] = useState<NivelDiagnostico>("Nível B");
   const [tabAtiva, setTabAtiva] = useState('instrucoes');
   const { isSignedIn, user } = useUser();
   const navigate = useNavigate();
+  
+  // Usamos "Ambos os Níveis" como padrão para considerar todos os requisitos
+  const nivelSelecionado: NivelDiagnostico = "Ambos os Níveis";
 
   const { 
     questoes, 
@@ -25,16 +27,14 @@ const Diagnostico = () => {
 
   const handleTabChange = (value: string) => {
     setTabAtiva(value);
-    if (value === 'nivelB') {
-      setNivelSelecionado("Nível B");
-    } else if (value === 'nivelA') {
-      setNivelSelecionado("Nível A");
+    if (value === 'diagnostico') {
+      fetchQuestoesDiagnostico();
     }
   };
 
-  // Load questions when tab changes to a nivel tab
+  // Carrega as questões quando a aba de diagnóstico é selecionada
   useEffect(() => {
-    if (tabAtiva === 'nivelB' || tabAtiva === 'nivelA') {
+    if (tabAtiva === 'diagnostico') {
       fetchQuestoesDiagnostico();
     }
   }, [tabAtiva, fetchQuestoesDiagnostico]);
