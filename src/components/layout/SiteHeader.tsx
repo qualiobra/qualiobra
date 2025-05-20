@@ -24,9 +24,9 @@ const SiteHeader = () => {
               <img 
                 src="/lovable-uploads/0606c9b7-ff8b-45c2-93f5-0ce14a8cdab6.png" 
                 alt="QualiObra Logo" 
-                className="h-10 w-auto mr-2" 
+                className="h-10 w-auto" 
               />
-              <span className="font-bold text-xl">QualiObra</span>
+              {/* Removed the span with "QualiObra" text */}
             </Link>
           </div>
           

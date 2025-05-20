@@ -23,7 +23,7 @@ const Index = () => {
               alt="QualiObra Logo" 
               className="h-12 w-auto mr-3" 
             />
-            <h1 className="text-2xl font-bold text-gray-900">QualiObra</h1>
+            {/* Removed the h1 with "QualiObra" text */}
           </div>
           <nav className="hidden md:flex space-x-6">
             <Link to="/" className="text-gray-700 hover:text-primary font-medium">Início</Link>
@@ -133,7 +133,7 @@ const Index = () => {
                   alt="QualiObra Logo" 
                   className="h-10 w-auto bg-white rounded-full p-1 mr-3" 
                 />
-                <h2 className="text-xl font-bold">QualiObra</h2>
+                {/* Removed the h2 with "QualiObra" text */}
               </div>
               <p className="mt-4 max-w-md text-gray-400">
                 Plataforma de gestão de qualidade para conformidade com ISO e PBQP-H na construção civil.
