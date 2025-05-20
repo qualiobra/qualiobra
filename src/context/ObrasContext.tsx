@@ -1,8 +1,15 @@
 
-import React, { createContext, useState, useContext, useEffect, ReactNode } from "react";
-import { Obra, Usuario, UsuarioObra, StatusObra, Documento } from "../types/obra";
+import React, { createContext, useState, useEffect, ReactNode } from "react";
+import { Obra, Usuario, StatusObra, Documento } from "../types/obra";
 import { useUserRole } from "./UserRoleContext";
 import { useUser } from "@clerk/clerk-react";
+import { 
+  obrasIniciais, 
+  adicionarUsuarioAObra, 
+  removerUsuarioDeObra,
+  adicionarDocumentoAObra,
+  removerDocumentoDeObra
+} from "../utils/obrasUtils";
 
 interface ObrasContextType {
   obras: Obra[];
@@ -20,39 +27,7 @@ interface ObrasContextType {
   removerDocumento: (obraId: string, documentoId: string) => void;
 }
 
-const ObrasContext = createContext<ObrasContextType | undefined>(undefined);
-
-// Dados de exemplo para obras
-const obrasIniciais: Obra[] = [
-  {
-    id: "1",
-    nome: "Edifício Residence Park",
-    descricao: "Construção de edifício residencial com 12 andares",
-    localizacao: "Av. Paulista, 1000 - São Paulo/SP",
-    dataInicio: "2023-10-15",
-    status: "em_andamento",
-    documentos: [
-      {
-        id: "doc1",
-        nome: "Planta baixa",
-        tipo: "pdf",
-        url: "/documentos/planta.pdf",
-        dataUpload: "2023-10-15"
-      }
-    ],
-    usuarios: []
-  },
-  {
-    id: "2",
-    nome: "Reforma Hospital Santa Casa",
-    descricao: "Reforma da ala pediátrica",
-    localizacao: "Rua das Flores, 500 - Rio de Janeiro/RJ",
-    dataInicio: "2023-09-01",
-    status: "em_andamento",
-    documentos: [],
-    usuarios: []
-  }
-];
+export const ObrasContext = createContext<ObrasContextType | undefined>(undefined);
 
 export const ObrasProvider: React.FC<{children: ReactNode}> = ({ children }) => {
   const [obras, setObras] = useState<Obra[]>(obrasIniciais);
@@ -95,24 +70,14 @@ export const ObrasProvider: React.FC<{children: ReactNode}> = ({ children }) => 
   const atribuirUsuario = (obraId: string, usuario: Usuario, funcao: string) => {
     setObras(prev => prev.map(obra => {
       if (obra.id !== obraId) return obra;
-      
-      // Remove o usuário se já existir e adiciona com a nova função
-      const usuariosAtualizados = obra.usuarios
-        .filter(u => u.usuario.id !== usuario.id)
-        .concat({ usuario, funcao });
-        
-      return { ...obra, usuarios: usuariosAtualizados };
+      return adicionarUsuarioAObra(obra, usuario, funcao);
     }));
   };
 
   const removerUsuario = (obraId: string, usuarioId: string) => {
     setObras(prev => prev.map(obra => {
       if (obra.id !== obraId) return obra;
-      
-      return {
-        ...obra,
-        usuarios: obra.usuarios.filter(u => u.usuario.id !== usuarioId)
-      };
+      return removerUsuarioDeObra(obra, usuarioId);
     }));
   };
 
@@ -127,30 +92,16 @@ export const ObrasProvider: React.FC<{children: ReactNode}> = ({ children }) => 
   };
 
   const adicionarDocumento = (obraId: string, documento: Omit<Documento, "id" | "dataUpload">) => {
-    const novoDocumento: Documento = {
-      ...documento,
-      id: Date.now().toString(),
-      dataUpload: new Date().toISOString().split('T')[0]
-    };
-
     setObras(prev => prev.map(obra => {
       if (obra.id !== obraId) return obra;
-      
-      return {
-        ...obra,
-        documentos: [...obra.documentos, novoDocumento]
-      };
+      return adicionarDocumentoAObra(obra, documento);
     }));
   };
 
   const removerDocumento = (obraId: string, documentoId: string) => {
     setObras(prev => prev.map(obra => {
       if (obra.id !== obraId) return obra;
-      
-      return {
-        ...obra,
-        documentos: obra.documentos.filter(d => d.id !== documentoId)
-      };
+      return removerDocumentoDeObra(obra, documentoId);
     }));
   };
 
@@ -201,12 +152,4 @@ export const ObrasProvider: React.FC<{children: ReactNode}> = ({ children }) => 
       {children}
     </ObrasContext.Provider>
   );
-};
-
-export const useObras = () => {
-  const context = useContext(ObrasContext);
-  if (context === undefined) {
-    throw new Error("useObras deve ser usado dentro de um ObrasProvider");
-  }
-  return context;
 };
