@@ -1,173 +1,220 @@
 
-import React from "react";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import RecentInspections from "@/components/dashboard/RecentInspections";
+import { useState } from "react";
+import { Card, CardHeader, CardTitle, CardContent, CardDescription } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Gauge, ClipboardCheck, Users, TrendingUp, TrendingDown, Bell } from "lucide-react";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 import ComplianceChart from "@/components/dashboard/ComplianceChart";
 import NonConformitiesChart from "@/components/dashboard/NonConformitiesChart";
+import RecentInspections from "@/components/dashboard/RecentInspections";
 import PendingTasks from "@/components/dashboard/PendingTasks";
-import { ObrasList } from "@/components/dashboard/ObrasList";
-import { useUser } from "@clerk/clerk-react";
+import SiteHeader from "@/components/layout/SiteHeader";
 
-export default function Dashboard() {
-  const { user } = useUser();
-  const firstName = user?.firstName || "";
+const Dashboard = () => {
+  const [selectedTab, setSelectedTab] = useState("overview");
+  const [showWelcome, setShowWelcome] = useState(true);
 
   return (
-    <div className="flex-1 space-y-4 p-4 md:p-8">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">
-          Olá, {firstName} 👋
-        </h2>
-      </div>
+    <div className="min-h-screen bg-gray-50">
+      <SiteHeader />
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Inspeções realizadas
-            </CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
-            </svg>
-          </CardHeader>
-          <CardHeader className="p-2">
-            <div className="text-2xl font-bold">24</div>
-            <p className="text-xs text-muted-foreground">
-              +10% em relação ao mês passado
-            </p>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Não conformidades
-            </CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2" />
-              <circle cx="9" cy="7" r="4" />
-              <path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75" />
-            </svg>
-          </CardHeader>
-          <CardHeader className="p-2">
-            <div className="text-2xl font-bold">8</div>
-            <p className="text-xs text-muted-foreground">
-              -15% em relação ao mês passado
-            </p>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Conformidade geral
-            </CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <rect width="20" height="14" x="2" y="5" rx="2" />
-              <path d="M2 10h20" />
-            </svg>
-          </CardHeader>
-          <CardHeader className="p-2">
-            <div className="text-2xl font-bold">92%</div>
-            <p className="text-xs text-muted-foreground">
-              +3% em relação ao mês passado
-            </p>
-          </CardHeader>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Inspeções pendentes
-            </CardTitle>
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              className="h-4 w-4 text-muted-foreground"
-            >
-              <path d="M22 12h-4l-3 9L9 3l-3 9H2" />
-            </svg>
-          </CardHeader>
-          <CardHeader className="p-2">
-            <div className="text-2xl font-bold">6</div>
-            <p className="text-xs text-muted-foreground">
-              -2 em relação à semana passada
-            </p>
-          </CardHeader>
-        </Card>
-      </div>
+      {/* Welcome Dialog */}
+      <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Bem-vindo ao Dashboard QualiObra</DialogTitle>
+            <DialogDescription>
+              Aqui você pode monitorar métricas de qualidade, acompanhar inspeções e gerenciar suas equipes em todos os canteiros de obras.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4">
+            <p>Novos recursos disponíveis:</p>
+            <ul className="list-disc list-inside space-y-1">
+              <li>Formulários de inspeção aprimorados com capacidade de upload de fotos</li>
+              <li>Notificações por WhatsApp para não-conformidades urgentes</li>
+              <li>Métricas de desempenho da equipe e rankings</li>
+            </ul>
+            <Button onClick={() => setShowWelcome(false)} className="w-full">
+              Começar
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
       
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
-          <CardHeader>
-            <CardTitle>Conformidade por Critério</CardTitle>
-            <CardDescription>
-              Distribuição de conformidade por critério de inspeção.
-            </CardDescription>
-          </CardHeader>
-          <ComplianceChart />
-        </Card>
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Não Conformidades</CardTitle>
-            <CardDescription>
-              Não conformidades identificadas nos últimos 30 dias.
-            </CardDescription>
-          </CardHeader>
-          <NonConformitiesChart />
-        </Card>
-      </div>
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <ObrasList />
-        <Card className="lg:col-span-2">
-          <CardHeader>
-            <CardTitle>Inspeções Recentes</CardTitle>
-          </CardHeader>
-          <RecentInspections />
-        </Card>
-      </div>
-      
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        <Card className="col-span-3">
-          <CardHeader>
-            <CardTitle>Tarefas Pendentes</CardTitle>
-            <CardDescription>
-              Lista de tarefas que precisam de sua atenção.
-            </CardDescription>
-          </CardHeader>
-          <PendingTasks />
-        </Card>
+      <div className="container mx-auto px-4 py-8">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">Dashboard de Qualidade</h1>
+          <p className="text-gray-600">Monitore métricas de qualidade em todos os seus projetos de construção</p>
+        </div>
+        
+        {/* Dashboard Tabs */}
+        <Tabs value={selectedTab} onValueChange={setSelectedTab} className="mb-8">
+          <TabsList className="grid grid-cols-4 md:w-[600px]">
+            <TabsTrigger value="overview">
+              <Gauge className="mr-2 h-4 w-4" /> Visão Geral
+            </TabsTrigger>
+            <TabsTrigger value="inspections">
+              <ClipboardCheck className="mr-2 h-4 w-4" /> Inspeções
+            </TabsTrigger>
+            <TabsTrigger value="team">
+              <Users className="mr-2 h-4 w-4" /> Equipe
+            </TabsTrigger>
+            <TabsTrigger value="notifications">
+              <Bell className="mr-2 h-4 w-4" /> Notificações
+            </TabsTrigger>
+          </TabsList>
+
+          {/* Overview Tab Content */}
+          <TabsContent value="overview" className="space-y-6">
+            {/* Stats Cards */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Total de Inspeções</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-3xl font-bold">324</div>
+                    <div className="flex items-center text-green-500">
+                      <TrendingUp className="mr-1 h-4 w-4" />
+                      <span className="text-xs font-medium">+12%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Taxa de Conformidade</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-3xl font-bold">88%</div>
+                    <div className="flex items-center text-green-500">
+                      <TrendingUp className="mr-1 h-4 w-4" />
+                      <span className="text-xs font-medium">+3%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Não-Conformidades</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-3xl font-bold">42</div>
+                    <div className="flex items-center text-red-500">
+                      <TrendingDown className="mr-1 h-4 w-4" />
+                      <span className="text-xs font-medium">-8%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader className="pb-2">
+                  <CardTitle className="text-sm font-medium text-gray-500">Tarefas Pendentes</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center justify-between">
+                    <div className="text-3xl font-bold">16</div>
+                    <div className="flex items-center text-amber-500">
+                      <TrendingUp className="mr-1 h-4 w-4" />
+                      <span className="text-xs font-medium">+2%</span>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Charts and Tables */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="col-span-1">
+                <CardHeader>
+                  <CardTitle>Métricas de Conformidade</CardTitle>
+                  <CardDescription>Conformidade mensal por categoria</CardDescription>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <ComplianceChart />
+                </CardContent>
+              </Card>
+              <Card className="col-span-1">
+                <CardHeader>
+                  <CardTitle>Não-Conformidades</CardTitle>
+                  <CardDescription>Problemas por gravidade e status</CardDescription>
+                </CardHeader>
+                <CardContent className="h-[300px]">
+                  <NonConformitiesChart />
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Recent Activity and Pending Tasks */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card className="col-span-1">
+                <CardHeader>
+                  <CardTitle>Inspeções Recentes</CardTitle>
+                  <CardDescription>Últimas 5 inspeções em todos os canteiros</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <RecentInspections />
+                </CardContent>
+              </Card>
+              <Card className="col-span-1">
+                <CardHeader>
+                  <CardTitle>Tarefas Pendentes</CardTitle>
+                  <CardDescription>Tarefas que requerem atenção</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <PendingTasks />
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          {/* Inspections Tab */}
+          <TabsContent value="inspections">
+            <Card>
+              <CardHeader>
+                <CardTitle>Inspeções</CardTitle>
+                <CardDescription>Gerencie todos os formulários e relatórios de inspeção</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>O conteúdo das inspeções será exibido aqui...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Team Tab */}
+          <TabsContent value="team">
+            <Card>
+              <CardHeader>
+                <CardTitle>Desempenho da Equipe</CardTitle>
+                <CardDescription>Visualize estatísticas da equipe e classificações</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>O conteúdo de desempenho da equipe será exibido aqui...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+
+          {/* Notifications Tab */}
+          <TabsContent value="notifications">
+            <Card>
+              <CardHeader>
+                <CardTitle>Notificações</CardTitle>
+                <CardDescription>Configure alertas e preferências de notificação</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <p>As configurações de notificação serão exibidas aqui...</p>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
       </div>
     </div>
   );
-}
+};
+
+export default Dashboard;

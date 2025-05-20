@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -5,12 +6,10 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading } from "@clerk/clerk-react";
 import { UserRoleProvider } from "./context/UserRoleContext";
-import { ObrasProvider } from "./context/ObrasContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Inspections from "./pages/Inspections";
 import Team from "./pages/Team";
-import Obras from "./pages/Obras";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
@@ -20,8 +19,6 @@ import AdminPanel from "./pages/admin/AdminPanel";
 import UserManagement from "./pages/admin/UserManagement";
 import Reports from "./pages/Reports";
 import UserLayout from "./components/layout/UserLayout";
-import AvaliacaoInicial from "./pages/AvaliacaoInicial";
-import Diagnostico from "./pages/Diagnostico";
 import { Loader2 } from "lucide-react";
 import React from "react";
 
@@ -54,58 +51,53 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 // Separando a estrutura da aplicação em um componente próprio
 const AppRoutes = () => (
   <UserRoleProvider>
-    <ObrasProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <Routes>
-            {/* Rotas públicas */}
-            <Route path="/" element={<Index />} />
-            <Route path="/login" element={
-              <SignedOut>
-                <Login />
-              </SignedOut>
-            } />
-            <Route path="/register" element={
-              <SignedOut>
-                <Register />
-              </SignedOut>
-            } />
-            <Route path="/verify" element={
-              <SignedOut>
-                <VerifyCode />
-              </SignedOut>
-            } />
-            <Route path="/forgot-password" element={
-              <SignedOut>
-                <ForgotPassword />
-              </SignedOut>
-            } />
-            <Route path="/avaliacao-inicial" element={<AvaliacaoInicial />} />
-            <Route path="/diagnostico" element={<Diagnostico />} />
-            
-            {/* Rotas protegidas */}
-            <Route element={
-              <ProtectedRoute>
-                <UserLayout />
-              </ProtectedRoute>
-            }>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/inspections" element={<Inspections />} />
-              <Route path="/team" element={<Team />} />
-              <Route path="/obras" element={<Obras />} />
-              <Route path="/reports" element={<Reports />} />
-              <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/admin/users" element={<UserManagement />} />
-            </Route>
-            
-            {/* Rota de fallback para página não encontrada */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </TooltipProvider>
-    </ObrasProvider>
+    <TooltipProvider>
+      <Toaster />
+      <Sonner />
+      <BrowserRouter>
+        <Routes>
+          {/* Rotas públicas */}
+          <Route path="/" element={<Index />} />
+          <Route path="/login" element={
+            <SignedOut>
+              <Login />
+            </SignedOut>
+          } />
+          <Route path="/register" element={
+            <SignedOut>
+              <Register />
+            </SignedOut>
+          } />
+          <Route path="/verify" element={
+            <SignedOut>
+              <VerifyCode />
+            </SignedOut>
+          } />
+          <Route path="/forgot-password" element={
+            <SignedOut>
+              <ForgotPassword />
+            </SignedOut>
+          } />
+          
+          {/* Rotas protegidas */}
+          <Route element={
+            <ProtectedRoute>
+              <UserLayout />
+            </ProtectedRoute>
+          }>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/inspections" element={<Inspections />} />
+            <Route path="/team" element={<Team />} />
+            <Route path="/reports" element={<Reports />} />
+            <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/admin/users" element={<UserManagement />} />
+          </Route>
+          
+          {/* Rota de fallback para página não encontrada */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </BrowserRouter>
+    </TooltipProvider>
   </UserRoleProvider>
 );
 
