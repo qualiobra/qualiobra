@@ -86,8 +86,8 @@ const Register = () => {
         await setActive({ session: result.createdSessionId });
         navigate("/dashboard");
       } else {
-        // Redirecionamento para o dashboard por simplicidade
-        navigate("/dashboard");
+        // Redirecionar para a página de verificação de código
+        navigate("/verify", { state: { email } });
       }
     } catch (err: any) {
       console.error("Erro no cadastro:", err);

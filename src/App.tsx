@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,6 +12,7 @@ import Team from "./pages/Team";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
+import VerifyCode from "./pages/auth/VerifyCode";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import AdminPanel from "./pages/admin/AdminPanel";
 import Reports from "./pages/Reports";
@@ -64,6 +64,11 @@ const AppRoutes = () => (
           <Route path="/register" element={
             <SignedOut>
               <Register />
+            </SignedOut>
+          } />
+          <Route path="/verify" element={
+            <SignedOut>
+              <VerifyCode />
             </SignedOut>
           } />
           <Route path="/forgot-password" element={
