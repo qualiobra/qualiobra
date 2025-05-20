@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -15,6 +16,7 @@ import Register from "./pages/auth/Register";
 import VerifyCode from "./pages/auth/VerifyCode";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import AdminPanel from "./pages/admin/AdminPanel";
+import UserManagement from "./pages/admin/UserManagement";
 import Reports from "./pages/Reports";
 import UserLayout from "./components/layout/UserLayout";
 import { Loader2 } from "lucide-react";
@@ -88,6 +90,7 @@ const AppRoutes = () => (
             <Route path="/team" element={<Team />} />
             <Route path="/reports" element={<Reports />} />
             <Route path="/admin" element={<AdminPanel />} />
+            <Route path="/admin/users" element={<UserManagement />} />
           </Route>
           
           {/* Rota de fallback para página não encontrada */}

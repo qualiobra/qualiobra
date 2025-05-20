@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { toast } from "@/hooks/use-toast";
@@ -44,7 +43,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserPlus, Users, Settings, MoreVertical, Pencil, Trash2 } from "lucide-react";
+import { UserPlus, Users, Settings, MoreVertical, Pencil, Trash2, User } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const AdminPanel = () => {
   const { user } = useUser();
@@ -387,9 +387,14 @@ const AdminPanel = () => {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <p className="text-center py-8 text-muted-foreground">
-                Funcionalidade de gerenciamento de usuários em desenvolvimento.
-              </p>
+              <div className="flex justify-center py-6">
+                <Link to="/admin/users">
+                  <Button className="flex items-center">
+                    <User className="mr-2 h-4 w-4" />
+                    Gerenciar Usuários
+                  </Button>
+                </Link>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
