@@ -65,7 +65,7 @@ export function useDiagnosticoRespostas(totalQuestoes: number, nivel: NivelDiagn
       const respostasArray = Object.entries(respostas).map(([id_questao, { pontuacao, observacao }]) => {
         const itemResposta = {
           id_resposta_diagnostico: uuidv4(),
-          id_usuario_avaliador: userId,
+          id_usuario_avaliador: userId, // Agora será tratado como texto
           id_questao_respondida: id_questao,
           nivel_diagnostico_realizado: nivel,
           pontuacao_usuario: pontuacao,

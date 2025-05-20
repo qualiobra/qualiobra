@@ -52,7 +52,7 @@ const QuestoesDiagnosticoList = ({
       return;
     }
 
-    // Usa o ID diretamente do Clerk
+    // Usa o ID como texto do Clerk (agora convertido automaticamente para string)
     console.log("Salvando respostas para usuário:", user.id);
     salvarRespostas(user.id);
   };
