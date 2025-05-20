@@ -110,7 +110,7 @@ export function useDiagnosticoRespostas(totalQuestoes: number, nivel: NivelDiagn
     }
   };
 
-  // Nova função para normalizar os valores do nível conforme esperado pelo banco de dados
+  // Função para normalizar os valores do nível conforme esperado pelo banco de dados
   const getNivelNormalizado = (nivel: NivelDiagnostico): string => {
     switch (nivel) {
       case "Nível A":
