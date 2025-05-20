@@ -7,9 +7,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Label } from "@/components/ui/label";
 import { toast } from "@/components/ui/use-toast";
 import { v4 as uuidv4 } from "uuid";
-import { Save } from "lucide-react";
+import { Save, FileChartPie } from "lucide-react";
 import { QuestaoDiagnostico, RespostaOpcao } from "@/types/diagnostico";
 import { QuestoesCapitulo } from "./QuestoesCapitulo";
+import { DiagnosticoSummary } from "./DiagnosticoSummary";
 
 // Dados simulados para questões de diagnóstico - idealmente viriam de uma API/BD
 const questoesExemplo: QuestaoDiagnostico[] = [
@@ -80,6 +81,7 @@ export function DiagnosticoForm() {
     resposta: RespostaOpcao | null;
     justificativa: string;
   }>>({});
+  const [mostraSumario, setMostraSumario] = useState<boolean>(false);
 
   // Filtrar questões conforme o nível selecionado
   const questoesFiltradas = questoesExemplo.filter(q => 
@@ -147,7 +149,26 @@ export function DiagnosticoForm() {
       obraId: selectedObraId,
       respostas
     });
+
+    // Mostrar sumário após salvar
+    setMostraSumario(true);
   };
+
+  // Converter as respostas para o formato usado pelo componente de sumário
+  const respostasDiagnostico = Object.entries(respostas)
+    .filter(([_, valor]) => valor.resposta !== null)
+    .map(([questaoId, valor]) => ({
+      IDRespostaDiagnostico: `resp-${questaoId}`,
+      IDUsuarioAvaliador: "user-id", // Em produção, seria o ID real do usuário
+      IDQuestaoRespondida: questaoId,
+      NivelDiagnosticoRealizado: selectedNivel,
+      RespostaUsuario: valor.resposta as RespostaOpcao,
+      JustificativaEvidencias: valor.justificativa,
+      DataHoraResposta: new Date().toISOString(),
+      IDDiagnosticoAgrupador: diagnosticoUUID
+    }));
+
+  const obraSelecionada = obras.find(o => o.id === selectedObraId);
 
   return (
     <div className="space-y-6">
@@ -188,32 +209,56 @@ export function DiagnosticoForm() {
           </Select>
         </div>
         
-        <div className="md:w-1/3 flex justify-end">
+        <div className="md:w-1/3 flex justify-end gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => setMostraSumario(!mostraSumario)}
+            disabled={!Object.values(respostas).some(r => r.resposta !== null)}
+          >
+            <FileChartPie className="mr-2 h-4 w-4" /> 
+            {mostraSumario ? "Editar Diagnóstico" : "Ver Resumo"}
+          </Button>
+          
           <Button onClick={handleSalvarDiagnostico} className="w-full md:w-auto">
             <Save className="mr-2 h-4 w-4" /> Salvar Progresso
           </Button>
         </div>
       </div>
       
-      <div className="space-y-8">
-        {Object.entries(questoesPorCapitulo).map(([capitulo, questoes]) => (
-          <QuestoesCapitulo
-            key={capitulo}
-            capitulo={capitulo}
-            questoes={questoes}
-            selectedNivel={selectedNivel}
-            respostas={respostas}
-            onRespostaChange={handleRespostaChange}
-            onJustificativaChange={handleJustificativaChange}
-          />
-        ))}
-      </div>
-      
-      <div className="flex justify-end">
-        <Button onClick={handleSalvarDiagnostico} size="lg">
-          <Save className="mr-2 h-4 w-4" /> Salvar Progresso do Diagnóstico
-        </Button>
-      </div>
+      {mostraSumario ? (
+        <DiagnosticoSummary 
+          nivel={selectedNivel}
+          obraNome={obraSelecionada?.nome}
+          respostas={respostasDiagnostico}
+          questoes={questoesFiltradas.map(q => ({ 
+            IDQuestao: q.IDQuestao, 
+            CapituloRequisito: q.CapituloRequisito,
+            DescricaoQuestao: q.DescricaoQuestao
+          }))}
+        />
+      ) : (
+        <>
+          <div className="space-y-8">
+            {Object.entries(questoesPorCapitulo).map(([capitulo, questoes]) => (
+              <QuestoesCapitulo
+                key={capitulo}
+                capitulo={capitulo}
+                questoes={questoes}
+                selectedNivel={selectedNivel}
+                respostas={respostas}
+                onRespostaChange={handleRespostaChange}
+                onJustificativaChange={handleJustificativaChange}
+              />
+            ))}
+          </div>
+          
+          <div className="flex justify-end">
+            <Button onClick={handleSalvarDiagnostico} size="lg">
+              <Save className="mr-2 h-4 w-4" /> Salvar Progresso do Diagnóstico
+            </Button>
+          </div>
+        </>
+      )}
     </div>
   );
 }
