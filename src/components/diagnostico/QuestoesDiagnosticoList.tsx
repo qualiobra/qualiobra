@@ -1,5 +1,5 @@
 
-import { QuestoesDiagnostico, NivelDiagnostico } from "@/types/diagnostico";
+import { QuestoesDiagnostico } from "@/types/diagnostico";
 import { Accordion } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
@@ -16,7 +16,6 @@ import { agruparQuestoesPorRequisito } from "@/utils/diagnosticoGroupUtils";
 interface QuestoesDiagnosticoListProps {
   questoes: QuestoesDiagnostico[];
   isLoading: boolean;
-  nivel: NivelDiagnostico;
   error?: string | null;
   onRetry?: () => void;
 }
@@ -24,7 +23,6 @@ interface QuestoesDiagnosticoListProps {
 const QuestoesDiagnosticoList = ({ 
   questoes, 
   isLoading, 
-  nivel, 
   error, 
   onRetry 
 }: QuestoesDiagnosticoListProps) => {
@@ -37,7 +35,7 @@ const QuestoesDiagnosticoList = ({
     handleRespostaChange, 
     handleObservacaoChange,
     salvarRespostas
-  } = useDiagnosticoRespostas(questoes.length, nivel);
+  } = useDiagnosticoRespostas(questoes.length);
   
   // Agrupar questões por requisito
   const gruposDeQuestoes = agruparQuestoesPorRequisito(questoes);
@@ -62,11 +60,11 @@ const QuestoesDiagnosticoList = ({
   }
 
   if (error) {
-    return <DiagnosticoEmptyState nivel={nivel} error={error} onRetry={onRetry} />;
+    return <DiagnosticoEmptyState error={error} onRetry={onRetry} />;
   }
 
   if (questoes.length === 0) {
-    return <DiagnosticoEmptyState nivel={nivel} />;
+    return <DiagnosticoEmptyState />;
   }
 
   return (

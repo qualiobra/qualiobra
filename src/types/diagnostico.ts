@@ -30,7 +30,8 @@ export interface DiagnosticoComResposta extends QuestoesDiagnostico {
   resposta?: RespostaDiagnostico;
 }
 
-export type NivelDiagnostico = 'Nível B' | 'Nível A' | 'Ambos os Níveis';
+// Simplificado para apenas um tipo de nível
+export type NivelDiagnostico = 'Geral';
 
 export interface ResultadoDiagnostico {
   pontuacaoTotal: number;

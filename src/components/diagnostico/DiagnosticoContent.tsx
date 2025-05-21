@@ -2,7 +2,7 @@
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { TabsContent } from "@/components/ui/tabs";
-import { NivelDiagnostico, QuestoesDiagnostico } from "@/types/diagnostico";
+import { QuestoesDiagnostico } from "@/types/diagnostico";
 import DiagnosticoInstructions from "@/components/diagnostico/DiagnosticoInstructions";
 import QuestoesDiagnosticoList from "@/components/diagnostico/QuestoesDiagnosticoList";
 
@@ -10,7 +10,6 @@ interface DiagnosticoContentProps {
   questoes: QuestoesDiagnostico[];
   isLoading: boolean;
   error: string | null;
-  nivelSelecionado: NivelDiagnostico;
   onNavigateBack: () => void;
   onRetry: () => void;
 }
@@ -19,7 +18,6 @@ const DiagnosticoContent = ({
   questoes,
   isLoading,
   error,
-  nivelSelecionado,
   onNavigateBack,
   onRetry
 }: DiagnosticoContentProps) => {
@@ -40,7 +38,6 @@ const DiagnosticoContent = ({
           <QuestoesDiagnosticoList 
             questoes={questoes}
             isLoading={isLoading}
-            nivel={nivelSelecionado}
             error={error}
             onRetry={onRetry}
           />

@@ -2,10 +2,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/components/ui/use-toast";
-import { QuestoesDiagnostico, NivelDiagnostico, DiagnosticoComResposta } from "@/types/diagnostico";
+import { QuestoesDiagnostico } from "@/types/diagnostico";
 import { convertToQuestoesDiagnostico } from "@/utils/diagnosticoUtils";
 
-export function useDiagnosticoQuestoes(nivelSelecionado: NivelDiagnostico, userId: string | undefined, isSignedIn: boolean) {
+export function useDiagnosticoQuestoes(userId: string | undefined, isSignedIn: boolean) {
   const [questoes, setQuestoes] = useState<QuestoesDiagnostico[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +37,6 @@ export function useDiagnosticoQuestoes(nivelSelecionado: NivelDiagnostico, userI
         const questoesConvertidas: QuestoesDiagnostico[] = data.map(convertToQuestoesDiagnostico);
         
         // Para diagnóstico, usamos todas as questões sem verificar respostas anteriores
-        // isso evita erros de UUID inválido
         setQuestoes(questoesConvertidas);
       }
     } catch (err: any) {
@@ -52,7 +51,7 @@ export function useDiagnosticoQuestoes(nivelSelecionado: NivelDiagnostico, userI
     } finally {
       setIsLoading(false);
     }
-  }, [nivelSelecionado]);
+  }, []);
 
   return {
     questoes,

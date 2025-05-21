@@ -2,7 +2,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
-import { NivelDiagnostico } from "@/types/diagnostico";
 
 import DiagnosticoHeader from "@/components/diagnostico/DiagnosticoHeader";
 import DiagnosticoTabs from "@/components/diagnostico/DiagnosticoTabs";
@@ -15,16 +14,13 @@ const Diagnostico = () => {
   const { isSignedIn, user } = useUser();
   const navigate = useNavigate();
   
-  // Usamos "Ambos os Níveis" como padrão para considerar todos os requisitos
-  const nivelSelecionado: NivelDiagnostico = "Ambos os Níveis";
-
   const { 
     questoes, 
     isLoading, 
     error, 
     reloadQuestoes,
     fetchQuestoesDiagnostico 
-  } = useDiagnosticoQuestoes(nivelSelecionado, user?.id, !!isSignedIn);
+  } = useDiagnosticoQuestoes(user?.id, !!isSignedIn);
 
   // Verificar se usuário está logado quando tenta acessar o diagnóstico
   useEffect(() => {
@@ -71,7 +67,6 @@ const Diagnostico = () => {
             questoes={questoes}
             isLoading={isLoading}
             error={error}
-            nivelSelecionado={nivelSelecionado}
             onNavigateBack={() => navigate(-1)}
             onRetry={reloadQuestoes}
           />
