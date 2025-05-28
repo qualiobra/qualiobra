@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { useClerk } from "@clerk/clerk-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Mail, ArrowLeft } from "lucide-react";
@@ -9,6 +9,7 @@ import { toast } from "@/hooks/use-toast";
 
 const ForgotPassword = () => {
   const { client } = useClerk();
+  const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
@@ -49,6 +50,12 @@ const ForgotPassword = () => {
         title: "E-mail enviado",
         description: "Enviamos instruções para redefinir sua senha.",
       });
+      
+      // Redirecionar para a página de redefinição após 2 segundos
+      setTimeout(() => {
+        navigate(`/reset-password?email=${encodeURIComponent(email)}`);
+      }, 2000);
+      
     } catch (err: any) {
       console.error("Erro ao enviar e-mail:", err);
       const errorMessage = err.errors?.[0]?.message || "Ocorreu um erro ao enviar o e-mail";
@@ -65,6 +72,10 @@ const ForgotPassword = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const continueToReset = () => {
+    navigate(`/reset-password?email=${encodeURIComponent(email)}`);
   };
 
   return (
@@ -121,11 +132,16 @@ const ForgotPassword = () => {
               <h2 className="text-xl font-bold mb-2">E-mail enviado</h2>
               <p className="text-gray-600 mb-6">
                 Enviamos instruções para redefinir sua senha para {email}. 
-                Por favor, verifique sua caixa de entrada.
+                Por favor, verifique sua caixa de entrada e clique no botão abaixo quando receber o código.
               </p>
-              <Button onClick={() => setResetSent(false)} variant="outline">
-                Tentar com outro e-mail
-              </Button>
+              <div className="space-y-3">
+                <Button onClick={continueToReset} className="w-full">
+                  Continuar para redefinir senha
+                </Button>
+                <Button onClick={() => setResetSent(false)} variant="outline" className="w-full">
+                  Tentar com outro e-mail
+                </Button>
+              </div>
             </div>
           )}
         </div>

@@ -18,6 +18,7 @@ import Login from "./pages/auth/Login";
 import Register from "./pages/auth/Register";
 import VerifyCode from "./pages/auth/VerifyCode";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import ResetPassword from "./pages/auth/ResetPassword";
 import AdminPanel from "./pages/admin/AdminPanel";
 import UserManagement from "./pages/admin/UserManagement";
 import Reports from "./pages/Reports";
@@ -80,6 +81,11 @@ const AppRoutes = () => (
             <Route path="/forgot-password" element={
               <SignedOut>
                 <ForgotPassword />
+              </SignedOut>
+            } />
+            <Route path="/reset-password" element={
+              <SignedOut>
+                <ResetPassword />
               </SignedOut>
             } />
             
