@@ -4,7 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading } from "@clerk/clerk-react";
+import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading, useUser } from "@clerk/clerk-react";
 import { UserRoleProvider } from "./context/UserRoleContext";
 import { ObrasProvider } from "./context/ObrasContext";
 import Index from "./pages/Index";
@@ -52,6 +52,29 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
+// Componente para rotas públicas (auth)
+const PublicRoute = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <>
+      <ClerkLoading>
+        <div className="flex items-center justify-center min-h-screen">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+          <span className="ml-2 text-lg">Carregando...</span>
+        </div>
+      </ClerkLoading>
+      
+      <ClerkLoaded>
+        <SignedIn>
+          <Navigate to="/dashboard" replace />
+        </SignedIn>
+        <SignedOut>
+          {children}
+        </SignedOut>
+      </ClerkLoaded>
+    </>
+  );
+};
+
 // Separando a estrutura da aplicação em um componente próprio
 const AppRoutes = () => (
   <UserRoleProvider>
@@ -61,32 +84,34 @@ const AppRoutes = () => (
         <Sonner />
         <BrowserRouter>
           <Routes>
-            {/* Rotas públicas */}
+            {/* Rota inicial */}
             <Route path="/" element={<Index />} />
+            
+            {/* Rotas públicas (auth) */}
             <Route path="/login" element={
-              <SignedOut>
+              <PublicRoute>
                 <Login />
-              </SignedOut>
+              </PublicRoute>
             } />
             <Route path="/register" element={
-              <SignedOut>
+              <PublicRoute>
                 <Register />
-              </SignedOut>
+              </PublicRoute>
             } />
             <Route path="/verify" element={
-              <SignedOut>
+              <PublicRoute>
                 <VerifyCode />
-              </SignedOut>
+              </PublicRoute>
             } />
             <Route path="/forgot-password" element={
-              <SignedOut>
+              <PublicRoute>
                 <ForgotPassword />
-              </SignedOut>
+              </PublicRoute>
             } />
             <Route path="/reset-password" element={
-              <SignedOut>
+              <PublicRoute>
                 <ResetPassword />
-              </SignedOut>
+              </PublicRoute>
             } />
             
             {/* Rotas protegidas */}
