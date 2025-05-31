@@ -46,7 +46,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
     return <Navigate to="/login" replace />;
   }
   
-  return <>{children}</>;
+  return <SupabaseUserLayout>{children}</SupabaseUserLayout>;
 };
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
@@ -104,58 +104,42 @@ const AppContent = () => (
         
         <Route path="/dashboard" element={
           <ProtectedRoute>
-            <SupabaseUserLayout>
-              <Dashboard />
-            </SupabaseUserLayout>
+            <Dashboard />
           </ProtectedRoute>
         } />
         <Route path="/inspections" element={
           <ProtectedRoute>
-            <SupabaseUserLayout>
-              <Inspections />
-            </SupabaseUserLayout>
+            <Inspections />
           </ProtectedRoute>
         } />
         <Route path="/team" element={
           <ProtectedRoute>
-            <SupabaseUserLayout>
-              <Team />
-            </SupabaseUserLayout>
+            <Team />
           </ProtectedRoute>
         } />
         <Route path="/obras" element={
           <ProtectedRoute>
-            <SupabaseUserLayout>
-              <Obras />
-            </SupabaseUserLayout>
+            <Obras />
           </ProtectedRoute>
         } />
         <Route path="/diagnostico" element={
           <ProtectedRoute>
-            <SupabaseUserLayout>
-              <Diagnostico />
-            </SupabaseUserLayout>
+            <Diagnostico />
           </ProtectedRoute>
         } />
         <Route path="/reports" element={
           <ProtectedRoute>
-            <SupabaseUserLayout>
-              <Reports />
-            </SupabaseUserLayout>
+            <Reports />
           </ProtectedRoute>
         } />
         <Route path="/admin" element={
           <ProtectedRoute>
-            <SupabaseUserLayout>
-              <AdminPanel />
-            </SupabaseUserLayout>
+            <AdminPanel />
           </ProtectedRoute>
         } />
         <Route path="/admin/users" element={
           <ProtectedRoute>
-            <SupabaseUserLayout>
-              <SupabaseUserManagement />
-            </SupabaseUserLayout>
+            <SupabaseUserManagement />
           </ProtectedRoute>
         } />
         

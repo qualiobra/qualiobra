@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/context/SupabaseAuthContext";
 import { toast } from "@/hooks/use-toast";
 import { useUserRole, UserRole } from "@/context/UserRoleContext";
 import { 
@@ -47,7 +47,7 @@ import { UserPlus, Users, Settings, MoreVertical, Pencil, Trash2, User } from "l
 import { Link } from "react-router-dom";
 
 const AdminPanel = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { userRoles, addRole, updateRole, deleteRole } = useUserRole();
   const [newRoleName, setNewRoleName] = useState("");
   const [newRolePermissions, setNewRolePermissions] = useState<string[]>([]);
