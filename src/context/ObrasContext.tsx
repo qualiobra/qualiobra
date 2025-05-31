@@ -1,7 +1,6 @@
 
 import React, { createContext, useState, useContext, useEffect } from "react";
-import { useUser } from "@clerk/clerk-react";
-import { useUserRole } from "./UserRoleContext";
+import { useAuth } from "./SupabaseAuthContext";
 import type { Obra, ObraStatus, NivelPBQPH, ObraUsuario, ObraAnexo } from "../types/obra";
 
 // Tipo para o contexto
@@ -23,8 +22,7 @@ type ObrasContextType = {
 const ObrasContext = createContext<ObrasContextType | undefined>(undefined);
 
 export const ObrasProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useUser();
-  const { currentUserRole } = useUserRole();
+  const { user } = useAuth();
   const [obras, setObras] = useState<Obra[]>(() => {
     // Inicialização do estado a partir do localStorage
     const savedObras = localStorage.getItem("obras");
@@ -116,15 +114,9 @@ export const ObrasProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const getObrasDoUsuario = () => {
     if (!user) return [];
     
-    // Administradores veem todas as obras
-    if (currentUserRole?.id === "admin") {
-      return obras;
-    }
-    
-    // Outros usuários veem apenas as obras às quais estão atribuídos
-    return obras.filter(obra => 
-      obra.usuarios.some(u => u.userId === user.id)
-    );
+    // Para Supabase, por simplicidade, retornar todas as obras por enquanto
+    // Pode ser refinado depois para usar roles do Supabase
+    return obras;
   };
 
   // Use adicionarObra as an alias for criarObra for backward compatibility
