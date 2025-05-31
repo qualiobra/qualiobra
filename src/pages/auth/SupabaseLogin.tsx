@@ -46,6 +46,7 @@ const SupabaseLogin = () => {
 
     try {
       setIsLoading(true);
+      console.log('Tentando fazer login com:', email);
       
       const { data, error } = await signIn(email, password);
       
@@ -75,11 +76,12 @@ const SupabaseLogin = () => {
       }
 
       if (data.user) {
+        console.log('Login realizado com sucesso, usuário:', data.user);
         toast({
           title: "Login realizado com sucesso",
           description: "Bem-vindo de volta!",
         });
-        navigate("/dashboard");
+        // O redirecionamento será feito automaticamente pelo AppContent
       }
       
     } catch (err: any) {

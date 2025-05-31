@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
 import { ObrasProvider } from "./context/ObrasContext";
 import Index from "./pages/Index";
@@ -28,6 +28,8 @@ const queryClient = new QueryClient();
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
   
+  console.log('ProtectedRoute - isAuthenticated:', isAuthenticated, 'loading:', loading);
+  
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -40,7 +42,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   }
   
   if (!isAuthenticated) {
-    return <SupabaseLogin />;
+    console.log('User not authenticated, redirecting to login');
+    return <Navigate to="/login" replace />;
   }
   
   return <>{children}</>;
@@ -48,6 +51,8 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   const { isAuthenticated, loading } = useAuth();
+  
+  console.log('PublicRoute - isAuthenticated:', isAuthenticated, 'loading:', loading);
   
   if (loading) {
     return (
@@ -61,7 +66,8 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   }
   
   if (isAuthenticated) {
-    return <Dashboard />;
+    console.log('User already authenticated, redirecting to dashboard');
+    return <Navigate to="/dashboard" replace />;
   }
   
   return <>{children}</>;
@@ -96,20 +102,62 @@ const AppContent = () => (
           </PublicRoute>
         } />
         
-        <Route element={
+        <Route path="/dashboard" element={
           <ProtectedRoute>
-            <SupabaseUserLayout />
+            <SupabaseUserLayout>
+              <Dashboard />
+            </SupabaseUserLayout>
           </ProtectedRoute>
-        }>
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/inspections" element={<Inspections />} />
-          <Route path="/team" element={<Team />} />
-          <Route path="/obras" element={<Obras />} />
-          <Route path="/diagnostico" element={<Diagnostico />} />
-          <Route path="/reports" element={<Reports />} />
-          <Route path="/admin" element={<AdminPanel />} />
-          <Route path="/admin/users" element={<SupabaseUserManagement />} />
-        </Route>
+        } />
+        <Route path="/inspections" element={
+          <ProtectedRoute>
+            <SupabaseUserLayout>
+              <Inspections />
+            </SupabaseUserLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/team" element={
+          <ProtectedRoute>
+            <SupabaseUserLayout>
+              <Team />
+            </SupabaseUserLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/obras" element={
+          <ProtectedRoute>
+            <SupabaseUserLayout>
+              <Obras />
+            </SupabaseUserLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/diagnostico" element={
+          <ProtectedRoute>
+            <SupabaseUserLayout>
+              <Diagnostico />
+            </SupabaseUserLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/reports" element={
+          <ProtectedRoute>
+            <SupabaseUserLayout>
+              <Reports />
+            </SupabaseUserLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin" element={
+          <ProtectedRoute>
+            <SupabaseUserLayout>
+              <AdminPanel />
+            </SupabaseUserLayout>
+          </ProtectedRoute>
+        } />
+        <Route path="/admin/users" element={
+          <ProtectedRoute>
+            <SupabaseUserLayout>
+              <SupabaseUserManagement />
+            </SupabaseUserLayout>
+          </ProtectedRoute>
+        } />
         
         <Route path="*" element={<NotFound />} />
       </Routes>
