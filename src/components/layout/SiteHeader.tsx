@@ -10,16 +10,13 @@ import {
   DropdownMenuTrigger 
 } from "@/components/ui/dropdown-menu";
 import { Menu, User, Bell, Settings, LogOut, UserCog, Building } from "lucide-react";
-import { useUser, useClerk } from "@clerk/clerk-react";
-import { useUserRole } from "@/context/UserRoleContext";
+import { useAuth } from "@/context/SupabaseAuthContext";
 import { toast } from "@/hooks/use-toast";
 
 const SiteHeader = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user } = useUser();
-  const { signOut } = useClerk();
+  const { user, signOut } = useAuth();
   const navigate = useNavigate();
-  const { currentUserRole } = useUserRole();
   
   const handleSignOut = async () => {
     try {
@@ -38,6 +35,17 @@ const SiteHeader = () => {
     }
   };
 
+  const getInitials = (email: string) => {
+    return email.substring(0, 2).toUpperCase();
+  };
+
+  const getUserName = () => {
+    if (user?.user_metadata?.first_name) {
+      return `${user.user_metadata.first_name} ${user.user_metadata.last_name || ''}`.trim();
+    }
+    return user?.email?.split('@')[0] || "Usuário";
+  };
+
   return (
     <header className="bg-white border-b sticky top-0 z-40">
       <div className="container mx-auto px-4">
@@ -50,7 +58,6 @@ const SiteHeader = () => {
                 alt="QualiObra Logo" 
                 className="h-10 w-auto" 
               />
-              {/* Removed the span with "QualiObra" text */}
             </Link>
           </div>
           
@@ -61,9 +68,7 @@ const SiteHeader = () => {
             <Link to="/team" className="text-gray-700 hover:text-primary font-medium">Equipe</Link>
             <Link to="/obras" className="text-gray-700 hover:text-primary font-medium">Obras</Link>
             <Link to="/reports" className="text-gray-700 hover:text-primary font-medium">Relatórios</Link>
-            {currentUserRole?.id === "admin" && (
-              <Link to="/admin" className="text-gray-700 hover:text-primary font-medium">Administração</Link>
-            )}
+            <Link to="/admin" className="text-gray-700 hover:text-primary font-medium">Administração</Link>
           </nav>
           
           {/* User & Notification Dropdowns */}
@@ -109,25 +114,19 @@ const SiteHeader = () => {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <button className="p-1.5 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center">
-                  {user?.imageUrl ? (
-                    <img 
-                      src={user.imageUrl} 
-                      alt={user.firstName || "Usuário"} 
-                      className="h-7 w-7 rounded-full object-cover"
-                    />
-                  ) : (
-                    <User size={20} />
-                  )}
+                  <div className="h-7 w-7 rounded-full bg-primary text-white flex items-center justify-center text-sm font-medium">
+                    {user?.email ? getInitials(user.email) : <User size={16} />}
+                  </div>
                   <span className="ml-2 hidden sm:inline text-sm font-medium">
-                    {user?.firstName || "Usuário"}
+                    {getUserName()}
                   </span>
                 </button>
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end">
                 <DropdownMenuLabel>
                   <div>
-                    <p className="font-medium">{user?.fullName || "Usuário"}</p>
-                    <p className="text-xs text-gray-500">{currentUserRole?.name || "Sem perfil"}</p>
+                    <p className="font-medium">{getUserName()}</p>
+                    <p className="text-xs text-gray-500">{user?.email}</p>
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
@@ -140,11 +139,9 @@ const SiteHeader = () => {
                 <DropdownMenuItem onClick={() => navigate("/obras")}>
                   <Building className="mr-2 h-4 w-4" /> Minhas Obras
                 </DropdownMenuItem>
-                {currentUserRole?.id === "admin" && (
-                  <DropdownMenuItem onClick={() => navigate("/admin")}>
-                    <UserCog className="mr-2 h-4 w-4" /> Administração
-                  </DropdownMenuItem>
-                )}
+                <DropdownMenuItem onClick={() => navigate("/admin")}>
+                  <UserCog className="mr-2 h-4 w-4" /> Administração
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>
                   <LogOut className="mr-2 h-4 w-4" /> Sair
@@ -171,9 +168,7 @@ const SiteHeader = () => {
               <Link to="/team" className="px-4 py-2 hover:bg-gray-100 rounded-md">Equipe</Link>
               <Link to="/obras" className="px-4 py-2 hover:bg-gray-100 rounded-md">Obras</Link>
               <Link to="/reports" className="px-4 py-2 hover:bg-gray-100 rounded-md">Relatórios</Link>
-              {currentUserRole?.id === "admin" && (
-                <Link to="/admin" className="px-4 py-2 hover:bg-gray-100 rounded-md">Administração</Link>
-              )}
+              <Link to="/admin" className="px-4 py-2 hover:bg-gray-100 rounded-md">Administração</Link>
               <button 
                 onClick={handleSignOut}
                 className="px-4 py-2 hover:bg-gray-100 rounded-md text-left flex items-center text-red-600"

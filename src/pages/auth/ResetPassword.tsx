@@ -1,11 +1,11 @@
 
 import { useState } from "react";
-import { useClerk } from "@clerk/clerk-react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Lock, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { useAuth } from "@/context/SupabaseAuthContext";
 import {
   InputOTP,
   InputOTPGroup,
@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/input-otp";
 
 const ResetPassword = () => {
-  const { client } = useClerk();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const email = searchParams.get("email") || "";
@@ -75,28 +75,15 @@ const ResetPassword = () => {
     try {
       setIsLoading(true);
       
-      const resetAttempt = await client.signIn.attemptFirstFactor({
-        strategy: "reset_password_email_code",
-        code: code,
-        password: password,
+      // Implementar reset de senha com Supabase aqui
+      toast({
+        title: "Funcionalidade em desenvolvimento",
+        description: "O reset de senha será implementado em breve.",
       });
-
-      if (resetAttempt.status === "complete") {
-        toast({
-          title: "Senha redefinida",
-          description: "Sua senha foi redefinida com sucesso.",
-        });
-        navigate("/dashboard");
-      }
+      
     } catch (err: any) {
       console.error("Erro ao redefinir senha:", err);
-      const errorMessage = err.errors?.[0]?.message || "Ocorreu um erro ao redefinir a senha";
-      
-      if (errorMessage.includes("code") || errorMessage.includes("código")) {
-        setErrors(prev => ({ ...prev, code: "Código inválido ou expirado" }));
-      } else {
-        setErrors(prev => ({ ...prev, general: errorMessage }));
-      }
+      setErrors(prev => ({ ...prev, general: "Ocorreu um erro ao redefinir a senha" }));
     } finally {
       setIsLoading(false);
     }
@@ -104,14 +91,9 @@ const ResetPassword = () => {
 
   const resendCode = async () => {
     try {
-      await client.signIn.create({
-        strategy: "reset_password_email_code",
-        identifier: email,
-      });
-      
       toast({
-        title: "Código reenviado",
-        description: "Um novo código foi enviado para seu e-mail.",
+        title: "Funcionalidade em desenvolvimento",
+        description: "O reenvio de código será implementado em breve.",
       });
     } catch (err: any) {
       console.error("Erro ao reenviar código:", err);

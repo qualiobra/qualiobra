@@ -1,17 +1,17 @@
 
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/context/SupabaseAuthContext";
 
 import DiagnosticoHeader from "@/components/diagnostico/DiagnosticoHeader";
 import DiagnosticoTabs from "@/components/diagnostico/DiagnosticoTabs";
 import DiagnosticoContent from "@/components/diagnostico/DiagnosticoContent";
 import useDiagnosticoQuestoes from "@/hooks/useDiagnosticoQuestoes";
-import { toast } from "@/components/ui/use-toast";
+import { toast } from "@/hooks/use-toast";
 
 const Diagnostico = () => {
   const [tabAtiva, setTabAtiva] = useState('instrucoes');
-  const { isSignedIn, user } = useUser();
+  const { isAuthenticated, user } = useAuth();
   const navigate = useNavigate();
   
   const { 
@@ -20,11 +20,11 @@ const Diagnostico = () => {
     error, 
     reloadQuestoes,
     fetchQuestoesDiagnostico 
-  } = useDiagnosticoQuestoes(user?.id, !!isSignedIn);
+  } = useDiagnosticoQuestoes(user?.id, !!isAuthenticated);
 
   // Verificar se usuário está logado quando tenta acessar o diagnóstico
   useEffect(() => {
-    if (tabAtiva === 'diagnostico' && !isSignedIn) {
+    if (tabAtiva === 'diagnostico' && !isAuthenticated) {
       toast({
         title: "Atenção",
         description: "É necessário estar logado para acessar o diagnóstico.",
@@ -32,10 +32,10 @@ const Diagnostico = () => {
       });
       setTabAtiva('instrucoes');
     }
-  }, [tabAtiva, isSignedIn]);
+  }, [tabAtiva, isAuthenticated]);
 
   const handleTabChange = (value: string) => {
-    if (value === 'diagnostico' && !isSignedIn) {
+    if (value === 'diagnostico' && !isAuthenticated) {
       toast({
         title: "Atenção",
         description: "É necessário estar logado para acessar o diagnóstico.",
