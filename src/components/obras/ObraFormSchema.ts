@@ -5,6 +5,7 @@ export const obraFormSchema = z.object({
   codigoDaObra: z.string().min(1, { message: "Código da obra é obrigatório" }),
   nome: z.string().min(3, { message: "O nome deve ter pelo menos 3 caracteres" }),
   descricao: z.string().min(10, { message: "A descrição deve ter pelo menos 10 caracteres" }),
+  localizacao: z.string().min(1, { message: "Localização é obrigatória" }),
   
   // Campos de endereço expandidos
   cepCodigoPostal: z.string().min(8, { message: "CEP deve ter 8 dígitos" }).max(8),

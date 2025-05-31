@@ -13,7 +13,7 @@ import { EngenheiroSelector } from "./EngenheiroSelector";
 import { useState } from "react";
 import { FileUp, Search } from "lucide-react";
 import { obraFormSchema, type ObraFormValues } from "./ObraFormSchema";
-import { type NivelPBQPH, type Obra } from "@/types/obra";
+import { type NivelPBQPH } from "@/types/obra";
 import { toast } from "@/hooks/use-toast";
 import { type Engenheiro } from "@/hooks/useEngenheiros";
 
@@ -37,6 +37,7 @@ export default function ObraForm({ defaultValues, onSubmit, submitButtonText, is
     codigoDaObra: codigoObra,
     nome: "",
     descricao: "",
+    localizacao: "",
     cepCodigoPostal: "",
     logradouro: "",
     numero: "",
@@ -77,6 +78,11 @@ export default function ObraForm({ defaultValues, onSubmit, submitButtonText, is
       if (endereco.complemento) {
         form.setValue("complemento", endereco.complemento);
       }
+      
+      // Auto-generate localizacao from address
+      const localizacao = `${endereco.logradouro}, ${endereco.bairro} - ${endereco.localidade}/${endereco.uf}`;
+      form.setValue("localizacao", localizacao);
+      
       toast({
         title: "Endereço encontrado",
         description: "Os campos de endereço foram preenchidos automaticamente.",
@@ -171,6 +177,20 @@ export default function ObraForm({ defaultValues, onSubmit, submitButtonText, is
               <FormLabel>Descrição</FormLabel>
               <FormControl>
                 <Textarea placeholder="Descreva a obra" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        <FormField
+          control={form.control}
+          name="localizacao"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Localização</FormLabel>
+              <FormControl>
+                <Input placeholder="Localização da obra" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -372,17 +392,11 @@ export default function ObraForm({ defaultValues, onSubmit, submitButtonText, is
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Engenheiro Responsável</h3>
           
-          <FormField
+          <EngenheiroSelector
             control={form.control}
             name="responsavelEngenheiroId"
-            render={({ field }) => (
-              <EngenheiroSelector
-                control={form.control}
-                name="responsavelEngenheiroId"
-                label="Selecionar Engenheiro"
-                onEngenheiroSelect={handleEngenheiroSelect}
-              />
-            )}
+            label="Selecionar Engenheiro"
+            onEngenheiroSelect={handleEngenheiroSelect}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
