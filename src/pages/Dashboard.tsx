@@ -9,7 +9,6 @@ import ComplianceChart from "@/components/dashboard/ComplianceChart";
 import NonConformitiesChart from "@/components/dashboard/NonConformitiesChart";
 import RecentInspections from "@/components/dashboard/RecentInspections";
 import PendingTasks from "@/components/dashboard/PendingTasks";
-import SiteHeader from "@/components/layout/SiteHeader";
 
 const Dashboard = () => {
   const [selectedTab, setSelectedTab] = useState("overview");
@@ -17,8 +16,6 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <SiteHeader />
-      
       {/* Welcome Dialog */}
       <Dialog open={showWelcome} onOpenChange={setShowWelcome}>
         <DialogContent className="sm:max-w-[425px]">
