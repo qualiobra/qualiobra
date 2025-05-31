@@ -75,31 +75,42 @@ const SupabaseRegister = () => {
       const { data, error } = await signUp(email, password, userData);
       
       if (error) {
-        throw error;
+        console.error("Erro no cadastro:", error);
+        
+        if (error.message.includes("User already registered")) {
+          setEmailError("Este e-mail já está cadastrado");
+          toast({
+            title: "E-mail já cadastrado",
+            description: "Este e-mail já possui uma conta. Tente fazer login.",
+            variant: "destructive",
+          });
+        } else if (error.message.includes("Password")) {
+          setPasswordError(error.message);
+        } else {
+          toast({
+            title: "Erro no cadastro",
+            description: error.message || "Ocorreu um erro durante o cadastro",
+            variant: "destructive",
+          });
+        }
+        return;
       }
 
       if (data.user) {
         toast({
-          title: "Conta criada com sucesso",
-          description: "Verifique seu e-mail para confirmar a conta.",
+          title: "Conta criada com sucesso!",
+          description: "Verifique seu e-mail para confirmar sua conta antes de fazer login.",
         });
         navigate("/login");
       }
       
     } catch (err: any) {
-      console.error("Erro no cadastro:", err);
-      
-      if (err.message.includes("User already registered")) {
-        setEmailError("Este e-mail já está cadastrado");
-      } else if (err.message.includes("Password")) {
-        setPasswordError(err.message);
-      } else {
-        toast({
-          title: "Erro no cadastro",
-          description: err.message || "Ocorreu um erro durante o cadastro",
-          variant: "destructive",
-        });
-      }
+      console.error("Erro inesperado no cadastro:", err);
+      toast({
+        title: "Erro no cadastro",
+        description: "Ocorreu um erro inesperado. Tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }

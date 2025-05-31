@@ -50,7 +50,28 @@ const SupabaseLogin = () => {
       const { data, error } = await signIn(email, password);
       
       if (error) {
-        throw error;
+        console.error("Erro no login:", error);
+        
+        if (error.message.includes("Invalid login credentials")) {
+          toast({
+            title: "Credenciais inválidas",
+            description: "E-mail ou senha incorretos. Tente novamente.",
+            variant: "destructive",
+          });
+        } else if (error.message.includes("Email not confirmed")) {
+          toast({
+            title: "Email não confirmado",
+            description: "Verifique seu e-mail e clique no link de confirmação.",
+            variant: "destructive",
+          });
+        } else {
+          toast({
+            title: "Erro no login",
+            description: error.message || "Ocorreu um erro ao fazer login",
+            variant: "destructive",
+          });
+        }
+        return;
       }
 
       if (data.user) {
@@ -62,21 +83,12 @@ const SupabaseLogin = () => {
       }
       
     } catch (err: any) {
-      console.error("Erro no login:", err);
-      
-      if (err.message.includes("Invalid login credentials")) {
-        toast({
-          title: "Credenciais inválidas",
-          description: "E-mail ou senha incorretos. Tente novamente.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Erro no login",
-          description: err.message || "Ocorreu um erro ao fazer login",
-          variant: "destructive",
-        });
-      }
+      console.error("Erro inesperado no login:", err);
+      toast({
+        title: "Erro no login",
+        description: "Ocorreu um erro inesperado. Tente novamente.",
+        variant: "destructive",
+      });
     } finally {
       setIsLoading(false);
     }

@@ -30,7 +30,8 @@ export const useSupabaseAuth = () => {
   }, []);
 
   const signUp = async (email: string, password: string, userData?: any) => {
-    const redirectUrl = `${window.location.origin}/`;
+    // Use a URL mais específica para confirmação
+    const redirectUrl = `${window.location.origin}/dashboard`;
     
     const { data, error } = await supabase.auth.signUp({
       email,
@@ -65,6 +66,17 @@ export const useSupabaseAuth = () => {
     return { error };
   };
 
+  const resendConfirmation = async (email: string) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/dashboard`
+      }
+    });
+    return { error };
+  };
+
   return {
     user,
     session,
@@ -73,6 +85,7 @@ export const useSupabaseAuth = () => {
     signIn,
     signOut,
     resetPassword,
+    resendConfirmation,
     isAuthenticated: !!user
   };
 };
