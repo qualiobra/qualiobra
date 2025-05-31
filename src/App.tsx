@@ -4,8 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { SignedIn, SignedOut, ClerkLoaded, ClerkLoading, useUser } from "@clerk/clerk-react";
-import { UserRoleProvider } from "./context/UserRoleContext";
+import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
 import { ObrasProvider } from "./context/ObrasContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
@@ -14,70 +13,32 @@ import Team from "./pages/Team";
 import Obras from "./pages/Obras";
 import Diagnostico from "./pages/Diagnostico";
 import NotFound from "./pages/NotFound";
-import Login from "./pages/auth/Login";
-import Register from "./pages/auth/Register";
-import VerifyCode from "./pages/auth/VerifyCode";
+import SupabaseLogin from "./pages/auth/SupabaseLogin";
+import SupabaseRegister from "./pages/auth/SupabaseRegister";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import AdminPanel from "./pages/admin/AdminPanel";
-import UserManagement from "./pages/admin/UserManagement";
+import SupabaseUserManagement from "./pages/admin/SupabaseUserManagement";
 import Reports from "./pages/Reports";
-import UserLayout from "./components/layout/UserLayout";
-import { Loader2 } from "lucide-react";
+import SupabaseUserLayout from "./components/layout/SupabaseUserLayout";
 import React from "react";
 
 // Moved queryClient outside the component
 const queryClient = new QueryClient();
 
-// Componente para rota protegida
+// Componente para rota protegida com Supabase
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <>
-      <ClerkLoading>
-        <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2 text-lg">Carregando...</span>
-        </div>
-      </ClerkLoading>
-      
-      <ClerkLoaded>
-        <SignedIn>
-          {children}
-        </SignedIn>
-        <SignedOut>
-          <Navigate to="/login" replace />
-        </SignedOut>
-      </ClerkLoaded>
-    </>
-  );
+  return children;
 };
 
 // Componente para rotas públicas (auth)
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  return (
-    <>
-      <ClerkLoading>
-        <div className="flex items-center justify-center min-h-screen">
-          <Loader2 className="h-8 w-8 animate-spin text-primary" />
-          <span className="ml-2 text-lg">Carregando...</span>
-        </div>
-      </ClerkLoading>
-      
-      <ClerkLoaded>
-        <SignedIn>
-          <Navigate to="/dashboard" replace />
-        </SignedIn>
-        <SignedOut>
-          {children}
-        </SignedOut>
-      </ClerkLoaded>
-    </>
-  );
+  return children;
 };
 
 // Separando a estrutura da aplicação em um componente próprio
 const AppRoutes = () => (
-  <UserRoleProvider>
+  <SupabaseAuthProvider>
     <ObrasProvider>
       <TooltipProvider>
         <Toaster />
@@ -90,17 +51,12 @@ const AppRoutes = () => (
             {/* Rotas públicas (auth) */}
             <Route path="/login" element={
               <PublicRoute>
-                <Login />
+                <SupabaseLogin />
               </PublicRoute>
             } />
             <Route path="/register" element={
               <PublicRoute>
-                <Register />
-              </PublicRoute>
-            } />
-            <Route path="/verify" element={
-              <PublicRoute>
-                <VerifyCode />
+                <SupabaseRegister />
               </PublicRoute>
             } />
             <Route path="/forgot-password" element={
@@ -117,7 +73,7 @@ const AppRoutes = () => (
             {/* Rotas protegidas */}
             <Route element={
               <ProtectedRoute>
-                <UserLayout />
+                <SupabaseUserLayout />
               </ProtectedRoute>
             }>
               <Route path="/dashboard" element={<Dashboard />} />
@@ -127,7 +83,7 @@ const AppRoutes = () => (
               <Route path="/diagnostico" element={<Diagnostico />} />
               <Route path="/reports" element={<Reports />} />
               <Route path="/admin" element={<AdminPanel />} />
-              <Route path="/admin/users" element={<UserManagement />} />
+              <Route path="/admin/users" element={<SupabaseUserManagement />} />
             </Route>
             
             {/* Rota de fallback para página não encontrada */}
@@ -136,7 +92,7 @@ const AppRoutes = () => (
         </BrowserRouter>
       </TooltipProvider>
     </ObrasProvider>
-  </UserRoleProvider>
+  </SupabaseAuthProvider>
 );
 
 // Componente App principal com o QueryClientProvider como wrapper mais externo

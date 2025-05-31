@@ -1,71 +1,60 @@
 
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
+import { useAuth } from "@/context/SupabaseAuthContext";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Lock, Mail, User, Phone, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const SupabaseRegister = () => {
-  const { signUp } = useSupabaseAuth();
+  const { signUp } = useAuth();
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    telefone: "",
-    password: "",
-    confirmPassword: "",
-    crea: "",
-    especialidade: "",
-    isEngenheiro: false
-  });
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [firstNameError, setFirstNameError] = useState("");
+  const [lastNameError, setLastNameError] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
 
   const validateForm = () => {
-    const newErrors: Record<string, string> = {};
+    let isValid = true;
+    setFirstNameError("");
+    setLastNameError("");
+    setEmailError("");
+    setPasswordError("");
 
-    if (!formData.firstName.trim()) {
-      newErrors.firstName = "Nome é obrigatório";
+    if (!firstName.trim()) {
+      setFirstNameError("Nome é obrigatório");
+      isValid = false;
     }
 
-    if (!formData.lastName.trim()) {
-      newErrors.lastName = "Sobrenome é obrigatório";
+    if (!lastName.trim()) {
+      setLastNameError("Sobrenome é obrigatório");
+      isValid = false;
     }
 
-    if (!formData.email.trim()) {
-      newErrors.email = "E-mail é obrigatório";
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = "E-mail inválido";
+    if (!email.trim()) {
+      setEmailError("E-mail é obrigatório");
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError("E-mail inválido");
+      isValid = false;
     }
 
-    if (!formData.password) {
-      newErrors.password = "Senha é obrigatória";
-    } else if (formData.password.length < 6) {
-      newErrors.password = "Senha deve ter pelo menos 6 caracteres";
+    if (!password) {
+      setPasswordError("Senha é obrigatória");
+      isValid = false;
+    } else if (password.length < 8) {
+      setPasswordError("A senha deve ter pelo menos 8 caracteres");
+      isValid = false;
     }
 
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = "Senhas não coincidem";
-    }
-
-    if (formData.isEngenheiro && !formData.crea.trim()) {
-      newErrors.crea = "CREA é obrigatório para engenheiros";
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
-  const handleInputChange = (field: string, value: string | boolean) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    // Limpar erro do campo quando o usuário começar a digitar
-    if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: "" }));
-    }
+    return isValid;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -79,16 +68,11 @@ const SupabaseRegister = () => {
       setIsLoading(true);
       
       const userData = {
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        telefone: formData.telefone,
-        crea: formData.crea,
-        especialidade: formData.especialidade,
-        is_engenheiro: formData.isEngenheiro,
-        role: 'user'
+        first_name: firstName,
+        last_name: lastName,
       };
 
-      const { data, error } = await signUp(formData.email, formData.password, userData);
+      const { data, error } = await signUp(email, password, userData);
       
       if (error) {
         throw error;
@@ -96,23 +80,23 @@ const SupabaseRegister = () => {
 
       if (data.user) {
         toast({
-          title: "Cadastro realizado com sucesso",
-          description: "Verifique seu e-mail para confirmar sua conta.",
+          title: "Conta criada com sucesso",
+          description: "Verifique seu e-mail para confirmar a conta.",
         });
-        navigate("/verify-code", { 
-          state: { email: formData.email }
-        });
+        navigate("/login");
       }
       
     } catch (err: any) {
       console.error("Erro no cadastro:", err);
       
       if (err.message.includes("User already registered")) {
-        setErrors({ email: "Este e-mail já está cadastrado" });
+        setEmailError("Este e-mail já está cadastrado");
+      } else if (err.message.includes("Password")) {
+        setPasswordError(err.message);
       } else {
         toast({
           title: "Erro no cadastro",
-          description: err.message || "Ocorreu um erro ao criar sua conta",
+          description: err.message || "Ocorreu um erro durante o cadastro",
           variant: "destructive",
         });
       }
@@ -133,7 +117,7 @@ const SupabaseRegister = () => {
         </div>
         
         <div className="bg-white p-8 rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold text-gray-900 text-center mb-6">Criar Conta</h1>
+          <h1 className="text-2xl font-bold text-gray-900 text-center mb-6">Criar conta</h1>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -141,33 +125,31 @@ const SupabaseRegister = () => {
                 <label htmlFor="firstName" className="text-sm font-medium text-gray-700">Nome</label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <User className="h-4 w-4 text-gray-400" />
+                    <User className="h-5 w-5 text-gray-400" />
                   </div>
                   <Input
                     id="firstName"
-                    type="text"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    className={`pl-9 ${errors.firstName ? 'border-red-500' : ''}`}
+                    value={firstName}
+                    onChange={(e) => setFirstName(e.target.value)}
+                    className={`pl-10 ${firstNameError ? 'border-red-500' : ''}`}
                     placeholder="Nome"
                     disabled={isLoading}
                   />
                 </div>
-                {errors.firstName && <p className="text-xs text-red-500">{errors.firstName}</p>}
+                {firstNameError && <p className="text-sm text-red-500">{firstNameError}</p>}
               </div>
               
               <div className="space-y-1">
                 <label htmlFor="lastName" className="text-sm font-medium text-gray-700">Sobrenome</label>
                 <Input
                   id="lastName"
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) => handleInputChange('lastName', e.target.value)}
-                  className={`${errors.lastName ? 'border-red-500' : ''}`}
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  className={`${lastNameError ? 'border-red-500' : ''}`}
                   placeholder="Sobrenome"
                   disabled={isLoading}
                 />
-                {errors.lastName && <p className="text-xs text-red-500">{errors.lastName}</p>}
+                {lastNameError && <p className="text-sm text-red-500">{lastNameError}</p>}
               </div>
             </div>
             
@@ -175,128 +157,63 @@ const SupabaseRegister = () => {
               <label htmlFor="email" className="text-sm font-medium text-gray-700">E-mail</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Mail className="h-4 w-4 text-gray-400" />
+                  <Mail className="h-5 w-5 text-gray-400" />
                 </div>
                 <Input
                   id="email"
                   type="email"
-                  value={formData.email}
-                  onChange={(e) => handleInputChange('email', e.target.value)}
-                  className={`pl-9 ${errors.email ? 'border-red-500' : ''}`}
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  className={`pl-10 ${emailError ? 'border-red-500' : ''}`}
                   placeholder="seu@email.com"
                   disabled={isLoading}
                 />
               </div>
-              {errors.email && <p className="text-xs text-red-500">{errors.email}</p>}
+              {emailError && <p className="text-sm text-red-500">{emailError}</p>}
             </div>
             
             <div className="space-y-1">
-              <label htmlFor="telefone" className="text-sm font-medium text-gray-700">Telefone (opcional)</label>
+              <label htmlFor="password" className="text-sm font-medium text-gray-700">Senha</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Phone className="h-4 w-4 text-gray-400" />
+                  <Lock className="h-5 w-5 text-gray-400" />
                 </div>
                 <Input
-                  id="telefone"
-                  type="tel"
-                  value={formData.telefone}
-                  onChange={(e) => handleInputChange('telefone', e.target.value)}
-                  className="pl-9"
-                  placeholder="+55 00 00000-0000"
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className={`pl-10 ${passwordError ? 'border-red-500' : ''}`}
+                  placeholder="Senha (mínimo 8 caracteres)"
                   disabled={isLoading}
                 />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowPassword(!showPassword)}
+                >
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5 text-gray-400" />
+                  ) : (
+                    <Eye className="h-5 w-5 text-gray-400" />
+                  )}
+                </button>
               </div>
+              {passwordError && <p className="text-sm text-red-500">{passwordError}</p>}
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-1">
-                <label htmlFor="password" className="text-sm font-medium text-gray-700">Senha</label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Lock className="h-4 w-4 text-gray-400" />
-                  </div>
-                  <Input
-                    id="password"
-                    type="password"
-                    value={formData.password}
-                    onChange={(e) => handleInputChange('password', e.target.value)}
-                    className={`pl-9 ${errors.password ? 'border-red-500' : ''}`}
-                    placeholder="Senha"
-                    disabled={isLoading}
-                  />
-                </div>
-                {errors.password && <p className="text-xs text-red-500">{errors.password}</p>}
-              </div>
-              
-              <div className="space-y-1">
-                <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirmar</label>
-                <Input
-                  id="confirmPassword"
-                  type="password"
-                  value={formData.confirmPassword}
-                  onChange={(e) => handleInputChange('confirmPassword', e.target.value)}
-                  className={`${errors.confirmPassword ? 'border-red-500' : ''}`}
-                  placeholder="Confirmar senha"
-                  disabled={isLoading}
-                />
-                {errors.confirmPassword && <p className="text-xs text-red-500">{errors.confirmPassword}</p>}
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Checkbox 
-                id="isEngenheiro"
-                checked={formData.isEngenheiro}
-                onCheckedChange={(checked) => handleInputChange('isEngenheiro', !!checked)}
-                disabled={isLoading}
-              />
-              <label htmlFor="isEngenheiro" className="text-sm text-gray-700">
-                Sou engenheiro
-              </label>
-            </div>
-            
-            {formData.isEngenheiro && (
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-1">
-                  <label htmlFor="crea" className="text-sm font-medium text-gray-700">CREA</label>
-                  <Input
-                    id="crea"
-                    type="text"
-                    value={formData.crea}
-                    onChange={(e) => handleInputChange('crea', e.target.value)}
-                    className={`${errors.crea ? 'border-red-500' : ''}`}
-                    placeholder="CREA"
-                    disabled={isLoading}
-                  />
-                  {errors.crea && <p className="text-xs text-red-500">{errors.crea}</p>}
-                </div>
-                
-                <div className="space-y-1">
-                  <label htmlFor="especialidade" className="text-sm font-medium text-gray-700">Especialidade</label>
-                  <Input
-                    id="especialidade"
-                    type="text"
-                    value={formData.especialidade}
-                    onChange={(e) => handleInputChange('especialidade', e.target.value)}
-                    placeholder="Especialidade"
-                    disabled={isLoading}
-                  />
-                </div>
-              </div>
-            )}
-            
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full mt-6" disabled={isLoading}>
               {isLoading ? "Criando conta..." : "Criar conta"}
             </Button>
           </form>
           
-          <div className="mt-6 text-center">
-            <p className="text-sm text-gray-600">
+          <div className="mt-6 text-center space-y-2">
+            <div className="text-sm text-gray-600">
               Já tem uma conta?{" "}
               <Link to="/login" className="text-primary hover:underline font-medium">
-                Faça login
+                Entrar
               </Link>
-            </p>
+            </div>
           </div>
         </div>
         
