@@ -31,12 +31,23 @@ export type Obra = {
   usuarios: ObraUsuario[];
   anexosObra?: ObraAnexo[];
   
-  // Adding missing fields that are being used in the components
+  // Campos de endereço expandidos
   cepCodigoPostal?: string;
-  documentos?: string[];
+  logradouro?: string;
+  numero?: string;
+  complemento?: string;
+  bairro?: string;
+  cidade?: string;
+  estado?: string;
+  
+  // Campos do engenheiro responsável
+  responsavelEngenheiroId?: string;
   responsavelEngenheiroNome?: string;
   responsavelEngenheiroEmail?: string;
   responsavelEngenheiroTelefone?: string;
+  responsavelEngenheiroCrea?: string;
+  
+  documentos?: string[];
   observacoesGerais?: string;
 };
 

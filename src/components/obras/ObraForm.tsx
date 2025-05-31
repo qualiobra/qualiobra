@@ -1,3 +1,4 @@
+
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Button } from "@/components/ui/button";
@@ -7,10 +8,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { ObraDatePicker } from "./ObraDatePicker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useObras } from "@/hooks/useObras";
+import { useCepLookup } from "@/hooks/useCepLookup";
+import { EngenheiroSelector } from "./EngenheiroSelector";
 import { useState } from "react";
-import { FileUp } from "lucide-react";
+import { FileUp, Search } from "lucide-react";
 import { obraFormSchema, type ObraFormValues } from "./ObraFormSchema";
-import { type NivelPBQPH } from "@/types/obra"; // Updated import to use the types file
+import { type NivelPBQPH, type Obra } from "@/types/obra";
+import { toast } from "@/hooks/use-toast";
+import { type Engenheiro } from "@/hooks/useEngenheiros";
 
 interface ObraFormProps {
   defaultValues?: Partial<ObraFormValues>;
@@ -21,6 +26,7 @@ interface ObraFormProps {
 
 export default function ObraForm({ defaultValues, onSubmit, submitButtonText, isEdit = false }: ObraFormProps) {
   const { gerarCodigoObra } = useObras();
+  const { buscarEnderecoPorCep, isLoading: isLoadingCep } = useCepLookup();
   const [anexos, setAnexos] = useState<Array<{nome: string, url: string, tipo: string}>>((defaultValues?.anexosObra || []) as Array<{nome: string, url: string, tipo: string}>);
   
   // Generate a new code only for new obras
@@ -31,17 +37,24 @@ export default function ObraForm({ defaultValues, onSubmit, submitButtonText, is
     codigoDaObra: codigoObra,
     nome: "",
     descricao: "",
-    localizacao: "",
     cepCodigoPostal: "",
+    logradouro: "",
+    numero: "",
+    complemento: "",
+    bairro: "",
+    cidade: "",
+    estado: "",
     dataInicio: new Date(),
     dataPrevistaTermino: undefined,
     status: "planejamento",
     nivelPBQPH: "Não Aplicável",
-    documentos: [],
-    anexosObra: [],
+    responsavelEngenheiroId: "",
     responsavelEngenheiroNome: "",
     responsavelEngenheiroEmail: "",
     responsavelEngenheiroTelefone: "",
+    responsavelEngenheiroCrea: "",
+    documentos: [],
+    anexosObra: [],
     observacoesGerais: "",
     ...defaultValues,
   };
@@ -51,11 +64,42 @@ export default function ObraForm({ defaultValues, onSubmit, submitButtonText, is
     defaultValues: initialValues,
   });
 
+  const handleCepBlur = async () => {
+    const cep = form.getValues("cepCodigoPostal");
+    if (!cep || cep.length !== 8) return;
+
+    const endereco = await buscarEnderecoPorCep(cep);
+    if (endereco) {
+      form.setValue("logradouro", endereco.logradouro);
+      form.setValue("bairro", endereco.bairro);
+      form.setValue("cidade", endereco.localidade);
+      form.setValue("estado", endereco.uf);
+      if (endereco.complemento) {
+        form.setValue("complemento", endereco.complemento);
+      }
+      toast({
+        title: "Endereço encontrado",
+        description: "Os campos de endereço foram preenchidos automaticamente.",
+      });
+    } else {
+      toast({
+        title: "CEP não encontrado",
+        description: "Verifique o CEP informado e tente novamente.",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleEngenheiroSelect = (engenheiro: Engenheiro) => {
+    const nomeCompleto = `${engenheiro.first_name || ''} ${engenheiro.last_name || ''}`.trim();
+    form.setValue("responsavelEngenheiroNome", nomeCompleto);
+    form.setValue("responsavelEngenheiroTelefone", engenheiro.telefone || "");
+    form.setValue("responsavelEngenheiroCrea", engenheiro.crea || "");
+  };
+
   const handleAnexoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      // Simular upload de arquivos (em uma aplicação real, isso seria feito para um servidor)
       const novosAnexos = Array.from(e.target.files).map(file => {
-        // Criar uma URL temporária para o arquivo
         const url = URL.createObjectURL(file);
         return {
           nome: file.name,
@@ -65,8 +109,6 @@ export default function ObraForm({ defaultValues, onSubmit, submitButtonText, is
       });
       
       setAnexos([...anexos, ...novosAnexos]);
-      
-      // Atualizar o campo anexosObra no formulário
       form.setValue('anexosObra', [...anexos, ...novosAnexos], { shouldValidate: true });
     }
   };
@@ -135,34 +177,121 @@ export default function ObraForm({ defaultValues, onSubmit, submitButtonText, is
           )}
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormField
-            control={form.control}
-            name="localizacao"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Localização</FormLabel>
-                <FormControl>
-                  <Input placeholder="Endereço da obra" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+        {/* Seção de Endereço */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Endereço da Obra</h3>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormField
+              control={form.control}
+              name="cepCodigoPostal"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>CEP</FormLabel>
+                  <div className="relative">
+                    <FormControl>
+                      <Input 
+                        placeholder="12345678" 
+                        {...field} 
+                        onBlur={handleCepBlur}
+                        maxLength={8}
+                      />
+                    </FormControl>
+                    {isLoadingCep && (
+                      <Search className="absolute right-2 top-2.5 h-4 w-4 animate-spin" />
+                    )}
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="cepCodigoPostal"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>CEP</FormLabel>
-                <FormControl>
-                  <Input placeholder="CEP" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="logradouro"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Logradouro</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Rua, Avenida, etc." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="numero"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Número</FormLabel>
+                  <FormControl>
+                    <Input placeholder="123" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <FormField
+              control={form.control}
+              name="complemento"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Complemento</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Apto, Sala, etc." {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="bairro"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Bairro</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nome do bairro" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="cidade"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Cidade</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nome da cidade" {...field} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="estado"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Estado</FormLabel>
+                  <FormControl>
+                    <Input placeholder="SP" {...field} maxLength={2} />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -239,48 +368,66 @@ export default function ObraForm({ defaultValues, onSubmit, submitButtonText, is
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        {/* Seção do Engenheiro Responsável */}
+        <div className="space-y-4">
+          <h3 className="text-lg font-medium">Engenheiro Responsável</h3>
+          
           <FormField
             control={form.control}
-            name="responsavelEngenheiroNome"
+            name="responsavelEngenheiroId"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel>Nome do Engenheiro Responsável</FormLabel>
-                <FormControl>
-                  <Input placeholder="Nome do engenheiro" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
+              <EngenheiroSelector
+                control={form.control}
+                name="responsavelEngenheiroId"
+                label="Selecionar Engenheiro"
+                onEngenheiroSelect={handleEngenheiroSelect}
+              />
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="responsavelEngenheiroEmail"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email do Engenheiro</FormLabel>
-                <FormControl>
-                  <Input placeholder="Email" type="email" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <FormField
+              control={form.control}
+              name="responsavelEngenheiroNome"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Nome do Engenheiro</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Nome completo" {...field} readOnly className="bg-gray-100" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="responsavelEngenheiroTelefone"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Telefone do Engenheiro</FormLabel>
-                <FormControl>
-                  <Input placeholder="Telefone" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+            <FormField
+              control={form.control}
+              name="responsavelEngenheiroTelefone"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Telefone</FormLabel>
+                  <FormControl>
+                    <Input placeholder="Telefone" {...field} readOnly className="bg-gray-100" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="responsavelEngenheiroCrea"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>CREA</FormLabel>
+                  <FormControl>
+                    <Input placeholder="CREA" {...field} readOnly className="bg-gray-100" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </div>
 
         <FormField
