@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
 import { ObrasProvider } from "./context/ObrasContext";
+import { UserRoleProvider } from "./context/UserRoleContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Inspections from "./pages/Inspections";
@@ -152,9 +153,11 @@ const AppContent = () => (
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <SupabaseAuthProvider>
-      <ObrasProvider>
-        <AppContent />
-      </ObrasProvider>
+      <UserRoleProvider>
+        <ObrasProvider>
+          <AppContent />
+        </ObrasProvider>
+      </UserRoleProvider>
     </SupabaseAuthProvider>
   </QueryClientProvider>
 );
