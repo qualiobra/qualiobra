@@ -1,6 +1,5 @@
-
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/context/SupabaseAuthContext";
 import { useObras } from "@/hooks/useObras";
 import { useUserRole } from "@/context/UserRoleContext";
 import { Badge } from "@/components/ui/badge";
@@ -36,7 +35,7 @@ import {
 } from "@/components/ui/popover";
 
 const Obras = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { currentUserRole } = useUserRole();
   const { obras, getObrasDoUsuario, arquivarObra } = useObras();
   
