@@ -1,5 +1,6 @@
+
 import React, { createContext, useState, useContext, useEffect, useCallback } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "./SupabaseAuthContext";
 
 // Tipos para perfis de usuário
 export type UserRole = {
@@ -53,7 +54,7 @@ const defaultRoles: UserRole[] = [
 const UserRoleContext = createContext<UserRoleContextType | undefined>(undefined);
 
 export const UserRoleProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [userRoles, setUserRoles] = useState<UserRole[]>(() => {
     // Inicialização do estado a partir do localStorage
     const savedRoles = localStorage.getItem("userRoles");
