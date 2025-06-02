@@ -53,13 +53,12 @@ const SupabaseSiteHeader = () => {
     <header className="border-b bg-white">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <div className="flex items-center space-x-8">
-          <Link to="/dashboard" className="flex items-center space-x-2">
+          <Link to="/dashboard" className="flex items-center">
             <img 
               src="/lovable-uploads/0606c9b7-ff8b-45c2-93f5-0ce14a8cdab6.png" 
               alt="QualiObra" 
               className="h-8 w-auto" 
             />
-            <span className="font-bold text-xl text-gray-900">QualiObra</span>
           </Link>
           
           <nav className="hidden md:flex items-center space-x-6">

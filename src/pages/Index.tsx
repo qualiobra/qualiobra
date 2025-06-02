@@ -9,13 +9,12 @@ const Index = () => {
       {/* Header */}
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center space-x-2">
+          <div className="flex items-center">
             <img 
               src="/lovable-uploads/0606c9b7-ff8b-45c2-93f5-0ce14a8cdab6.png" 
               alt="QualiObra" 
               className="h-8 w-auto" 
             />
-            <span className="font-bold text-xl text-gray-900">QualiObra</span>
           </div>
           
           <div className="flex items-center space-x-4">
@@ -117,13 +116,12 @@ const Index = () => {
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8 mt-16">
         <div className="container mx-auto px-4 text-center">
-          <div className="flex items-center justify-center space-x-2 mb-4">
+          <div className="flex items-center justify-center mb-4">
             <img 
               src="/lovable-uploads/0606c9b7-ff8b-45c2-93f5-0ce14a8cdab6.png" 
               alt="QualiObra" 
               className="h-6 w-auto" 
             />
-            <span className="font-bold text-lg">QualiObra</span>
           </div>
           <p className="text-gray-400">
             © 2024 QualiObra. Todos os direitos reservados.
