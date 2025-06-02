@@ -1,6 +1,6 @@
 
 import { useState, useEffect } from "react";
-import { useUser } from "@clerk/clerk-react";
+import { useAuth } from "@/context/SupabaseAuthContext";
 import { useUserRole } from "@/context/UserRoleContext";
 import type { Obra, ObraUsuario, ObraAnexo } from "@/types/obra";
 
@@ -105,7 +105,7 @@ const mockObras: Obra[] = [
 ];
 
 export const useObras = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { currentUserRole } = useUserRole();
   const [obras, setObras] = useState<Obra[]>(() => {
     const savedObras = localStorage.getItem("obras");
@@ -170,7 +170,7 @@ export const useObras = () => {
     }
 
     return obras.filter((obra) =>
-      obra.usuarios.some((usuario) => usuario.email === user.emailAddresses[0].emailAddress)
+      obra.usuarios.some((usuario) => usuario.email === user.email)
     );
   };
   
