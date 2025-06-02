@@ -7,7 +7,8 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
 import { ObrasProvider } from "./context/ObrasContext";
 import { UserRoleProvider } from "./context/UserRoleContext";
-import Index from "./pages/Index";
+import ComingSoon from "./pages/ComingSoon";
+import LandingPage from "./pages/LandingPage";
 import Dashboard from "./pages/Dashboard";
 import Inspections from "./pages/Inspections";
 import Team from "./pages/Team";
@@ -80,7 +81,8 @@ const AppContent = () => (
     <Sonner />
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Index />} />
+        <Route path="/" element={<ComingSoon />} />
+        <Route path="/preview" element={<LandingPage />} />
         
         <Route path="/login" element={
           <PublicRoute>
