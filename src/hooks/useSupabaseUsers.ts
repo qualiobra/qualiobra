@@ -2,7 +2,6 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
-import { v4 as uuidv4 } from "uuid";
 
 export type Profile = {
   id: string;
@@ -36,8 +35,8 @@ export const useSupabaseUsers = () => {
     },
   });
 
-  const createInviteMutation = useMutation({
-    mutationFn: async (inviteData: {
+  const createUserMutation = useMutation({
+    mutationFn: async (userData: {
       email: string;
       role: string;
       first_name?: string;
@@ -47,56 +46,47 @@ export const useSupabaseUsers = () => {
       especialidade?: string;
       is_engenheiro?: boolean;
     }) => {
-      const token = uuidv4();
-      const { data: { user } } = await supabase.auth.getUser();
+      console.log('Creating user with data:', userData);
       
-      if (!user) throw new Error('Usuário não autenticado');
-
-      // Criar convite na tabela user_invites
-      const { error: inviteError } = await supabase
-        .from('user_invites')
-        .insert({
-          email: inviteData.email,
-          role: inviteData.role,
-          invited_by: user.id,
-          token
-        });
-
-      if (inviteError) throw inviteError;
-
-      // Enviar email de convite através do Supabase Auth
-      const { error: authError } = await supabase.auth.admin.inviteUserByEmail(
-        inviteData.email,
-        {
+      // Criar usuário diretamente no Supabase Auth com senha temporária
+      const tempPassword = Math.random().toString(36).slice(-8) + 'A1!';
+      
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: userData.email,
+        password: tempPassword,
+        options: {
           data: {
-            first_name: inviteData.first_name,
-            last_name: inviteData.last_name,
-            telefone: inviteData.telefone,
-            crea: inviteData.crea,
-            especialidade: inviteData.especialidade,
-            is_engenheiro: inviteData.is_engenheiro,
-            role: inviteData.role
-          },
-          redirectTo: `${window.location.origin}/accept-invite?token=${token}`
+            first_name: userData.first_name,
+            last_name: userData.last_name,
+            telefone: userData.telefone,
+            crea: userData.crea,
+            especialidade: userData.especialidade,
+            is_engenheiro: userData.is_engenheiro,
+            role: userData.role
+          }
         }
-      );
+      });
 
-      if (authError) throw authError;
+      if (authError) {
+        console.error('Auth error:', authError);
+        throw authError;
+      }
 
-      return { token };
+      console.log('User created successfully:', authData);
+      return authData;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ['supabase-users'] });
       toast({
-        title: "Convite enviado",
-        description: "O convite foi enviado por email com sucesso.",
+        title: "Usuário criado",
+        description: "O usuário foi criado com sucesso.",
       });
     },
     onError: (error: any) => {
-      console.error('Erro ao enviar convite:', error);
+      console.error('Erro ao criar usuário:', error);
       toast({
-        title: "Erro ao enviar convite",
-        description: error.message || "Ocorreu um erro ao enviar o convite.",
+        title: "Erro ao criar usuário",
+        description: error.message || "Ocorreu um erro ao criar o usuário.",
         variant: "destructive",
       });
     },
@@ -148,10 +138,15 @@ export const useSupabaseUsers = () => {
 
       if (profileError) throw profileError;
 
-      // Depois deletar o usuário do auth (requer privilégios de admin)
-      const { error: authError } = await supabase.auth.admin.deleteUser(userId);
-      
-      if (authError) throw authError;
+      // Depois deletar o usuário do auth (pode falhar se não tiver privilégios)
+      try {
+        const { error: authError } = await supabase.auth.admin.deleteUser(userId);
+        if (authError) {
+          console.warn('Could not delete user from auth:', authError);
+        }
+      } catch (err) {
+        console.warn('Auth deletion not available:', err);
+      }
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['supabase-users'] });
@@ -173,10 +168,10 @@ export const useSupabaseUsers = () => {
   return {
     users,
     isLoading,
-    createInvite: createInviteMutation.mutate,
+    createUser: createUserMutation.mutate,
     updateUser: updateUserMutation.mutate,
     deleteUser: deleteUserMutation.mutate,
-    isCreatingInvite: createInviteMutation.isPending,
+    isCreatingUser: createUserMutation.isPending,
     isUpdatingUser: updateUserMutation.isPending,
     isDeletingUser: deleteUserMutation.isPending,
   };

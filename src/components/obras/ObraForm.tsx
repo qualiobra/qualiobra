@@ -9,13 +9,13 @@ import { ObraDatePicker } from "./ObraDatePicker";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useObras } from "@/hooks/useObras";
 import { useCepLookup } from "@/hooks/useCepLookup";
-import { EngenheiroSelector } from "./EngenheiroSelector";
+import { SupabaseEngenheiroSelector } from "./SupabaseEngenheiroSelector";
 import { useState } from "react";
 import { FileUp, Search } from "lucide-react";
 import { obraFormSchema, type ObraFormValues } from "./ObraFormSchema";
 import { type NivelPBQPH } from "@/types/obra";
 import { toast } from "@/hooks/use-toast";
-import { type Engenheiro } from "@/hooks/useEngenheiros";
+import { type SupabaseEngenheiro } from "@/hooks/useSupabaseEngenheiros";
 
 interface ObraFormProps {
   defaultValues?: Partial<ObraFormValues>;
@@ -96,9 +96,10 @@ export default function ObraForm({ defaultValues, onSubmit, submitButtonText, is
     }
   };
 
-  const handleEngenheiroSelect = (engenheiro: Engenheiro) => {
+  const handleEngenheiroSelect = (engenheiro: SupabaseEngenheiro) => {
     const nomeCompleto = `${engenheiro.first_name || ''} ${engenheiro.last_name || ''}`.trim();
     form.setValue("responsavelEngenheiroNome", nomeCompleto);
+    form.setValue("responsavelEngenheiroEmail", engenheiro.email || "");
     form.setValue("responsavelEngenheiroTelefone", engenheiro.telefone || "");
     form.setValue("responsavelEngenheiroCrea", engenheiro.crea || "");
   };
@@ -392,7 +393,7 @@ export default function ObraForm({ defaultValues, onSubmit, submitButtonText, is
         <div className="space-y-4">
           <h3 className="text-lg font-medium">Engenheiro Responsável</h3>
           
-          <EngenheiroSelector
+          <SupabaseEngenheiroSelector
             control={form.control}
             name="responsavelEngenheiroId"
             label="Selecionar Engenheiro"

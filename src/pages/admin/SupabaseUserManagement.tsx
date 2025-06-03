@@ -87,10 +87,10 @@ const SupabaseUserManagement = () => {
   const { 
     users, 
     isLoading, 
-    createInvite, 
+    createUser, 
     updateUser, 
     deleteUser,
-    isCreatingInvite,
+    isCreatingUser,
     isUpdatingUser,
     isDeletingUser
   } = useSupabaseUsers();
@@ -159,6 +159,8 @@ const SupabaseUserManagement = () => {
 
   // Função para lidar com o envio do formulário
   const onSubmit = (values: z.infer<typeof userFormSchema>) => {
+    console.log('Submitting user form with values:', values);
+    
     if (editingUser) {
       // Atualizar usuário existente
       updateUser({
@@ -173,8 +175,8 @@ const SupabaseUserManagement = () => {
         status: values.status,
       });
     } else {
-      // Criar convite para novo usuário
-      createInvite({
+      // Criar novo usuário
+      createUser({
         email: values.email,
         role: values.role,
         first_name: values.firstName,
@@ -251,20 +253,20 @@ const SupabaseUserManagement = () => {
         
         <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={handleAddUser} disabled={isCreatingInvite}>
+            <Button onClick={handleAddUser} disabled={isCreatingUser}>
               <UserPlus className="mr-2 h-4 w-4" /> 
-              {isCreatingInvite ? "Enviando..." : "Novo Usuário"}
+              {isCreatingUser ? "Criando..." : "Novo Usuário"}
             </Button>
           </DialogTrigger>
           <DialogContent className="sm:max-w-[600px]">
             <DialogHeader>
               <DialogTitle>
-                {editingUser ? "Editar Usuário" : "Convidar Novo Usuário"}
+                {editingUser ? "Editar Usuário" : "Criar Novo Usuário"}
               </DialogTitle>
               <DialogDescription>
                 {editingUser 
                   ? "Edite as informações do usuário conforme necessário."
-                  : "Preencha os detalhes para enviar um convite para um novo usuário."}
+                  : "Preencha os detalhes para criar um novo usuário no sistema."}
               </DialogDescription>
             </DialogHeader>
             
@@ -432,8 +434,8 @@ const SupabaseUserManagement = () => {
                   <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
                     Cancelar
                   </Button>
-                  <Button type="submit" disabled={isCreatingInvite || isUpdatingUser}>
-                    {editingUser ? "Salvar Alterações" : "Enviar Convite"}
+                  <Button type="submit" disabled={isCreatingUser || isUpdatingUser}>
+                    {editingUser ? "Salvar Alterações" : "Criar Usuário"}
                   </Button>
                 </DialogFooter>
               </form>
