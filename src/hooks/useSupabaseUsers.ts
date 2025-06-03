@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -25,12 +24,18 @@ export const useSupabaseUsers = () => {
   const { data: users = [], isLoading } = useQuery({
     queryKey: ['supabase-users'],
     queryFn: async () => {
+      console.log('Fetching users from profiles table...');
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
         .order('created_at', { ascending: false });
       
-      if (error) throw error;
+      if (error) {
+        console.error('Error fetching users:', error);
+        throw error;
+      }
+      
+      console.log('Users fetched:', data);
       return data as Profile[];
     },
   });
@@ -51,19 +56,24 @@ export const useSupabaseUsers = () => {
       // Criar usuário diretamente no Supabase Auth com senha temporária
       const tempPassword = Math.random().toString(36).slice(-8) + 'A1!';
       
+      // Preparar os metadata do usuário
+      const userMetadata = {
+        first_name: userData.first_name || '',
+        last_name: userData.last_name || '',
+        telefone: userData.telefone || '',
+        crea: userData.crea || '',
+        especialidade: userData.especialidade || '',
+        is_engenheiro: userData.is_engenheiro || false,
+        role: userData.role || 'user'
+      };
+
+      console.log('User metadata being sent:', userMetadata);
+      
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: userData.email,
         password: tempPassword,
         options: {
-          data: {
-            first_name: userData.first_name,
-            last_name: userData.last_name,
-            telefone: userData.telefone,
-            crea: userData.crea,
-            especialidade: userData.especialidade,
-            is_engenheiro: userData.is_engenheiro,
-            role: userData.role
-          }
+          data: userMetadata
         }
       });
 
@@ -73,13 +83,20 @@ export const useSupabaseUsers = () => {
       }
 
       console.log('User created successfully:', authData);
+      
+      // Aguardar um pouco para garantir que o trigger foi executado
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       return authData;
     },
-    onSuccess: (data) => {
+    onSuccess: () => {
+      // Invalidar e refetch os dados dos usuários
       queryClient.invalidateQueries({ queryKey: ['supabase-users'] });
+      queryClient.invalidateQueries({ queryKey: ['supabase-engenheiros'] });
+      
       toast({
         title: "Usuário criado",
-        description: "O usuário foi criado com sucesso.",
+        description: "O usuário foi criado com sucesso e aparecerá na lista em instantes.",
       });
     },
     onError: (error: any) => {
@@ -113,6 +130,7 @@ export const useSupabaseUsers = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['supabase-users'] });
+      queryClient.invalidateQueries({ queryKey: ['supabase-engenheiros'] });
       toast({
         title: "Usuário atualizado",
         description: "Os dados do usuário foram atualizados com sucesso.",
@@ -150,6 +168,7 @@ export const useSupabaseUsers = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['supabase-users'] });
+      queryClient.invalidateQueries({ queryKey: ['supabase-engenheiros'] });
       toast({
         title: "Usuário excluído",
         description: "O usuário foi removido com sucesso.",
