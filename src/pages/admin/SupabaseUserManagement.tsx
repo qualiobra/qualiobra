@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/SupabaseAuthContext";
 import { useSupabaseUsers, type Profile } from "@/hooks/useSupabaseUsers";
@@ -49,15 +48,25 @@ const SupabaseUserManagement = () => {
     updateUser, 
     deleteUser,
     isCreatingUser,
-    isUpdatingUser
+    isUpdatingUser,
+    refetch
   } = useSupabaseUsers();
   
   const [editingUser, setEditingUser] = useState<Profile | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [lastUserCount, setLastUserCount] = useState(0);
   
-  // Verificar se o usuário atual é admin (implementação básica)
+  // Verificar se o usuário atual é admin
   const currentUserProfile = users.find(u => u.id === user?.id);
   const isAdmin = currentUserProfile?.role === 'admin';
+  
+  // Monitor changes in user count
+  useEffect(() => {
+    if (users.length !== lastUserCount) {
+      console.log(`👥 Lista de usuários atualizada: ${lastUserCount} → ${users.length} usuários`);
+      setLastUserCount(users.length);
+    }
+  }, [users.length, lastUserCount]);
   
   // Se não for administrador, redirecionar para o dashboard
   if (!isLoading && !isAdmin) {
@@ -71,7 +80,9 @@ const SupabaseUserManagement = () => {
 
   // Função para lidar com o envio do formulário
   const onSubmit = (values: UserFormData) => {
-    console.log('Submitting user form with values:', values);
+    console.log('=== SUBMETENDO FORMULÁRIO DE USUÁRIO ===');
+    console.log('Valores do formulário:', values);
+    console.log('Usuários atuais na lista:', users.length);
     
     if (editingUser) {
       // Atualizar usuário existente
@@ -88,6 +99,7 @@ const SupabaseUserManagement = () => {
       });
     } else {
       // Criar novo usuário
+      console.log('Criando novo usuário...');
       createUser({
         email: values.email,
         role: values.role,
@@ -135,6 +147,30 @@ const SupabaseUserManagement = () => {
     setIsDialogOpen(true);
   };
 
+  // Função para refresh manual
+  const handleManualRefresh = async () => {
+    console.log('🔄 Refresh manual iniciado...');
+    toast({
+      title: "Atualizando lista",
+      description: "Buscando usuários mais recentes...",
+    });
+    
+    try {
+      await refetch();
+      toast({
+        title: "Lista atualizada",
+        description: `${users.length} usuários encontrados.`,
+      });
+    } catch (error) {
+      console.error('Erro no refresh manual:', error);
+      toast({
+        title: "Erro ao atualizar",
+        description: "Não foi possível atualizar a lista de usuários.",
+        variant: "destructive",
+      });
+    }
+  };
+
   // Obter as iniciais do nome para o fallback do avatar
   const getInitials = (profile: Profile) => {
     const firstName = profile.first_name || '';
@@ -166,7 +202,7 @@ const SupabaseUserManagement = () => {
         <div className="flex gap-2">
           <Button 
             variant="outline" 
-            onClick={() => window.location.reload()}
+            onClick={handleManualRefresh}
             title="Atualizar lista"
           >
             <RefreshCw className="h-4 w-4" />
@@ -190,15 +226,25 @@ const SupabaseUserManagement = () => {
           <CardTitle>Usuários do Sistema ({users.length})</CardTitle>
           <CardDescription>
             Lista de todos os usuários registrados no sistema.
+            {users.length > 0 && (
+              <span className="block mt-1 text-sm text-green-600">
+                ✅ {users.length} usuário(s) encontrado(s)
+              </span>
+            )}
           </CardDescription>
         </CardHeader>
         <CardContent>
           {users.length === 0 ? (
             <div className="text-center py-8">
               <p className="text-gray-500 mb-4">Nenhum usuário encontrado</p>
-              <Button onClick={handleAddUser}>
-                <UserPlus className="mr-2 h-4 w-4" /> Criar Primeiro Usuário
-              </Button>
+              <div className="space-y-2">
+                <Button onClick={handleAddUser}>
+                  <UserPlus className="mr-2 h-4 w-4" /> Criar Primeiro Usuário
+                </Button>
+                <Button variant="outline" onClick={handleManualRefresh}>
+                  <RefreshCw className="mr-2 h-4 w-4" /> Atualizar Lista
+                </Button>
+              </div>
             </div>
           ) : (
             <Table>

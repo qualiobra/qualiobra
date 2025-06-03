@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -43,10 +44,10 @@ const generateStrongPassword = () => {
 export const useSupabaseUsers = () => {
   const queryClient = useQueryClient();
 
-  const { data: users = [], isLoading } = useQuery({
+  const { data: users = [], isLoading, refetch } = useQuery({
     queryKey: ['supabase-users'],
     queryFn: async () => {
-      console.log('Fetching users from profiles table...');
+      console.log('=== FETCHING USERS FROM DATABASE ===');
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -57,7 +58,8 @@ export const useSupabaseUsers = () => {
         throw error;
       }
       
-      console.log('Users fetched:', data);
+      console.log('Users fetched from database:', data?.length || 0, 'users');
+      console.log('User list:', data?.map(u => `${u.first_name} ${u.last_name} (${u.email})`));
       return data as Profile[];
     },
   });
@@ -77,28 +79,48 @@ export const useSupabaseUsers = () => {
       console.log('Dados do usuário:', userData);
       
       try {
-        // 1. Verificar se o email já existe
-        console.log('1. Verificando se email já existe...');
-        const { data: existingUsers, error: checkError } = await supabase
+        // 1. Verificar se o email já existe na tabela profiles
+        console.log('1. Verificando se email já existe na tabela profiles...');
+        const { data: existingProfiles, error: checkProfileError } = await supabase
           .from('profiles')
-          .select('email')
+          .select('email, id')
           .eq('email', userData.email);
         
-        if (checkError) {
-          console.error('Erro ao verificar email existente:', checkError);
-          throw new Error(`Erro ao verificar email: ${checkError.message}`);
+        if (checkProfileError) {
+          console.error('Erro ao verificar profiles existentes:', checkProfileError);
+          throw new Error(`Erro ao verificar email: ${checkProfileError.message}`);
         }
         
-        if (existingUsers && existingUsers.length > 0) {
-          console.error('Email já existe no sistema');
+        if (existingProfiles && existingProfiles.length > 0) {
+          console.error('Email já existe na tabela profiles:', existingProfiles[0]);
           throw new Error('Este email já está cadastrado no sistema');
         }
         
-        // 2. Gerar senha forte
-        const tempPassword = generateStrongPassword();
-        console.log('2. Senha temporária gerada:', tempPassword.substring(0, 3) + '***');
+        console.log('1a. Email não existe na tabela profiles, prosseguindo...');
         
-        // 3. Preparar metadados do usuário
+        // 2. Verificar se o email já existe no Auth
+        console.log('2. Verificando usuários no Auth via admin...');
+        try {
+          const { data: authUsers, error: authListError } = await supabase.auth.admin.listUsers();
+          if (authListError) {
+            console.warn('Não foi possível listar usuários do Auth:', authListError);
+          } else {
+            const existingAuthUser = authUsers.users?.find(u => u.email === userData.email);
+            if (existingAuthUser) {
+              console.error('Email já existe no Auth:', existingAuthUser.email);
+              throw new Error('Este email já está cadastrado no sistema de autenticação');
+            }
+            console.log('2a. Email não existe no Auth, prosseguindo...');
+          }
+        } catch (authError) {
+          console.warn('Erro ao verificar Auth (continuando):', authError);
+        }
+        
+        // 3. Gerar senha forte
+        const tempPassword = generateStrongPassword();
+        console.log('3. Senha temporária gerada (primeiros 3 chars):', tempPassword.substring(0, 3) + '***');
+        
+        // 4. Preparar metadados do usuário
         const userMetadata = {
           first_name: userData.first_name || '',
           last_name: userData.last_name || '',
@@ -109,10 +131,10 @@ export const useSupabaseUsers = () => {
           role: userData.role || 'user'
         };
         
-        console.log('3. Metadados preparados:', userMetadata);
+        console.log('4. Metadados preparados:', userMetadata);
         
-        // 4. Tentar criar usuário no Supabase Auth
-        console.log('4. Criando usuário no Supabase Auth...');
+        // 5. Criar usuário no Supabase Auth
+        console.log('5. Criando usuário no Supabase Auth...');
         const { data: authData, error: authError } = await supabase.auth.signUp({
           email: userData.email,
           password: tempPassword,
@@ -122,21 +144,18 @@ export const useSupabaseUsers = () => {
           }
         });
         
-        console.log('4a. Resposta do signUp:', {
+        console.log('5a. Resposta do signUp:', {
           user: authData.user ? 'Criado' : 'Não criado',
           userId: authData.user?.id,
+          userEmail: authData.user?.email,
           session: authData.session ? 'Existe' : 'Não existe',
           error: authError
         });
         
         if (authError) {
           console.error('=== ERRO NO SUPABASE AUTH ===');
-          console.error('Tipo do erro:', authError.name);
-          console.error('Mensagem:', authError.message);
-          console.error('Status:', authError.status);
-          console.error('Detalhes completos:', authError);
+          console.error('Erro completo:', authError);
           
-          // Mapear erros comuns
           let errorMessage = authError.message;
           if (authError.message.includes('Email rate limit exceeded')) {
             errorMessage = 'Muitas tentativas de cadastro. Aguarde alguns minutos e tente novamente.';
@@ -144,8 +163,6 @@ export const useSupabaseUsers = () => {
             errorMessage = 'Este email já está cadastrado no sistema.';
           } else if (authError.message.includes('Invalid email')) {
             errorMessage = 'Email inválido.';
-          } else if (authError.message.includes('Password')) {
-            errorMessage = 'Erro na senha. Tente novamente.';
           } else if (authError.message.includes('Signup is disabled')) {
             errorMessage = 'Cadastro está desabilitado. Verifique as configurações do Supabase.';
           }
@@ -154,24 +171,24 @@ export const useSupabaseUsers = () => {
         }
         
         if (!authData.user) {
-          console.error('Usuário não foi criado no Auth, mas não houve erro explícito');
+          console.error('Usuário não foi criado no Auth');
           throw new Error('Falha na criação do usuário. Verifique as configurações de autenticação.');
         }
         
-        console.log('5. Usuário criado com sucesso no Auth, ID:', authData.user.id);
+        console.log('6. Usuário criado com sucesso no Auth, ID:', authData.user.id);
         
-        // 5. Aguardar e verificar se o perfil foi criado via trigger
-        console.log('6. Aguardando criação do perfil via trigger...');
+        // 6. Aguardar e verificar se o perfil foi criado via trigger
+        console.log('7. Aguardando criação do perfil via trigger...');
         
         let profileCreated = false;
         let attempts = 0;
-        const maxAttempts = 10;
+        const maxAttempts = 15; // Aumentar tentativas
         
         while (!profileCreated && attempts < maxAttempts) {
           attempts++;
-          console.log(`6.${attempts}. Tentativa ${attempts}/${maxAttempts} - Verificando perfil...`);
+          console.log(`7.${attempts}. Tentativa ${attempts}/${maxAttempts} - Verificando perfil...`);
           
-          await new Promise(resolve => setTimeout(resolve, 2000)); // Aguardar 2 segundos
+          await new Promise(resolve => setTimeout(resolve, 1500)); // Aguardar 1.5 segundos
           
           const { data: profileData, error: profileError } = await supabase
             .from('profiles')
@@ -180,28 +197,26 @@ export const useSupabaseUsers = () => {
             .single();
           
           if (profileError) {
-            console.log(`6.${attempts}a. Erro ao buscar perfil:`, profileError.message);
             if (profileError.code !== 'PGRST116') { // PGRST116 = não encontrado
               console.error('Erro inesperado ao verificar perfil:', profileError);
+            } else {
+              console.log(`7.${attempts}a. Perfil ainda não encontrado...`);
             }
           } else if (profileData) {
-            console.log(`6.${attempts}b. Perfil encontrado:`, profileData);
+            console.log(`7.${attempts}b. ✅ PERFIL ENCONTRADO:`, profileData);
             profileCreated = true;
-          } else {
-            console.log(`6.${attempts}c. Perfil ainda não encontrado, aguardando...`);
+            
+            // Forçar refresh da query imediatamente
+            console.log('7.${attempts}c. Forçando refresh da lista de usuários...');
+            await queryClient.invalidateQueries({ queryKey: ['supabase-users'] });
+            await queryClient.refetchQueries({ queryKey: ['supabase-users'] });
           }
         }
         
         if (!profileCreated) {
           console.error('=== PERFIL NÃO FOI CRIADO APÓS MÚLTIPLAS TENTATIVAS ===');
-          console.error('O usuário foi criado no Auth mas o perfil não apareceu na tabela profiles');
-          console.error('Isso pode indicar problemas com:');
-          console.error('- Trigger handle_new_user() não está funcionando');
-          console.error('- Permissões de RLS na tabela profiles');
-          console.error('- Configurações do banco de dados');
+          console.error('Tentando criar perfil manualmente...');
           
-          // Tentar criar o perfil manualmente como fallback
-          console.log('7. Tentando criar perfil manualmente...');
           const { data: manualProfile, error: manualError } = await supabase
             .from('profiles')
             .insert({
@@ -223,15 +238,26 @@ export const useSupabaseUsers = () => {
             console.error('Erro ao criar perfil manualmente:', manualError);
             throw new Error(`Usuário criado mas perfil falhou: ${manualError.message}`);
           } else {
-            console.log('7a. Perfil criado manualmente com sucesso:', manualProfile);
+            console.log('✅ Perfil criado manualmente com sucesso:', manualProfile);
+            profileCreated = true;
           }
         }
         
         console.log('=== USUÁRIO CRIADO COM SUCESSO ===');
+        console.log('Forçando refresh final das queries...');
+        
+        // Refresh múltiplo para garantir
+        setTimeout(async () => {
+          await queryClient.invalidateQueries({ queryKey: ['supabase-users'] });
+          await queryClient.invalidateQueries({ queryKey: ['supabase-engenheiros'] });
+          await refetch();
+        }, 500);
+        
         return {
           authData,
           profileCreated: true,
-          attempts
+          attempts,
+          userId: authData.user.id
         };
         
       } catch (error: any) {
@@ -242,19 +268,36 @@ export const useSupabaseUsers = () => {
     },
     onSuccess: (result) => {
       console.log('=== SUCESSO NA MUTAÇÃO ===');
-      console.log('Resultado:', result);
+      console.log('Resultado completo:', result);
       
-      // Invalidar e refazer queries com delay
-      setTimeout(() => {
-        console.log('Invalidando queries...');
-        queryClient.invalidateQueries({ queryKey: ['supabase-users'] });
-        queryClient.invalidateQueries({ queryKey: ['supabase-engenheiros'] });
-        queryClient.refetchQueries({ queryKey: ['supabase-users'] });
-      }, 1000);
+      // Forçar refresh das queries múltiplas vezes
+      const forceRefresh = async () => {
+        console.log('Invalidando e refazendo todas as queries relacionadas...');
+        await queryClient.invalidateQueries({ queryKey: ['supabase-users'] });
+        await queryClient.invalidateQueries({ queryKey: ['supabase-engenheiros'] });
+        await queryClient.refetchQueries({ queryKey: ['supabase-users'] });
+        await refetch();
+        
+        // Verificar se o usuário aparece na lista após refresh
+        setTimeout(async () => {
+          const currentUsers = queryClient.getQueryData(['supabase-users']) as Profile[] || [];
+          const createdUser = currentUsers.find(u => u.id === result.userId);
+          console.log('Usuário criado encontrado na lista após refresh:', createdUser ? 'SIM' : 'NÃO');
+          if (createdUser) {
+            console.log('Dados do usuário criado:', createdUser);
+          } else {
+            console.error('⚠️ USUÁRIO NÃO APARECE NA LISTA APÓS CRIAÇÃO!');
+            // Tentar refresh adicional
+            await refetch();
+          }
+        }, 2000);
+      };
+      
+      forceRefresh();
       
       toast({
         title: "Usuário criado com sucesso!",
-        description: `O usuário foi criado e aparecerá na lista. Tentativas de verificação: ${result.attempts}`,
+        description: `O usuário foi criado e deve aparecer na lista. Tentativas: ${result.attempts}`,
       });
     },
     onError: (error: any) => {
@@ -355,5 +398,6 @@ export const useSupabaseUsers = () => {
     isCreatingUser: createUserMutation.isPending,
     isUpdatingUser: updateUserMutation.isPending,
     isDeletingUser: deleteUserMutation.isPending,
+    refetch, // Expor a função refetch
   };
 };
