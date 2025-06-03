@@ -101,11 +101,11 @@ export const useSupabaseUsers = () => {
         // 2. Verificar se o email já existe no Auth
         console.log('2. Verificando usuários no Auth via admin...');
         try {
-          const { data: authUsers, error: authListError } = await supabase.auth.admin.listUsers();
+          const { data: authUsersResponse, error: authListError } = await supabase.auth.admin.listUsers();
           if (authListError) {
             console.warn('Não foi possível listar usuários do Auth:', authListError);
-          } else {
-            const existingAuthUser = authUsers.users?.find(u => u.email === userData.email);
+          } else if (authUsersResponse?.users) {
+            const existingAuthUser = authUsersResponse.users.find(u => u.email === userData.email);
             if (existingAuthUser) {
               console.error('Email já existe no Auth:', existingAuthUser.email);
               throw new Error('Este email já está cadastrado no sistema de autenticação');
