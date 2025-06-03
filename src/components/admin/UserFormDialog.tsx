@@ -18,17 +18,16 @@ import {
 } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userFormSchema, UserFormData } from "./schemas/userFormSchema";
-import { UserData } from "@/types/user";
-import { UserRole } from "@/context/UserRoleContext";
+import { Profile } from "@/hooks/useSupabaseUsers";
 
 interface UserFormDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  editingUser: UserData | null;
-  userRoles: UserRole[];
+  editingUser: Profile | null;
   onSubmit: (data: UserFormData) => void;
 }
 
@@ -36,18 +35,20 @@ export const UserFormDialog = ({
   isOpen,
   onOpenChange,
   editingUser,
-  userRoles,
   onSubmit,
 }: UserFormDialogProps) => {
   const form = useForm<UserFormData>({
     resolver: zodResolver(userFormSchema),
     defaultValues: {
-      name: "",
+      firstName: "",
+      lastName: "",
       email: "",
-      telefoneWhatsApp: "",
+      telefone: "",
       password: "",
-      roleId: "",
-      avatar: "",
+      role: "",
+      isEngenheiro: false,
+      crea: "",
+      especialidade: "",
       status: "active",
     },
   });
@@ -55,22 +56,28 @@ export const UserFormDialog = ({
   useEffect(() => {
     if (editingUser) {
       form.reset({
-        name: editingUser.name,
-        email: editingUser.email,
-        telefoneWhatsApp: editingUser.telefoneWhatsApp || "",
+        firstName: editingUser.first_name || "",
+        lastName: editingUser.last_name || "",
+        email: editingUser.email || "",
+        telefone: editingUser.telefone || "",
         password: "",
-        roleId: editingUser.roleId,
-        avatar: editingUser.avatar || "",
-        status: editingUser.status,
+        role: editingUser.role || "user",
+        isEngenheiro: editingUser.is_engenheiro || false,
+        crea: editingUser.crea || "",
+        especialidade: editingUser.especialidade || "",
+        status: editingUser.status as "active" | "inactive" || "active",
       });
     } else {
       form.reset({
-        name: "",
+        firstName: "",
+        lastName: "",
         email: "",
-        telefoneWhatsApp: "",
+        telefone: "",
         password: "",
-        roleId: "",
-        avatar: "",
+        role: "",
+        isEngenheiro: false,
+        crea: "",
+        especialidade: "",
         status: "active",
       });
     }
@@ -80,6 +87,8 @@ export const UserFormDialog = ({
     onSubmit(values);
     form.reset();
   };
+
+  const isEngenheiroChecked = form.watch("isEngenheiro");
 
   return (
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
@@ -100,12 +109,12 @@ export const UserFormDialog = ({
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="name"
+                name="firstName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Nome Completo</FormLabel>
+                    <FormLabel>Nome</FormLabel>
                     <FormControl>
-                      <Input placeholder="Nome do usuário" {...field} />
+                      <Input placeholder="Nome" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -114,12 +123,12 @@ export const UserFormDialog = ({
               
               <FormField
                 control={form.control}
-                name="email"
+                name="lastName"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Email</FormLabel>
+                    <FormLabel>Sobrenome</FormLabel>
                     <FormControl>
-                      <Input placeholder="email@exemplo.com" {...field} />
+                      <Input placeholder="Sobrenome" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -127,10 +136,28 @@ export const UserFormDialog = ({
               />
             </div>
             
+            <FormField
+              control={form.control}
+              name="email"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Email</FormLabel>
+                  <FormControl>
+                    <Input 
+                      placeholder="email@exemplo.com" 
+                      {...field} 
+                      disabled={!!editingUser}
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="telefoneWhatsApp"
+                name="telefone"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Telefone/WhatsApp</FormLabel>
@@ -164,7 +191,7 @@ export const UserFormDialog = ({
             <div className="grid grid-cols-2 gap-4">
               <FormField
                 control={form.control}
-                name="roleId"
+                name="role"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Perfil</FormLabel>
@@ -174,11 +201,9 @@ export const UserFormDialog = ({
                         {...field}
                       >
                         <option value="" disabled>Selecione um perfil</option>
-                        {userRoles.map((role) => (
-                          <option key={role.id} value={role.id}>
-                            {role.name}
-                          </option>
-                        ))}
+                        <option value="admin">Administrador</option>
+                        <option value="user">Usuário</option>
+                        <option value="engenheiro">Engenheiro</option>
                       </select>
                     </FormControl>
                     <FormMessage />
@@ -211,17 +236,53 @@ export const UserFormDialog = ({
             
             <FormField
               control={form.control}
-              name="avatar"
+              name="isEngenheiro"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>URL da Imagem de Perfil (opcional)</FormLabel>
+                <FormItem className="flex flex-row items-start space-x-3 space-y-0">
                   <FormControl>
-                    <Input placeholder="https://exemplo.com/avatar.jpg" {...field} />
+                    <Checkbox
+                      checked={field.value}
+                      onCheckedChange={field.onChange}
+                    />
                   </FormControl>
-                  <FormMessage />
+                  <div className="space-y-1 leading-none">
+                    <FormLabel>É engenheiro</FormLabel>
+                  </div>
                 </FormItem>
               )}
             />
+            
+            {isEngenheiroChecked && (
+              <div className="grid grid-cols-2 gap-4">
+                <FormField
+                  control={form.control}
+                  name="crea"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>CREA</FormLabel>
+                      <FormControl>
+                        <Input placeholder="CREA" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                
+                <FormField
+                  control={form.control}
+                  name="especialidade"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Especialidade</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Especialidade" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            )}
             
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
