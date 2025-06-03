@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -92,7 +91,8 @@ export const useSupabaseUsers = () => {
         }
         
         if (existingProfiles && existingProfiles.length > 0) {
-          console.error('Email já existe na tabela profiles:', existingProfiles[0]);
+          const existingProfile = existingProfiles[0];
+          console.error('Email já existe na tabela profiles:', existingProfile);
           throw new Error('Este email já está cadastrado no sistema');
         }
         
@@ -207,7 +207,7 @@ export const useSupabaseUsers = () => {
             profileCreated = true;
             
             // Forçar refresh da query imediatamente
-            console.log('7.${attempts}c. Forçando refresh da lista de usuários...');
+            console.log(`7.${attempts}c. Forçando refresh da lista de usuários...`);
             await queryClient.invalidateQueries({ queryKey: ['supabase-users'] });
             await queryClient.refetchQueries({ queryKey: ['supabase-users'] });
           }
