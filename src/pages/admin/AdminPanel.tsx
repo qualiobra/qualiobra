@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useAuth } from "@/context/SupabaseAuthContext";
 import { toast } from "@/hooks/use-toast";
@@ -388,7 +389,7 @@ const AdminPanel = () => {
             </CardHeader>
             <CardContent>
               <div className="flex justify-center py-6">
-                <Link to="/admin/users">
+                <Link to="/admin/user-management">
                   <Button className="flex items-center">
                     <User className="mr-2 h-4 w-4" />
                     Gerenciar Usuários
