@@ -1,33 +1,8 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useUserRole } from "@/context/UserRoleContext";
 import { Navigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-import { 
-  Table, 
-  TableBody, 
-  TableCell, 
-  TableHead, 
-  TableHeader, 
-  TableRow 
-} from "@/components/ui/table";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
 import {
   Card,
   CardContent,
@@ -35,64 +10,12 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import { 
-  UserPlus, 
-  User, 
-  Users, 
-  Pencil, 
-  Trash2, 
-  MoreVertical, 
-  ShieldCheck,
-  Mail,
-  Phone
-} from "lucide-react";
-
-// Dados mockados para simular usuários do sistema
-interface UserData {
-  id: string;
-  name: string;
-  email: string;
-  telefoneWhatsApp?: string;
-  role: string;
-  roleId: string;
-  avatar?: string;
-  status: "active" | "inactive";
-  lastLogin: string | null;
-}
-
-// Schema de validação para o formulário de usuário
-const userFormSchema = z.object({
-  name: z.string().min(3, {
-    message: "Nome deve ter pelo menos 3 caracteres.",
-  }),
-  email: z.string().email({
-    message: "Email inválido.",
-  }),
-  telefoneWhatsApp: z.string().optional(),
-  password: z.string().min(6, {
-    message: "Senha deve ter pelo menos 6 caracteres.",
-  }).optional(), // Tornando senha opcional na edição
-  roleId: z.string({
-    required_error: "Por favor, selecione um perfil.",
-  }),
-  avatar: z.string().optional(),
-  status: z.enum(["active", "inactive"]).default("active"),
-});
+import { UserPlus } from "lucide-react";
+import { UserData } from "@/types/user";
+import { UserFormDialog } from "@/components/admin/UserFormDialog";
+import { UsersTable } from "@/components/admin/UsersTable";
+import { UserFormData } from "@/components/admin/schemas/userFormSchema";
 
 const UserManagement = () => {
   const { currentUserRole, userRoles } = useUserRole();
@@ -148,47 +71,8 @@ const UserManagement = () => {
     return <Navigate to="/dashboard" replace />;
   }
 
-  // Configurar o formulário com React Hook Form
-  const form = useForm<z.infer<typeof userFormSchema>>({
-    resolver: zodResolver(userFormSchema),
-    defaultValues: {
-      name: "",
-      email: "",
-      telefoneWhatsApp: "",
-      password: "", // Senha vazia por padrão
-      roleId: "",
-      avatar: "",
-      status: "active",
-    },
-  });
-
-  // Atualizar o formulário quando um usuário estiver sendo editado
-  useEffect(() => {
-    if (editingUser) {
-      form.reset({
-        name: editingUser.name,
-        email: editingUser.email,
-        telefoneWhatsApp: editingUser.telefoneWhatsApp || "",
-        password: "", // Senha vazia na edição
-        roleId: editingUser.roleId,
-        avatar: editingUser.avatar || "",
-        status: editingUser.status,
-      });
-    } else {
-      form.reset({
-        name: "",
-        email: "",
-        telefoneWhatsApp: "",
-        password: "",
-        roleId: "",
-        avatar: "",
-        status: "active",
-      });
-    }
-  }, [editingUser, form]);
-
   // Função para lidar com o envio do formulário
-  const onSubmit = (values: z.infer<typeof userFormSchema>) => {
+  const handleFormSubmit = (values: UserFormData) => {
     if (editingUser) {
       // Atualizar usuário existente
       setUsers(users.map(user => 
@@ -282,26 +166,16 @@ const UserManagement = () => {
     });
   };
 
-  // Função para abrir o diálogo de edição - Corrigido para abrir o diálogo
+  // Função para abrir o diálogo de edição
   const handleEditUser = (user: UserData) => {
     setEditingUser(user);
-    setIsDialogOpen(true); // Adiciona esta linha para garantir que o diálogo abrirá
+    setIsDialogOpen(true);
   };
 
   // Função para abrir o diálogo de criação
   const handleAddUser = () => {
     setEditingUser(null);
     setIsDialogOpen(true);
-  };
-
-  // Obter as iniciais do nome para o fallback do avatar
-  const getInitials = (name: string) => {
-    return name
-      .split(' ')
-      .map(n => n[0])
-      .slice(0, 2)
-      .join('')
-      .toUpperCase();
   };
 
   return (
@@ -314,164 +188,9 @@ const UserManagement = () => {
           </p>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button onClick={handleAddUser}>
-              <UserPlus className="mr-2 h-4 w-4" /> Novo Usuário
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>
-                {editingUser ? "Editar Usuário" : "Adicionar Novo Usuário"}
-              </DialogTitle>
-              <DialogDescription>
-                {editingUser 
-                  ? "Edite as informações do usuário conforme necessário."
-                  : "Preencha os detalhes para criar um novo usuário no sistema."}
-              </DialogDescription>
-            </DialogHeader>
-            
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="name"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Nome Completo</FormLabel>
-                        <FormControl>
-                          <Input placeholder="Nome do usuário" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="email"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Email</FormLabel>
-                        <FormControl>
-                          <Input placeholder="email@exemplo.com" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="telefoneWhatsApp"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Telefone/WhatsApp</FormLabel>
-                        <FormControl>
-                          <Input placeholder="+55 00 00000-0000" {...field} />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  <FormField
-                    control={form.control}
-                    name="password"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>{editingUser ? "Nova Senha (opcional)" : "Senha"}</FormLabel>
-                        <FormControl>
-                          <Input 
-                            type="password" 
-                            placeholder={editingUser ? "Deixe em branco para manter" : "Senha temporária"} 
-                            {...field} 
-                          />
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <FormField
-                    control={form.control}
-                    name="roleId"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormLabel>Perfil</FormLabel>
-                        <FormControl>
-                          <select
-                            className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
-                            {...field}
-                          >
-                            <option value="" disabled>Selecione um perfil</option>
-                            {userRoles.map((role) => (
-                              <option key={role.id} value={role.id}>
-                                {role.name}
-                              </option>
-                            ))}
-                          </select>
-                        </FormControl>
-                        <FormMessage />
-                      </FormItem>
-                    )}
-                  />
-                  
-                  {editingUser && (
-                    <FormField
-                      control={form.control}
-                      name="status"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormLabel>Status</FormLabel>
-                          <FormControl>
-                            <select
-                              className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm"
-                              {...field}
-                            >
-                              <option value="active">Ativo</option>
-                              <option value="inactive">Inativo</option>
-                            </select>
-                          </FormControl>
-                          <FormMessage />
-                        </FormItem>
-                      )}
-                    />
-                  )}
-                </div>
-                
-                <FormField
-                  control={form.control}
-                  name="avatar"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>URL da Imagem de Perfil (opcional)</FormLabel>
-                      <FormControl>
-                        <Input placeholder="https://exemplo.com/avatar.jpg" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                
-                <DialogFooter>
-                  <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>
-                    Cancelar
-                  </Button>
-                  <Button type="submit">
-                    {editingUser ? "Salvar Alterações" : "Criar Usuário"}
-                  </Button>
-                </DialogFooter>
-              </form>
-            </Form>
-          </DialogContent>
-        </Dialog>
+        <Button onClick={handleAddUser}>
+          <UserPlus className="mr-2 h-4 w-4" /> Novo Usuário
+        </Button>
       </div>
       
       <Card>
@@ -482,78 +201,23 @@ const UserManagement = () => {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]">Foto</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Telefone</TableHead>
-                <TableHead>Perfil</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Último Acesso</TableHead>
-                <TableHead className="w-[80px]">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {users.map((user) => (
-                <TableRow key={user.id}>
-                  <TableCell>
-                    <Avatar>
-                      <AvatarImage src={user.avatar} />
-                      <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
-                    </Avatar>
-                  </TableCell>
-                  <TableCell className="font-medium">{user.name}</TableCell>
-                  <TableCell>{user.email}</TableCell>
-                  <TableCell>{user.telefoneWhatsApp || "-"}</TableCell>
-                  <TableCell>{user.role}</TableCell>
-                  <TableCell>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      user.status === "active" 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-red-100 text-red-800"
-                    }`}>
-                      {user.status === "active" ? "Ativo" : "Inativo"}
-                    </span>
-                  </TableCell>
-                  <TableCell>{user.lastLogin || "Nunca acessou"}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleEditUser(user)}>
-                          <Pencil className="mr-2 h-4 w-4" /> Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toggleUserStatus(user.id)}>
-                          <ShieldCheck className="mr-2 h-4 w-4" /> 
-                          {user.status === "active" ? "Desativar" : "Ativar"}
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => resendInvitation(user.id)}>
-                          <Mail className="mr-2 h-4 w-4" /> Reenviar Convite
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          className="text-red-600" 
-                          onClick={() => deleteUser(user.id)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" /> Excluir
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <UsersTable
+            users={users}
+            onEditUser={handleEditUser}
+            onToggleStatus={toggleUserStatus}
+            onDeleteUser={deleteUser}
+            onResendInvitation={resendInvitation}
+          />
         </CardContent>
       </Card>
+
+      <UserFormDialog
+        isOpen={isDialogOpen}
+        onOpenChange={setIsDialogOpen}
+        editingUser={editingUser}
+        userRoles={userRoles}
+        onSubmit={handleFormSubmit}
+      />
     </div>
   );
 };
