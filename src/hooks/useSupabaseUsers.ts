@@ -1,3 +1,4 @@
+
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -84,15 +85,35 @@ export const useSupabaseUsers = () => {
 
       console.log('User created successfully:', authData);
       
-      // Aguardar um pouco para garantir que o trigger foi executado
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Aguardar mais tempo para garantir que o trigger foi executado
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Verificar se o usuário foi criado na tabela profiles
+      if (authData.user) {
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', authData.user.id)
+          .single();
+        
+        console.log('Profile verification:', { profileData, profileError });
+        
+        if (!profileData && !profileError) {
+          console.warn('Profile not found, waiting a bit more...');
+          await new Promise(resolve => setTimeout(resolve, 3000));
+        }
+      }
       
       return authData;
     },
     onSuccess: () => {
-      // Invalidar e refetch os dados dos usuários
-      queryClient.invalidateQueries({ queryKey: ['supabase-users'] });
-      queryClient.invalidateQueries({ queryKey: ['supabase-engenheiros'] });
+      console.log('User creation successful, invalidating queries...');
+      // Invalidar e refetch os dados dos usuários com delay adicional
+      setTimeout(() => {
+        queryClient.invalidateQueries({ queryKey: ['supabase-users'] });
+        queryClient.invalidateQueries({ queryKey: ['supabase-engenheiros'] });
+        queryClient.refetchQueries({ queryKey: ['supabase-users'] });
+      }, 1000);
       
       toast({
         title: "Usuário criado",
@@ -121,6 +142,7 @@ export const useSupabaseUsers = () => {
       role?: string;
       status?: string;
     }) => {
+      console.log('Updating user with data:', userData);
       const { error } = await supabase
         .from('profiles')
         .update(userData)
@@ -148,6 +170,7 @@ export const useSupabaseUsers = () => {
 
   const deleteUserMutation = useMutation({
     mutationFn: async (userId: string) => {
+      console.log('Deleting user:', userId);
       // Primeiro deletar o perfil
       const { error: profileError } = await supabase
         .from('profiles')

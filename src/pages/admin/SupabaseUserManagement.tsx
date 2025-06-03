@@ -34,7 +34,8 @@ import {
   Pencil, 
   Trash2, 
   MoreVertical, 
-  ShieldCheck
+  ShieldCheck,
+  RefreshCw
 } from "lucide-react";
 import { UserFormDialog } from "@/components/admin/UserFormDialog";
 import { UserFormData } from "@/components/admin/schemas/userFormSchema";
@@ -162,10 +163,19 @@ const SupabaseUserManagement = () => {
           </p>
         </div>
         
-        <Button onClick={handleAddUser} disabled={isCreatingUser}>
-          <UserPlus className="mr-2 h-4 w-4" /> 
-          {isCreatingUser ? "Criando..." : "Novo Usuário"}
-        </Button>
+        <div className="flex gap-2">
+          <Button 
+            variant="outline" 
+            onClick={() => window.location.reload()}
+            title="Atualizar lista"
+          >
+            <RefreshCw className="h-4 w-4" />
+          </Button>
+          <Button onClick={handleAddUser} disabled={isCreatingUser}>
+            <UserPlus className="mr-2 h-4 w-4" /> 
+            {isCreatingUser ? "Criando..." : "Novo Usuário"}
+          </Button>
+        </div>
       </div>
       
       <UserFormDialog
@@ -177,90 +187,99 @@ const SupabaseUserManagement = () => {
       
       <Card>
         <CardHeader>
-          <CardTitle>Usuários do Sistema</CardTitle>
+          <CardTitle>Usuários do Sistema ({users.length})</CardTitle>
           <CardDescription>
             Lista de todos os usuários registrados no sistema.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[50px]">Foto</TableHead>
-                <TableHead>Nome</TableHead>
-                <TableHead>Email</TableHead>
-                <TableHead>Telefone</TableHead>
-                <TableHead>Perfil</TableHead>
-                <TableHead>Status</TableHead>
-                <TableHead>Engenheiro</TableHead>
-                <TableHead className="w-[80px]">Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {users.map((userProfile) => (
-                <TableRow key={userProfile.id}>
-                  <TableCell>
-                    <Avatar>
-                      <AvatarImage src="" />
-                      <AvatarFallback>{getInitials(userProfile)}</AvatarFallback>
-                    </Avatar>
-                  </TableCell>
-                  <TableCell className="font-medium">
-                    {`${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim() || 'Sem nome'}
-                  </TableCell>
-                  <TableCell>{userProfile.email || '-'}</TableCell>
-                  <TableCell>{userProfile.telefone || "-"}</TableCell>
-                  <TableCell>{userProfile.role || 'user'}</TableCell>
-                  <TableCell>
-                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                      userProfile.status === "active" 
-                        ? "bg-green-100 text-green-800" 
-                        : "bg-red-100 text-red-800"
-                    }`}>
-                      {userProfile.status === "active" ? "Ativo" : "Inativo"}
-                    </span>
-                  </TableCell>
-                  <TableCell>
-                    {userProfile.is_engenheiro ? (
-                      <span className="text-green-600">Sim</span>
-                    ) : (
-                      <span className="text-gray-500">Não</span>
-                    )}
-                    {userProfile.crea && (
-                      <div className="text-xs text-gray-500">CREA: {userProfile.crea}</div>
-                    )}
-                  </TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" className="h-8 w-8 p-0">
-                          <MoreVertical className="h-4 w-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Ações</DropdownMenuLabel>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem onClick={() => handleEditUser(userProfile)}>
-                          <Pencil className="mr-2 h-4 w-4" /> Editar
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => toggleUserStatus(userProfile)}>
-                          <ShieldCheck className="mr-2 h-4 w-4" /> 
-                          {userProfile.status === "active" ? "Desativar" : "Ativar"}
-                        </DropdownMenuItem>
-                        <DropdownMenuSeparator />
-                        <DropdownMenuItem 
-                          className="text-red-600" 
-                          onClick={() => handleDeleteUser(userProfile)}
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" /> Excluir
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
+          {users.length === 0 ? (
+            <div className="text-center py-8">
+              <p className="text-gray-500 mb-4">Nenhum usuário encontrado</p>
+              <Button onClick={handleAddUser}>
+                <UserPlus className="mr-2 h-4 w-4" /> Criar Primeiro Usuário
+              </Button>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead className="w-[50px]">Foto</TableHead>
+                  <TableHead>Nome</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Telefone</TableHead>
+                  <TableHead>Perfil</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Engenheiro</TableHead>
+                  <TableHead className="w-[80px]">Ações</TableHead>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+              </TableHeader>
+              <TableBody>
+                {users.map((userProfile) => (
+                  <TableRow key={userProfile.id}>
+                    <TableCell>
+                      <Avatar>
+                        <AvatarImage src="" />
+                        <AvatarFallback>{getInitials(userProfile)}</AvatarFallback>
+                      </Avatar>
+                    </TableCell>
+                    <TableCell className="font-medium">
+                      {`${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim() || 'Sem nome'}
+                    </TableCell>
+                    <TableCell>{userProfile.email || '-'}</TableCell>
+                    <TableCell>{userProfile.telefone || "-"}</TableCell>
+                    <TableCell>{userProfile.role || 'user'}</TableCell>
+                    <TableCell>
+                      <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                        userProfile.status === "active" 
+                          ? "bg-green-100 text-green-800" 
+                          : "bg-red-100 text-red-800"
+                      }`}>
+                        {userProfile.status === "active" ? "Ativo" : "Inativo"}
+                      </span>
+                    </TableCell>
+                    <TableCell>
+                      {userProfile.is_engenheiro ? (
+                        <span className="text-green-600">Sim</span>
+                      ) : (
+                        <span className="text-gray-500">Não</span>
+                      )}
+                      {userProfile.crea && (
+                        <div className="text-xs text-gray-500">CREA: {userProfile.crea}</div>
+                      )}
+                    </TableCell>
+                    <TableCell>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <MoreVertical className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuLabel>Ações</DropdownMenuLabel>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem onClick={() => handleEditUser(userProfile)}>
+                            <Pencil className="mr-2 h-4 w-4" /> Editar
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => toggleUserStatus(userProfile)}>
+                            <ShieldCheck className="mr-2 h-4 w-4" /> 
+                            {userProfile.status === "active" ? "Desativar" : "Ativar"}
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem 
+                            className="text-red-600" 
+                            onClick={() => handleDeleteUser(userProfile)}
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>
