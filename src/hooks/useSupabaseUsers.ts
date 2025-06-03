@@ -105,7 +105,7 @@ export const useSupabaseUsers = () => {
           if (authListError) {
             console.warn('Não foi possível listar usuários do Auth:', authListError);
           } else if (authUsersResponse?.users) {
-            const existingAuthUser = authUsersResponse.users.find(u => u.email === userData.email);
+            const existingAuthUser = authUsersResponse.users.find((user: any) => user.email === userData.email);
             if (existingAuthUser) {
               console.error('Email já existe no Auth:', existingAuthUser.email);
               throw new Error('Este email já está cadastrado no sistema de autenticação');
