@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useUserRole } from "@/context/UserRoleContext";
 import { Navigate } from "react-router-dom";
@@ -73,37 +72,38 @@ const UserManagement = () => {
 
   // Função para lidar com o envio do formulário
   const handleFormSubmit = (values: UserFormData) => {
+    const fullName = `${values.firstName} ${values.lastName}`.trim();
+    
     if (editingUser) {
       // Atualizar usuário existente
       setUsers(users.map(user => 
         user.id === editingUser.id 
           ? { 
               ...user, 
-              name: values.name, 
+              name: fullName, 
               email: values.email,
-              telefoneWhatsApp: values.telefoneWhatsApp,
-              roleId: values.roleId,
-              role: userRoles.find(r => r.id === values.roleId)?.name || user.role,
+              telefoneWhatsApp: values.telefone || "",
+              roleId: values.role,
+              role: userRoles.find(r => r.id === values.role)?.name || user.role,
               status: values.status,
-              ...(values.avatar ? { avatar: values.avatar } : {})
             } 
           : user
       ));
       
       toast({
         title: "Usuário Atualizado",
-        description: `O usuário ${values.name} foi atualizado com sucesso.`,
+        description: `O usuário ${fullName} foi atualizado com sucesso.`,
       });
     } else {
       // Criar novo usuário
       const newUser: UserData = {
         id: Date.now().toString(),
-        name: values.name,
+        name: fullName,
         email: values.email,
-        telefoneWhatsApp: values.telefoneWhatsApp,
-        roleId: values.roleId,
-        role: userRoles.find(r => r.id === values.roleId)?.name || "Usuário",
-        avatar: values.avatar,
+        telefoneWhatsApp: values.telefone || "",
+        roleId: values.role,
+        role: userRoles.find(r => r.id === values.role)?.name || "Usuário",
+        avatar: "",
         status: values.status,
         lastLogin: null
       };
@@ -215,7 +215,6 @@ const UserManagement = () => {
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         editingUser={editingUser}
-        userRoles={userRoles}
         onSubmit={handleFormSubmit}
       />
     </div>

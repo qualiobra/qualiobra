@@ -23,11 +23,12 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { userFormSchema, UserFormData } from "./schemas/userFormSchema";
 import { Profile } from "@/hooks/useSupabaseUsers";
+import { UserData } from "@/types/user";
 
 interface UserFormDialogProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
-  editingUser: Profile | null;
+  editingUser: Profile | UserData | null;
   onSubmit: (data: UserFormData) => void;
 }
 
@@ -55,18 +56,42 @@ export const UserFormDialog = ({
 
   useEffect(() => {
     if (editingUser) {
-      form.reset({
-        firstName: editingUser.first_name || "",
-        lastName: editingUser.last_name || "",
-        email: editingUser.email || "",
-        telefone: editingUser.telefone || "",
-        password: "",
-        role: editingUser.role || "user",
-        isEngenheiro: editingUser.is_engenheiro || false,
-        crea: editingUser.crea || "",
-        especialidade: editingUser.especialidade || "",
-        status: editingUser.status as "active" | "inactive" || "active",
-      });
+      // Check if it's a Profile (Supabase) or UserData (mock)
+      const isProfile = 'first_name' in editingUser;
+      
+      if (isProfile) {
+        const profile = editingUser as Profile;
+        form.reset({
+          firstName: profile.first_name || "",
+          lastName: profile.last_name || "",
+          email: profile.email || "",
+          telefone: profile.telefone || "",
+          password: "",
+          role: profile.role || "user",
+          isEngenheiro: profile.is_engenheiro || false,
+          crea: profile.crea || "",
+          especialidade: profile.especialidade || "",
+          status: profile.status as "active" | "inactive" || "active",
+        });
+      } else {
+        const userData = editingUser as UserData;
+        const nameParts = userData.name.split(' ');
+        const firstName = nameParts[0] || "";
+        const lastName = nameParts.slice(1).join(' ') || "";
+        
+        form.reset({
+          firstName,
+          lastName,
+          email: userData.email || "",
+          telefone: userData.telefoneWhatsApp || "",
+          password: "",
+          role: userData.roleId || "user",
+          isEngenheiro: false,
+          crea: "",
+          especialidade: "",
+          status: userData.status as "active" | "inactive" || "active",
+        });
+      }
     } else {
       form.reset({
         firstName: "",
