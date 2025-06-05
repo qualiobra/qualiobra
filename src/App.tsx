@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -20,7 +19,7 @@ import SupabaseRegister from "./pages/auth/SupabaseRegister";
 import ForgotPassword from "./pages/auth/ForgotPassword";
 import ResetPassword from "./pages/auth/ResetPassword";
 import AdminPanel from "./pages/admin/AdminPanel";
-import UserManagement from "./pages/admin/UserManagement";
+import SupabaseUserManagement from "./pages/admin/SupabaseUserManagement";
 import Reports from "./pages/Reports";
 import SupabaseUserLayout from "./components/layout/SupabaseUserLayout";
 import { useAuth } from "./context/SupabaseAuthContext";
@@ -142,7 +141,7 @@ const AppContent = () => (
         } />
         <Route path="/admin/user-management" element={
           <ProtectedRoute>
-            <UserManagement />
+            <SupabaseUserManagement />
           </ProtectedRoute>
         } />
         
