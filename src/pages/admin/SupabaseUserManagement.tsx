@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/SupabaseAuthContext";
 import { useSupabaseUsers, type Profile } from "@/hooks/useSupabaseUsers";
@@ -60,6 +61,25 @@ const SupabaseUserManagement = () => {
   const currentUserProfile = users.find(u => u.id === user?.id);
   const isAdmin = currentUserProfile?.role === 'admin';
   
+  // Debug detalhado de permissões
+  useEffect(() => {
+    console.log('=== DEBUG COMPLETO DE PERMISSÕES ===');
+    console.log('1. Usuário autenticado:', {
+      id: user?.id,
+      email: user?.email
+    });
+    console.log('2. Total de usuários carregados:', users.length);
+    console.log('3. Perfil do usuário atual:', currentUserProfile);
+    console.log('4. Role do usuário atual:', currentUserProfile?.role);
+    console.log('5. É admin?:', isAdmin);
+    console.log('6. Está carregando?:', isLoading);
+    
+    // Buscar especificamente o usuário lucas
+    const lucasProfile = users.find(u => u.email === 'lucas@araujoempreendimentos.com');
+    console.log('7. Perfil do Lucas no array:', lucasProfile);
+    console.log('===================================');
+  }, [user, users, currentUserProfile, isAdmin, isLoading]);
+  
   // Monitor changes in user count
   useEffect(() => {
     if (users.length !== lastUserCount) {
@@ -68,8 +88,13 @@ const SupabaseUserManagement = () => {
     }
   }, [users.length, lastUserCount]);
   
-  // Se não for administrador, redirecionar para o dashboard
+  // Adicione também um log temporário antes do redirect
   if (!isLoading && !isAdmin) {
+    console.log('BLOQUEANDO ACESSO - Não é admin:', {
+      isLoading,
+      isAdmin,
+      currentUserProfile
+    });
     toast({
       title: "Acesso Restrito",
       description: "Você não tem permissão para acessar esta página.",
