@@ -21,7 +21,7 @@ import { MoreVertical, Pencil, Power, PowerOff } from "lucide-react";
 import { ItemInspecionavel } from "@/types/itemTypes";
 
 interface ItensAdminTableProps {
-  itens: (ItemInspecionavel & { categorias_itens: { id: string; nome: string } })[];
+  itens: (ItemInspecionavel & { categoria_nome: string })[];
   isLoading: boolean;
   onEdit: (item: ItemInspecionavel) => void;
   onToggleStatus: (id: string, ativo: boolean) => void;
@@ -72,7 +72,7 @@ export const ItensAdminTable = ({
             <TableCell className="font-medium">{item.nome}</TableCell>
             <TableCell>
               <Badge variant="outline">
-                {item.categorias_itens?.nome || "Sem categoria"}
+                {item.categoria_nome || "Sem categoria"}
               </Badge>
             </TableCell>
             <TableCell>

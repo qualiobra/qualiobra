@@ -9,6 +9,33 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      categorias_itens: {
+        Row: {
+          ativo: boolean
+          created_at: string
+          descricao: string | null
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       comodos_master: {
         Row: {
           ativo: boolean
@@ -73,6 +100,44 @@ export type Database = {
             columns: ["tipologia_id"]
             isOneToOne: false
             referencedRelation: "tipologias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      itens_inspectionaveis: {
+        Row: {
+          ativo: boolean
+          categoria_id: string
+          created_at: string
+          descricao: string | null
+          id: string
+          nome: string
+          updated_at: string
+        }
+        Insert: {
+          ativo?: boolean
+          categoria_id: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome: string
+          updated_at?: string
+        }
+        Update: {
+          ativo?: boolean
+          categoria_id?: string
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          nome?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "itens_inspectionaveis_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "categorias_itens"
             referencedColumns: ["id"]
           },
         ]
@@ -315,9 +380,28 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_categoria_item: {
+        Args: { p_nome: string; p_descricao: string }
+        Returns: string
+      }
       create_comodo_master: {
         Args: { p_nome: string; p_descricao: string; p_icone: string }
         Returns: string
+      }
+      create_item_inspecionavel: {
+        Args: { p_nome: string; p_descricao: string; p_categoria_id: string }
+        Returns: string
+      }
+      get_categorias_itens: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          nome: string
+          descricao: string
+          ativo: boolean
+          created_at: string
+          updated_at: string
+        }[]
       }
       get_comodos_master: {
         Args: Record<PropertyKey, never>
@@ -331,8 +415,33 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_itens_inspectionaveis: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          nome: string
+          descricao: string
+          categoria_id: string
+          ativo: boolean
+          created_at: string
+          updated_at: string
+          categoria_nome: string
+        }[]
+      }
+      toggle_categoria_item: {
+        Args: { p_id: string; p_ativo: boolean }
+        Returns: boolean
+      }
       toggle_comodo_master: {
         Args: { p_id: string; p_ativo: boolean }
+        Returns: boolean
+      }
+      toggle_item_inspecionavel: {
+        Args: { p_id: string; p_ativo: boolean }
+        Returns: boolean
+      }
+      update_categoria_item: {
+        Args: { p_id: string; p_nome: string; p_descricao: string }
         Returns: boolean
       }
       update_comodo_master: {
@@ -341,6 +450,15 @@ export type Database = {
           p_nome: string
           p_descricao: string
           p_icone: string
+        }
+        Returns: boolean
+      }
+      update_item_inspecionavel: {
+        Args: {
+          p_id: string
+          p_nome: string
+          p_descricao: string
+          p_categoria_id: string
         }
         Returns: boolean
       }
