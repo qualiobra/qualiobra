@@ -13,7 +13,7 @@ import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 import { UserRoleProvider } from "./context/UserRoleContext";
 import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
-import { SupabaseUserLayout } from "./components/layout/SupabaseUserLayout";
+import SupabaseUserLayout from "./components/layout/SupabaseUserLayout";
 import {
   QueryClient,
   QueryClientProvider,
