@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -48,7 +47,7 @@ export const useItensAdmin = () => {
       }
 
       console.log("Itens encontrados:", data);
-      return data as (ItemInspecionavel & { categorias_itens: { id: string; nome: string } })[];
+      return data as (ItemInspecionavel & { categoria_nome: string })[];
     },
   });
 
