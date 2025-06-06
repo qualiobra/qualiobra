@@ -1,10 +1,11 @@
+
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Home } from "lucide-react";
-import { TipologiaCard } from "./TipologiaCard";
-import { TipologiaDialog } from "./TipologiaDialog";
-import { useTipologias } from "@/hooks/useTipologias";
-import { Tipologia } from "@/types/tipologia";
+import { Plus, Door } from "lucide-react";
+import { ComodoCard } from "./ComodoCard";
+import { ComodoDialog } from "./ComodoDialog";
+import { useComodosTipologia } from "@/hooks/useComodosTipologia";
+import { ComodoTipologia } from "@/types/comodo";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -16,59 +17,59 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-interface TipologiasListProps {
-  obraId: string;
-  obraNome: string;
+interface ComodosListProps {
+  tipologiaId: string;
+  tipologiaNome: string;
 }
 
-export const TipologiasList = ({ obraId, obraNome }: TipologiasListProps) => {
+export const ComodosList = ({ tipologiaId, tipologiaNome }: ComodosListProps) => {
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [editingTipologia, setEditingTipologia] = useState<Tipologia | null>(null);
+  const [editingComodo, setEditingComodo] = useState<ComodoTipologia | null>(null);
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [tipologiaToDelete, setTipologiaToDelete] = useState<string | null>(null);
+  const [comodoToDelete, setComodoToDelete] = useState<string | null>(null);
 
   const {
-    tipologias,
+    comodos,
     isLoading,
-    createTipologia,
-    updateTipologia,
-    deleteTipologia,
+    createComodo,
+    updateComodo,
+    deleteComodo,
     isCreating,
     isUpdating,
     isDeleting,
-  } = useTipologias(obraId);
+  } = useComodosTipologia(tipologiaId);
 
   const handleCreate = () => {
-    setEditingTipologia(null);
+    setEditingComodo(null);
     setDialogOpen(true);
   };
 
-  const handleEdit = (tipologia: Tipologia) => {
-    setEditingTipologia(tipologia);
+  const handleEdit = (comodo: ComodoTipologia) => {
+    setEditingComodo(comodo);
     setDialogOpen(true);
   };
 
-  const handleDelete = (tipologiaId: string) => {
-    setTipologiaToDelete(tipologiaId);
+  const handleDelete = (comodoId: string) => {
+    setComodoToDelete(comodoId);
     setDeleteConfirmOpen(true);
   };
 
   const confirmDelete = () => {
-    if (tipologiaToDelete) {
-      deleteTipologia(tipologiaToDelete);
-      setTipologiaToDelete(null);
+    if (comodoToDelete) {
+      deleteComodo(comodoToDelete);
+      setComodoToDelete(null);
       setDeleteConfirmOpen(false);
     }
   };
 
   const handleSubmit = (data: any) => {
-    if (editingTipologia) {
-      updateTipologia(data);
+    if (editingComodo) {
+      updateComodo(data);
     } else {
-      createTipologia(data);
+      createComodo(data);
     }
     setDialogOpen(false);
-    setEditingTipologia(null);
+    setEditingComodo(null);
   };
 
   if (isLoading) {
@@ -76,7 +77,7 @@ export const TipologiasList = ({ obraId, obraNome }: TipologiasListProps) => {
       <div className="flex items-center justify-center p-8">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-2 text-sm text-muted-foreground">Carregando tipologias...</p>
+          <p className="mt-2 text-sm text-muted-foreground">Carregando cômodos...</p>
         </div>
       </div>
     );
@@ -87,36 +88,35 @@ export const TipologiasList = ({ obraId, obraNome }: TipologiasListProps) => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Home className="h-6 w-6 text-primary" />
-            Tipologias da Obra
+            <Door className="h-6 w-6 text-primary" />
+            Cômodos da Tipologia
           </h2>
-          <p className="text-muted-foreground">{obraNome}</p>
+          <p className="text-muted-foreground">{tipologiaNome}</p>
         </div>
         <Button onClick={handleCreate}>
           <Plus className="mr-2 h-4 w-4" />
-          Nova Tipologia
+          Novo Cômodo
         </Button>
       </div>
 
-      {tipologias.length === 0 ? (
+      {comodos.length === 0 ? (
         <div className="text-center py-12">
-          <Home className="mx-auto h-12 w-12 text-muted-foreground" />
-          <h3 className="mt-2 text-lg font-semibold">Nenhuma tipologia cadastrada</h3>
+          <Door className="mx-auto h-12 w-12 text-muted-foreground" />
+          <h3 className="mt-2 text-lg font-semibold">Nenhum cômodo cadastrado</h3>
           <p className="mt-1 text-muted-foreground">
-            Comece criando a primeira tipologia para esta obra.
+            Comece criando o primeiro cômodo para esta tipologia.
           </p>
           <Button className="mt-4" onClick={handleCreate}>
             <Plus className="mr-2 h-4 w-4" />
-            Criar primeira tipologia
+            Criar primeiro cômodo
           </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {tipologias.map((tipologia) => (
-            <TipologiaCard
-              key={tipologia.id}
-              tipologia={tipologia}
-              obraId={obraId}
+          {comodos.map((comodo) => (
+            <ComodoCard
+              key={comodo.id}
+              comodo={comodo}
               onEdit={handleEdit}
               onDelete={handleDelete}
             />
@@ -124,11 +124,11 @@ export const TipologiasList = ({ obraId, obraNome }: TipologiasListProps) => {
         </div>
       )}
 
-      <TipologiaDialog
+      <ComodoDialog
         open={dialogOpen}
         onOpenChange={setDialogOpen}
-        tipologia={editingTipologia}
-        obraId={obraId}
+        comodo={editingComodo}
+        tipologiaId={tipologiaId}
         onSubmit={handleSubmit}
         isLoading={isCreating || isUpdating}
       />
@@ -138,7 +138,7 @@ export const TipologiasList = ({ obraId, obraNome }: TipologiasListProps) => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar exclusão</AlertDialogTitle>
             <AlertDialogDescription>
-              Tem certeza que deseja excluir esta tipologia? Esta ação não pode ser desfeita.
+              Tem certeza que deseja excluir este cômodo? Esta ação não pode ser desfeita.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
