@@ -243,8 +243,14 @@ const AdminPanel = () => {
 
   // Manipuladores para categorias
   const handleCreateCategoria = (data: CategoriaFormData) => {
-    createCategoria(data);
-    setIsCategoriaDialogOpen(false);
+    // Garantir que nome existe antes de chamar a função
+    if (data.nome) {
+      createCategoria({
+        nome: data.nome,
+        descricao: data.descricao || null,
+      });
+      setIsCategoriaDialogOpen(false);
+    }
   };
 
   const handleEditCategoria = (categoria: any) => {
@@ -271,8 +277,15 @@ const AdminPanel = () => {
 
   // Manipuladores para itens
   const handleCreateItem = (data: ItemFormData) => {
-    createItem(data);
-    setIsItemDialogOpen(false);
+    // Garantir que nome e categoria_id existem antes de chamar a função
+    if (data.nome && data.categoria_id) {
+      createItem({
+        nome: data.nome,
+        descricao: data.descricao || null,
+        categoria_id: data.categoria_id,
+      });
+      setIsItemDialogOpen(false);
+    }
   };
 
   const handleEditItem = (item: any) => {
