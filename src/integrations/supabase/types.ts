@@ -36,6 +36,51 @@ export type Database = {
         }
         Relationships: []
       }
+      comodos_itens: {
+        Row: {
+          comodo_id: string
+          created_at: string
+          id: string
+          item_id: string
+          obrigatorio: boolean
+          ordem: number
+          updated_at: string
+        }
+        Insert: {
+          comodo_id: string
+          created_at?: string
+          id?: string
+          item_id: string
+          obrigatorio?: boolean
+          ordem?: number
+          updated_at?: string
+        }
+        Update: {
+          comodo_id?: string
+          created_at?: string
+          id?: string
+          item_id?: string
+          obrigatorio?: boolean
+          ordem?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comodos_itens_comodo_id_fkey"
+            columns: ["comodo_id"]
+            isOneToOne: false
+            referencedRelation: "comodos_master"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comodos_itens_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "itens_inspectionaveis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comodos_master: {
         Row: {
           ativo: boolean
@@ -384,6 +429,15 @@ export type Database = {
         Args: { p_nome: string; p_descricao: string }
         Returns: string
       }
+      create_comodo_item: {
+        Args: {
+          p_comodo_id: string
+          p_item_id: string
+          p_obrigatorio: boolean
+          p_ordem: number
+        }
+        Returns: string
+      }
       create_comodo_master: {
         Args: { p_nome: string; p_descricao: string; p_icone: string }
         Returns: string
@@ -391,6 +445,10 @@ export type Database = {
       create_item_inspecionavel: {
         Args: { p_nome: string; p_descricao: string; p_categoria_id: string }
         Returns: string
+      }
+      delete_comodo_item: {
+        Args: { p_id: string }
+        Returns: boolean
       }
       get_categorias_itens: {
         Args: Record<PropertyKey, never>
@@ -401,6 +459,21 @@ export type Database = {
           ativo: boolean
           created_at: string
           updated_at: string
+        }[]
+      }
+      get_comodos_itens_by_comodo: {
+        Args: { p_comodo_id: string }
+        Returns: {
+          id: string
+          comodo_id: string
+          item_id: string
+          obrigatorio: boolean
+          ordem: number
+          created_at: string
+          updated_at: string
+          item_nome: string
+          item_descricao: string
+          categoria_nome: string
         }[]
       }
       get_comodos_master: {
@@ -432,6 +505,10 @@ export type Database = {
         Args: { p_id: string; p_ativo: boolean }
         Returns: boolean
       }
+      toggle_comodo_item_obrigatorio: {
+        Args: { p_id: string; p_obrigatorio: boolean }
+        Returns: boolean
+      }
       toggle_comodo_master: {
         Args: { p_id: string; p_ativo: boolean }
         Returns: boolean
@@ -442,6 +519,10 @@ export type Database = {
       }
       update_categoria_item: {
         Args: { p_id: string; p_nome: string; p_descricao: string }
+        Returns: boolean
+      }
+      update_comodo_item: {
+        Args: { p_id: string; p_obrigatorio: boolean; p_ordem: number }
         Returns: boolean
       }
       update_comodo_master: {
