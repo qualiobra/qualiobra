@@ -33,7 +33,7 @@ export const useComodosAdmin = () => {
   // Criar novo cômodo usando RPC
   const createComodoMutation = useMutation({
     mutationFn: async (data: ComodoFormData) => {
-      console.log("Criando cômodo via RPC:", data);
+      console.log("Criando cômodo:", { nome: data.nome, descricao: data.descricao, icone: data.icone });
       
       const { data: result, error } = await supabase.rpc('create_comodo_master', {
         p_nome: data.nome,
@@ -41,8 +41,10 @@ export const useComodosAdmin = () => {
         p_icone: data.icone
       });
 
+      console.log("Resposta do Supabase:", { data: result, error });
+
       if (error) {
-        console.error("Erro ao criar cômodo:", error);
+        console.error("Erro detalhado:", error);
         throw error;
       }
 
