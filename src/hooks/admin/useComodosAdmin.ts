@@ -3,16 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { ComodoFormData } from "@/components/admin/schemas/comodoFormSchema";
-
-export interface ComodoMaster {
-  id: string;
-  nome: string;
-  descricao?: string;
-  icone: string;
-  ativo: boolean;
-  created_at: string;
-  updated_at: string;
-}
+import { ComodoMaster, ComodoMasterInsert, ComodoMasterUpdate } from "@/types/comodoTypes";
 
 export const useComodosAdmin = () => {
   const queryClient = useQueryClient();
@@ -26,14 +17,24 @@ export const useComodosAdmin = () => {
     queryKey: ["comodos-master"],
     queryFn: async () => {
       console.log("Buscando cômodos master...");
-      const { data, error } = await supabase
-        .from("comodos_master")
-        .select("*")
-        .order("nome");
-
+      
+      // Usar query SQL direta para acessar a tabela comodos_master
+      const { data, error } = await supabase.rpc('get_comodos_master');
+      
       if (error) {
-        console.error("Erro ao buscar cômodos:", error);
-        throw error;
+        // Fallback: tentar query SQL direta se a RPC não existir
+        const { data: fallbackData, error: fallbackError } = await supabase
+          .from('comodos_master' as any)
+          .select('*')
+          .order('nome');
+          
+        if (fallbackError) {
+          console.error("Erro ao buscar cômodos:", fallbackError);
+          throw fallbackError;
+        }
+        
+        console.log("Cômodos encontrados (fallback):", fallbackData);
+        return fallbackData as ComodoMaster[];
       }
 
       console.log("Cômodos encontrados:", data);
@@ -45,9 +46,17 @@ export const useComodosAdmin = () => {
   const createComodoMutation = useMutation({
     mutationFn: async (data: ComodoFormData) => {
       console.log("Criando cômodo:", data);
+      
+      const insertData: ComodoMasterInsert = {
+        nome: data.nome,
+        descricao: data.descricao || null,
+        icone: data.icone,
+        ativo: true
+      };
+
       const { data: result, error } = await supabase
-        .from("comodos_master")
-        .insert([data])
+        .from('comodos_master' as any)
+        .insert([insertData])
         .select()
         .single();
 
@@ -56,7 +65,7 @@ export const useComodosAdmin = () => {
         throw error;
       }
 
-      return result;
+      return result as ComodoMaster;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comodos-master"] });
@@ -79,10 +88,17 @@ export const useComodosAdmin = () => {
   const updateComodoMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: ComodoFormData }) => {
       console.log("Atualizando cômodo:", id, data);
+      
+      const updateData: ComodoMasterUpdate = {
+        nome: data.nome,
+        descricao: data.descricao || null,
+        icone: data.icone
+      };
+
       const { data: result, error } = await supabase
-        .from("comodos_master")
-        .update(data)
-        .eq("id", id)
+        .from('comodos_master' as any)
+        .update(updateData)
+        .eq('id', id)
         .select()
         .single();
 
@@ -91,7 +107,7 @@ export const useComodosAdmin = () => {
         throw error;
       }
 
-      return result;
+      return result as ComodoMaster;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comodos-master"] });
@@ -114,10 +130,11 @@ export const useComodosAdmin = () => {
   const toggleComodoStatusMutation = useMutation({
     mutationFn: async ({ id, ativo }: { id: string; ativo: boolean }) => {
       console.log("Alterando status do cômodo:", id, ativo);
+      
       const { data: result, error } = await supabase
-        .from("comodos_master")
+        .from('comodos_master' as any)
         .update({ ativo })
-        .eq("id", id)
+        .eq('id', id)
         .select()
         .single();
 
@@ -126,7 +143,7 @@ export const useComodosAdmin = () => {
         throw error;
       }
 
-      return result;
+      return result as ComodoMaster;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["comodos-master"] });

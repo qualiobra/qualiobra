@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { comodoFormSchema, ComodoFormData, ICONES_DISPONIVEIS } from "./schemas/comodoFormSchema";
-import { ComodoMaster } from "@/hooks/admin/useComodosAdmin";
+import { ComodoMaster } from "@/types/comodoTypes";
 import * as LucideIcons from "lucide-react";
 
 interface ComodoFormDialogProps {
@@ -54,7 +54,7 @@ export const ComodoFormDialog = ({
     defaultValues: {
       nome: "",
       descricao: "",
-      icone: "Home" as any,
+      icone: "Sofa" as any,
     },
   });
 
@@ -72,9 +72,9 @@ export const ComodoFormDialog = ({
         form.reset({
           nome: "",
           descricao: "",
-          icone: "Home" as any,
+          icone: "Sofa" as any,
         });
-        setSelectedIcon("Home");
+        setSelectedIcon("Sofa");
       }
     }
   }, [comodo, open, form]);
@@ -84,14 +84,14 @@ export const ComodoFormDialog = ({
     onSubmit(data);
     if (!comodo) {
       form.reset();
-      setSelectedIcon("Home");
+      setSelectedIcon("Sofa");
     }
   };
 
   const handleClose = () => {
     onOpenChange(false);
     form.reset();
-    setSelectedIcon("Home");
+    setSelectedIcon("Sofa");
   };
 
   // Renderizar ícone dinamicamente

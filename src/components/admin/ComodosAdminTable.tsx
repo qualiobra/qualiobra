@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { MoreVertical, Pencil, Power, PowerOff, Search } from "lucide-react";
-import { ComodoMaster } from "@/hooks/admin/useComodosAdmin";
+import { ComodoMaster } from "@/types/comodoTypes";
 import * as LucideIcons from "lucide-react";
 
 interface ComodosAdminTableProps {

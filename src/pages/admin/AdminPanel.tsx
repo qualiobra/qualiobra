@@ -71,7 +71,7 @@ const AdminPanel = () => {
   } = useComodosAdmin();
   
   const [isComodoDialogOpen, setIsComodoDialogOpen] = useState(false);
-  const [editingComodo, setEditingComodo] = useState(null);
+  const [editingComodo, setEditingComodo] = useState<any>(null);
   
   // Manipuladores para adicionar e editar perfis
   const handleAddRole = () => {
@@ -204,6 +204,10 @@ const AdminPanel = () => {
   const handleCloseComodoDialog = () => {
     setIsComodoDialogOpen(false);
     setEditingComodo(null);
+  };
+
+  const handleToggleComodoStatus = (id: string, ativo: boolean) => {
+    toggleComodoStatus({ id, ativo });
   };
 
   return (
@@ -489,7 +493,7 @@ const AdminPanel = () => {
                     comodos={comodos}
                     isLoading={isLoadingComodos}
                     onEdit={handleEditComodo}
-                    onToggleStatus={toggleComodoStatus}
+                    onToggleStatus={handleToggleComodoStatus}
                     isTogglingStatus={isTogglingStatus}
                   />
                 </CardContent>
