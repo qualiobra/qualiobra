@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useAuth } from "@/context/SupabaseAuthContext";
 import { toast } from "@/hooks/use-toast";
@@ -44,7 +43,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserPlus, Users, Settings, MoreVertical, Pencil, Trash2, User } from "lucide-react";
+import { UserPlus, Users, Settings, MoreVertical, Pencil, Trash2, User, Home } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AdminPanel = () => {
@@ -182,6 +181,9 @@ const AdminPanel = () => {
           </TabsTrigger>
           <TabsTrigger value="users" className="flex items-center">
             <UserPlus className="mr-2 h-4 w-4" /> Usuários
+          </TabsTrigger>
+          <TabsTrigger value="comodos" className="flex items-center">
+            <Home className="mr-2 h-4 w-4" /> Cômodos
           </TabsTrigger>
           <TabsTrigger value="settings" className="flex items-center">
             <Settings className="mr-2 h-4 w-4" /> Configurações
@@ -395,6 +397,30 @@ const AdminPanel = () => {
                     Gerenciar Usuários
                   </Button>
                 </Link>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+        
+        <TabsContent value="comodos" className="space-y-4">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold">Gerenciar Cômodos Master</h2>
+            
+            <Button>
+              <Home className="mr-2 h-4 w-4" /> Novo Cômodo
+            </Button>
+          </div>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Cômodos Master</CardTitle>
+              <CardDescription>
+                Cadastro global de tipos de cômodos para o sistema.
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="text-center py-8 text-muted-foreground">
+                Tabela de cômodos será implementada aqui.
               </div>
             </CardContent>
           </Card>
