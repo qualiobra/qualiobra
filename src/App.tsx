@@ -1,3 +1,4 @@
+
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -12,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Inspections from "./pages/Inspections";
 import Team from "./pages/Team";
 import Obras from "./pages/Obras";
+import TipologiasPage from "./pages/TipologiasPage";
 import Diagnostico from "./pages/Diagnostico";
 import NotFound from "./pages/NotFound";
 import SupabaseLogin from "./pages/auth/SupabaseLogin";
@@ -122,6 +124,11 @@ const AppContent = () => (
         <Route path="/obras" element={
           <ProtectedRoute>
             <Obras />
+          </ProtectedRoute>
+        } />
+        <Route path="/obras/:obraId/tipologias" element={
+          <ProtectedRoute>
+            <TipologiasPage />
           </ProtectedRoute>
         } />
         <Route path="/diagnostico" element={

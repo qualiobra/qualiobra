@@ -179,6 +179,36 @@ export type Database = {
           },
         ]
       }
+      tipologias: {
+        Row: {
+          created_at: string
+          descricao: string | null
+          id: string
+          metragem: number | null
+          nome: string
+          obra_id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          metragem?: number | null
+          nome: string
+          obra_id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          descricao?: string | null
+          id?: string
+          metragem?: number | null
+          nome?: string
+          obra_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       user_invites: {
         Row: {
           created_at: string
