@@ -2,6 +2,10 @@ import { useState } from "react";
 import { useAuth } from "@/context/SupabaseAuthContext";
 import { toast } from "@/hooks/use-toast";
 import { useUserRole, UserRole } from "@/context/UserRoleContext";
+import { useComodosAdmin } from "@/hooks/admin/useComodosAdmin";
+import { ComodoFormDialog } from "@/components/admin/ComodoFormDialog";
+import { ComodosAdminTable } from "@/components/admin/ComodosAdminTable";
+import { ComodoFormData } from "@/components/admin/schemas/comodoFormSchema";
 import { 
   Tabs, 
   TabsContent, 
@@ -53,6 +57,21 @@ const AdminPanel = () => {
   const [newRolePermissions, setNewRolePermissions] = useState<string[]>([]);
   const [editingRole, setEditingRole] = useState<UserRole | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  
+  // Estados para gerenciamento de cômodos
+  const {
+    comodos,
+    isLoading: isLoadingComodos,
+    createComodo,
+    updateComodo,
+    toggleComodoStatus,
+    isCreating,
+    isUpdating,
+    isTogglingStatus,
+  } = useComodosAdmin();
+  
+  const [isComodoDialogOpen, setIsComodoDialogOpen] = useState(false);
+  const [editingComodo, setEditingComodo] = useState(null);
   
   // Manipuladores para adicionar e editar perfis
   const handleAddRole = () => {
@@ -161,6 +180,30 @@ const AdminPanel = () => {
       setNewRolePermissions([]);
     }
     setIsDialogOpen(open);
+  };
+
+  // Manipuladores para cômodos
+  const handleCreateComodo = (data: ComodoFormData) => {
+    createComodo(data);
+    setIsComodoDialogOpen(false);
+  };
+
+  const handleEditComodo = (comodo: any) => {
+    setEditingComodo(comodo);
+    setIsComodoDialogOpen(true);
+  };
+
+  const handleUpdateComodo = (data: ComodoFormData) => {
+    if (editingComodo) {
+      updateComodo({ id: editingComodo.id, data });
+      setIsComodoDialogOpen(false);
+      setEditingComodo(null);
+    }
+  };
+
+  const handleCloseComodoDialog = () => {
+    setIsComodoDialogOpen(false);
+    setEditingComodo(null);
   };
 
   return (
@@ -429,7 +472,7 @@ const AdminPanel = () => {
               <div className="flex justify-between items-center mb-4">
                 <h2 className="text-xl font-semibold">Gerenciar Cômodos Master</h2>
                 
-                <Button>
+                <Button onClick={() => setIsComodoDialogOpen(true)}>
                   <Home className="mr-2 h-4 w-4" /> Novo Cômodo
                 </Button>
               </div>
@@ -442,15 +485,28 @@ const AdminPanel = () => {
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="text-center py-8 text-muted-foreground">
-                    Tabela de cômodos será implementada aqui.
-                  </div>
+                  <ComodosAdminTable
+                    comodos={comodos}
+                    isLoading={isLoadingComodos}
+                    onEdit={handleEditComodo}
+                    onToggleStatus={toggleComodoStatus}
+                    isTogglingStatus={isTogglingStatus}
+                  />
                 </CardContent>
               </Card>
             </TabsContent>
           </Tabs>
         </TabsContent>
       </Tabs>
+
+      {/* Dialog para criar/editar cômodos */}
+      <ComodoFormDialog
+        open={isComodoDialogOpen}
+        onOpenChange={handleCloseComodoDialog}
+        onSubmit={editingComodo ? handleUpdateComodo : handleCreateComodo}
+        comodo={editingComodo}
+        isLoading={isCreating || isUpdating}
+      />
     </div>
   );
 };
