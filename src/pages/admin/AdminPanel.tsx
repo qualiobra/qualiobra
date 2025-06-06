@@ -182,9 +182,6 @@ const AdminPanel = () => {
           <TabsTrigger value="users" className="flex items-center">
             <UserPlus className="mr-2 h-4 w-4" /> Usuários
           </TabsTrigger>
-          <TabsTrigger value="comodos" className="flex items-center">
-            <Home className="mr-2 h-4 w-4" /> Cômodos
-          </TabsTrigger>
           <TabsTrigger value="settings" className="flex items-center">
             <Settings className="mr-2 h-4 w-4" /> Configurações
           </TabsTrigger>
@@ -402,31 +399,7 @@ const AdminPanel = () => {
           </Card>
         </TabsContent>
         
-        <TabsContent value="comodos" className="space-y-4">
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-semibold">Gerenciar Cômodos Master</h2>
-            
-            <Button>
-              <Home className="mr-2 h-4 w-4" /> Novo Cômodo
-            </Button>
-          </div>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Cômodos Master</CardTitle>
-              <CardDescription>
-                Cadastro global de tipos de cômodos para o sistema.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8 text-muted-foreground">
-                Tabela de cômodos será implementada aqui.
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-        
-        <TabsContent value="settings">
+        <TabsContent value="settings" className="space-y-4">
           <Card>
             <CardHeader>
               <CardTitle>Configurações do Sistema</CardTitle>
@@ -434,12 +407,48 @@ const AdminPanel = () => {
                 Ajuste as configurações gerais da plataforma.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <p className="text-center py-8 text-muted-foreground">
-                Funcionalidade de configurações em desenvolvimento.
-              </p>
-            </CardContent>
           </Card>
+
+          <Tabs defaultValue="geral" className="mt-6">
+            <TabsList className="mb-4">
+              <TabsTrigger value="geral">Geral</TabsTrigger>
+              <TabsTrigger value="comodos">Cômodos</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="geral">
+              <Card>
+                <CardContent>
+                  <p className="text-center py-8 text-muted-foreground">
+                    Funcionalidade de configurações em desenvolvimento.
+                  </p>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="comodos" className="space-y-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">Gerenciar Cômodos Master</h2>
+                
+                <Button>
+                  <Home className="mr-2 h-4 w-4" /> Novo Cômodo
+                </Button>
+              </div>
+              
+              <Card>
+                <CardHeader>
+                  <CardTitle>Cômodos Master</CardTitle>
+                  <CardDescription>
+                    Cadastro global de tipos de cômodos para o sistema.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center py-8 text-muted-foreground">
+                    Tabela de cômodos será implementada aqui.
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </TabsContent>
       </Tabs>
     </div>
