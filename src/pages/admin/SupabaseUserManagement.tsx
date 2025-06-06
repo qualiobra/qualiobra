@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/context/SupabaseAuthContext";
 import { useSupabaseUsers, type Profile } from "@/hooks/useSupabaseUsers";
+import { useUserInvites } from "@/hooks/useUserInvites";
 import { Navigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
 import { 
@@ -29,15 +30,20 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Input } from "@/components/ui/input";
 import { 
   UserPlus, 
   Pencil, 
   Trash2, 
   MoreVertical, 
   ShieldCheck,
-  RefreshCw
+  RefreshCw,
+  Mail,
+  Search
 } from "lucide-react";
 import { UserFormDialog } from "@/components/admin/UserFormDialog";
+import { InviteUserDialog } from "@/components/admin/InviteUserDialog";
+import { UserInvitesTable } from "@/components/admin/UserInvitesTable";
 import { UserFormData } from "@/components/admin/schemas/userFormSchema";
 
 const SupabaseUserManagement = () => {
@@ -53,48 +59,31 @@ const SupabaseUserManagement = () => {
     refetch
   } = useSupabaseUsers();
   
+  const {
+    createInvite,
+    deleteInvite,
+    isCreatingInvite
+  } = useUserInvites();
+  
   const [editingUser, setEditingUser] = useState<Profile | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [lastUserCount, setLastUserCount] = useState(0);
+  const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   
   // Verificar se o usuário atual é admin
   const currentUserProfile = users.find(u => u.id === user?.id);
   const isAdmin = currentUserProfile?.role === 'admin';
   
-  // Debug detalhado de permissões
-  useEffect(() => {
-    console.log('=== DEBUG COMPLETO DE PERMISSÕES ===');
-    console.log('1. Usuário autenticado:', {
-      id: user?.id,
-      email: user?.email
-    });
-    console.log('2. Total de usuários carregados:', users.length);
-    console.log('3. Perfil do usuário atual:', currentUserProfile);
-    console.log('4. Role do usuário atual:', currentUserProfile?.role);
-    console.log('5. É admin?:', isAdmin);
-    console.log('6. Está carregando?:', isLoading);
-    
-    // Buscar especificamente o usuário lucas
-    const lucasProfile = users.find(u => u.email === 'lucas@araujoempreendimentos.com');
-    console.log('7. Perfil do Lucas no array:', lucasProfile);
-    console.log('===================================');
-  }, [user, users, currentUserProfile, isAdmin, isLoading]);
+  // Filtrar usuários baseado na busca
+  const filteredUsers = users.filter(user => {
+    if (!searchTerm) return true;
+    const fullName = `${user.first_name || ''} ${user.last_name || ''}`.toLowerCase();
+    const email = user.email?.toLowerCase() || '';
+    const search = searchTerm.toLowerCase();
+    return fullName.includes(search) || email.includes(search);
+  });
   
-  // Monitor changes in user count
-  useEffect(() => {
-    if (users.length !== lastUserCount) {
-      console.log(`👥 Lista de usuários atualizada: ${lastUserCount} → ${users.length} usuários`);
-      setLastUserCount(users.length);
-    }
-  }, [users.length, lastUserCount]);
-  
-  // Adicione também um log temporário antes do redirect
   if (!isLoading && !isAdmin) {
-    console.log('BLOQUEANDO ACESSO - Não é admin:', {
-      isLoading,
-      isAdmin,
-      currentUserProfile
-    });
     toast({
       title: "Acesso Restrito",
       description: "Você não tem permissão para acessar esta página.",
@@ -105,10 +94,6 @@ const SupabaseUserManagement = () => {
 
   // Função para lidar com o envio do formulário
   const onSubmit = (values: UserFormData) => {
-    console.log('=== SUBMETENDO FORMULÁRIO DE USUÁRIO ===');
-    console.log('Valores do formulário:', values);
-    console.log('Usuários atuais na lista:', users.length);
-    
     if (editingUser) {
       // Atualizar usuário existente
       updateUser({
@@ -124,7 +109,6 @@ const SupabaseUserManagement = () => {
       });
     } else {
       // Criar novo usuário
-      console.log('Criando novo usuário...');
       createUser({
         email: values.email,
         role: values.role,
@@ -172,9 +156,25 @@ const SupabaseUserManagement = () => {
     setIsDialogOpen(true);
   };
 
+  // Função para abrir o diálogo de convite
+  const handleInviteUser = () => {
+    setIsInviteDialogOpen(true);
+  };
+
+  // Função para enviar convite
+  const handleSendInvite = (email: string, role: string) => {
+    createInvite({ email, role });
+  };
+
+  // Função para excluir convite
+  const handleDeleteInvite = (inviteId: string) => {
+    if (window.confirm('Tem certeza que deseja excluir este convite?')) {
+      deleteInvite(inviteId);
+    }
+  };
+
   // Função para refresh manual
   const handleManualRefresh = async () => {
-    console.log('🔄 Refresh manual iniciado...');
     toast({
       title: "Atualizando lista",
       description: "Buscando usuários mais recentes...",
@@ -232,6 +232,13 @@ const SupabaseUserManagement = () => {
           >
             <RefreshCw className="h-4 w-4" />
           </Button>
+          <Button 
+            variant="outline" 
+            onClick={handleInviteUser}
+          >
+            <Mail className="mr-2 h-4 w-4" /> 
+            Convidar
+          </Button>
           <Button onClick={handleAddUser} disabled={isCreatingUser}>
             <UserPlus className="mr-2 h-4 w-4" /> 
             {isCreatingUser ? "Criando..." : "Novo Usuário"}
@@ -246,30 +253,55 @@ const SupabaseUserManagement = () => {
         onSubmit={onSubmit}
       />
       
+      <InviteUserDialog
+        isOpen={isInviteDialogOpen}
+        onOpenChange={setIsInviteDialogOpen}
+        onInvite={handleSendInvite}
+        isLoading={isCreatingInvite}
+      />
+      
+      <UserInvitesTable onDeleteInvite={handleDeleteInvite} />
+      
       <Card>
         <CardHeader>
-          <CardTitle>Usuários do Sistema ({users.length})</CardTitle>
-          <CardDescription>
-            Lista de todos os usuários registrados no sistema.
-            {users.length > 0 && (
-              <span className="block mt-1 text-sm text-green-600">
-                ✅ {users.length} usuário(s) encontrado(s)
-              </span>
-            )}
-          </CardDescription>
+          <div className="flex justify-between items-center">
+            <div>
+              <CardTitle>Usuários do Sistema ({filteredUsers.length})</CardTitle>
+              <CardDescription>
+                Lista de todos os usuários registrados no sistema.
+              </CardDescription>
+            </div>
+            <div className="w-72">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder="Buscar por nome ou email..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          {users.length === 0 ? (
+          {filteredUsers.length === 0 ? (
             <div className="text-center py-8">
-              <p className="text-gray-500 mb-4">Nenhum usuário encontrado</p>
-              <div className="space-y-2">
-                <Button onClick={handleAddUser}>
-                  <UserPlus className="mr-2 h-4 w-4" /> Criar Primeiro Usuário
-                </Button>
-                <Button variant="outline" onClick={handleManualRefresh}>
-                  <RefreshCw className="mr-2 h-4 w-4" /> Atualizar Lista
-                </Button>
-              </div>
+              {searchTerm ? (
+                <p className="text-gray-500">Nenhum usuário encontrado para "{searchTerm}"</p>
+              ) : (
+                <div className="space-y-4">
+                  <p className="text-gray-500">Nenhum usuário encontrado</p>
+                  <div className="space-y-2">
+                    <Button onClick={handleAddUser}>
+                      <UserPlus className="mr-2 h-4 w-4" /> Criar Primeiro Usuário
+                    </Button>
+                    <Button variant="outline" onClick={handleManualRefresh}>
+                      <RefreshCw className="mr-2 h-4 w-4" /> Atualizar Lista
+                    </Button>
+                  </div>
+                </div>
+              )}
             </div>
           ) : (
             <Table>
@@ -286,7 +318,7 @@ const SupabaseUserManagement = () => {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {users.map((userProfile) => (
+                {filteredUsers.map((userProfile) => (
                   <TableRow key={userProfile.id}>
                     <TableCell>
                       <Avatar>
