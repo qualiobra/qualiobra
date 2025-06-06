@@ -79,6 +79,20 @@ export type Database = {
             referencedRelation: "itens_inspectionaveis"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "fk_comodos_itens_comodo"
+            columns: ["comodo_id"]
+            isOneToOne: false
+            referencedRelation: "comodos_tipologia"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "fk_comodos_itens_item"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "itens_inspectionaveis"
+            referencedColumns: ["id"]
+          },
         ]
       }
       comodos_master: {

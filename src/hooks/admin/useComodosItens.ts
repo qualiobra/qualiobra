@@ -4,28 +4,28 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { ComodoItemWithDetails, ComodoItemInsert, ComodoItemUpdate } from "@/types/comodoItensTypes";
 
-export const useComodosItens = (comodoMasterId?: string) => {
+export const useComodosItens = (comodoId?: string) => {
   const queryClient = useQueryClient();
 
-  // Buscar itens de um cômodo master específico
+  // Buscar itens de um cômodo específico
   const {
     data: comodoItens = [],
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["comodos-itens", comodoMasterId],
+    queryKey: ["comodos-itens", comodoId],
     queryFn: async () => {
-      if (!comodoMasterId) return [];
+      if (!comodoId) return [];
       
-      console.log("Buscando itens do cômodo master:", comodoMasterId);
+      console.log("Buscando itens do cômodo:", comodoId);
       
       const { data, error } = await supabase
         .from('comodos_itens')
         .select(`
           id,
-          comodo_master_id,
+          comodo_id,
           item_id,
-          obrigatorio_override,
+          obrigatorio,
           ordem,
           created_at,
           itens_inspectionaveis!inner (
@@ -37,7 +37,7 @@ export const useComodosItens = (comodoMasterId?: string) => {
             )
           )
         `)
-        .eq('comodo_master_id', comodoMasterId)
+        .eq('comodo_id', comodoId)
         .order('ordem');
       
       if (error) {
@@ -50,9 +50,9 @@ export const useComodosItens = (comodoMasterId?: string) => {
       // Transformar dados para o formato esperado
       const transformedData = data.map(item => ({
         id: item.id,
-        comodo_id: item.comodo_master_id,
+        comodo_id: item.comodo_id,
         item_id: item.item_id,
-        obrigatorio: item.obrigatorio_override ?? true,
+        obrigatorio: item.obrigatorio,
         ordem: item.ordem,
         created_at: item.created_at,
         updated_at: item.created_at,
@@ -63,7 +63,7 @@ export const useComodosItens = (comodoMasterId?: string) => {
 
       return transformedData as ComodoItemWithDetails[];
     },
-    enabled: !!comodoMasterId,
+    enabled: !!comodoId,
   });
 
   // Criar associação cômodo-item
@@ -74,9 +74,9 @@ export const useComodosItens = (comodoMasterId?: string) => {
       const { data: result, error } = await supabase
         .from('comodos_itens')
         .insert({
-          comodo_master_id: data.comodo_id,
+          comodo_id: data.comodo_id,
           item_id: data.item_id,
-          obrigatorio_override: data.obrigatorio,
+          obrigatorio: data.obrigatorio,
           ordem: data.ordem || 0
         })
         .select()
@@ -115,7 +115,7 @@ export const useComodosItens = (comodoMasterId?: string) => {
       const { data: result, error } = await supabase
         .from('comodos_itens')
         .update({
-          obrigatorio_override: data.obrigatorio,
+          obrigatorio: data.obrigatorio,
           ordem: data.ordem
         })
         .eq('id', id)
@@ -189,7 +189,7 @@ export const useComodosItens = (comodoMasterId?: string) => {
       
       const { data: result, error } = await supabase
         .from('comodos_itens')
-        .update({ obrigatorio_override: obrigatorio })
+        .update({ obrigatorio: obrigatorio })
         .eq('id', id)
         .select()
         .single();

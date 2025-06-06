@@ -40,7 +40,7 @@ export const ComodoItensDialog = ({
   const [ordem, setOrdem] = useState<number>(1);
 
   // Usar o comodo_master_id se disponível, senão usar o id do próprio cômodo
-  const comodoMasterId = comodo.comodo_master_id || comodo.id;
+  const comodoId = comodo.comodo_master_id || comodo.id;
 
   const {
     comodoItens,
@@ -51,7 +51,7 @@ export const ComodoItensDialog = ({
     isCreating,
     isDeleting,
     isTogglingObrigatorio,
-  } = useComodosItens(comodoMasterId);
+  } = useComodosItens(comodoId);
 
   const { itens, isLoading: isLoadingAllItens } = useItensAdmin();
 
@@ -81,7 +81,7 @@ export const ComodoItensDialog = ({
     }
 
     createComodoItem({
-      comodo_id: comodoMasterId,
+      comodo_id: comodoId,
       item_id: selectedItemId,
       obrigatorio: false,
       ordem: ordem,
