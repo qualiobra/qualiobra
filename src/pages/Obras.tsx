@@ -26,6 +26,8 @@ import { PlusCircle, FileEdit, Users, ArchiveIcon, Search, Filter, FileUp } from
 import NovaObraDialog from "@/components/obras/NovaObraDialog";
 import EditarObraDialog from "@/components/obras/EditarObraDialog";
 import AtribuirUsuariosDialog from "@/components/obras/AtribuirUsuariosDialog";
+import { TipologiasButton } from "@/components/obras/TipologiasButton";
+import { useTipologiasCount } from "@/hooks/useTipologiasCount";
 import type { Obra, ObraStatus, NivelPBQPH } from "@/types/obra";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -106,6 +108,77 @@ const Obras = () => {
       });
       return;
     }
+  };
+
+  // Componente para renderizar cada linha da tabela
+  const TipologiasTableRow = ({ obra, isAdmin, onEditarObra, onAtribuirUsuarios, onArquivarObra, onVisualizarAnexos, getStatusBadge, getNivelPBQPHBadge }: {
+    obra: Obra;
+    isAdmin: boolean;
+    onEditarObra: (obra: Obra) => void;
+    onAtribuirUsuarios: (obra: Obra) => void;
+    onArquivarObra: (obra: Obra) => void;
+    onVisualizarAnexos: (obra: Obra) => void;
+    getStatusBadge: (status: string) => JSX.Element;
+    getNivelPBQPHBadge: (nivel?: string) => JSX.Element;
+  }) => {
+    const { data: tipologiasCount } = useTipologiasCount(obra.id);
+
+    return (
+      <TableRow>
+        <TableCell className="font-medium">{obra.codigoDaObra}</TableCell>
+        <TableCell>{obra.nome}</TableCell>
+        <TableCell>{obra.localizacao}</TableCell>
+        <TableCell>
+          {format(new Date(obra.dataInicio), "dd/MM/yyyy", { locale: ptBR })}
+        </TableCell>
+        <TableCell>{getStatusBadge(obra.status)}</TableCell>
+        <TableCell>{getNivelPBQPHBadge(obra.nivelPBQPH)}</TableCell>
+        <TableCell>
+          <TipologiasButton obraId={obra.id} tipologiasCount={tipologiasCount} />
+        </TableCell>
+        <TableCell>{obra.usuarios.length}</TableCell>
+        <TableCell>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => onVisualizarAnexos(obra)}
+            disabled={!obra.anexosObra || obra.anexosObra.length === 0}
+          >
+            <FileUp className="h-4 w-4 mr-1" />
+            {obra.anexosObra?.length || 0}
+          </Button>
+        </TableCell>
+        <TableCell className="text-right">
+          <div className="flex justify-end gap-2">
+            {isAdmin && obra.status !== "arquivada" && (
+              <>
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => onEditarObra(obra)}
+                >
+                  <FileEdit className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => onAtribuirUsuarios(obra)}
+                >
+                  <Users className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="sm"
+                  onClick={() => onArquivarObra(obra)}
+                >
+                  <ArchiveIcon className="h-4 w-4" />
+                </Button>
+              </>
+            )}
+          </div>
+        </TableCell>
+      </TableRow>
+    );
   };
 
   const getStatusBadge = (status: string) => {
@@ -269,6 +342,7 @@ const Obras = () => {
                   <TableHead>Data de Início</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Nível PBQP-H</TableHead>
+                  <TableHead>Tipologias</TableHead>
                   <TableHead>Usuários</TableHead>
                   <TableHead>Anexos</TableHead>
                   <TableHead className="text-right">Ações</TableHead>
@@ -276,57 +350,7 @@ const Obras = () => {
               </TableHeader>
               <TableBody>
                 {filteredObras.map((obra) => (
-                  <TableRow key={obra.id}>
-                    <TableCell className="font-medium">{obra.codigoDaObra}</TableCell>
-                    <TableCell>{obra.nome}</TableCell>
-                    <TableCell>{obra.localizacao}</TableCell>
-                    <TableCell>
-                      {format(new Date(obra.dataInicio), "dd/MM/yyyy", { locale: ptBR })}
-                    </TableCell>
-                    <TableCell>{getStatusBadge(obra.status)}</TableCell>
-                    <TableCell>{getNivelPBQPHBadge(obra.nivelPBQPH)}</TableCell>
-                    <TableCell>{obra.usuarios.length}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => handleVisualizarAnexos(obra)}
-                        disabled={!obra.anexosObra || obra.anexosObra.length === 0}
-                      >
-                        <FileUp className="h-4 w-4 mr-1" />
-                        {obra.anexosObra?.length || 0}
-                      </Button>
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <div className="flex justify-end gap-2">
-                        {isAdmin && obra.status !== "arquivada" && (
-                          <>
-                            <Button 
-                              variant="outline" 
-                              size="sm" 
-                              onClick={() => handleEditarObra(obra)}
-                            >
-                              <FileEdit className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleAtribuirUsuarios(obra)}
-                            >
-                              <Users className="h-4 w-4" />
-                            </Button>
-                            <Button 
-                              variant="outline" 
-                              size="sm"
-                              onClick={() => handleArquivarObra(obra)}
-                            >
-                              <ArchiveIcon className="h-4 w-4" />
-                            </Button>
-                          </>
-                        )}
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                  <TipologiasTableRow key={obra.id} obra={obra} isAdmin={isAdmin} onEditarObra={handleEditarObra} onAtribuirUsuarios={handleAtribuirUsuarios} onArquivarObra={handleArquivarObra} onVisualizarAnexos={handleVisualizarAnexos} getStatusBadge={getStatusBadge} getNivelPBQPHBadge={getNivelPBQPHBadge} />
                 ))}
               </TableBody>
             </Table>
