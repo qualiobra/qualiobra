@@ -28,7 +28,7 @@ export const useComodosItens = (comodoId?: string) => {
           obrigatorio,
           ordem,
           created_at,
-          itens_inspectionaveis!inner (
+          itens_inspectionaveis!comodos_itens_item_id_fkey (
             id,
             nome,
             descricao,
