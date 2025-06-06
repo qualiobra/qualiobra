@@ -15,9 +15,12 @@ export const useItensAdmin = () => {
   } = useQuery({
     queryKey: ["categorias-admin"],
     queryFn: async () => {
-      console.log("Buscando categorias via RPC");
+      console.log("Buscando categorias");
       
-      const { data, error } = await supabase.rpc('get_categorias_itens');
+      const { data, error } = await supabase
+        .from('categorias_itens')
+        .select('*')
+        .order('nome');
       
       if (error) {
         console.error("Erro ao buscar categorias:", error);
@@ -37,9 +40,17 @@ export const useItensAdmin = () => {
   } = useQuery({
     queryKey: ["itens-admin"],
     queryFn: async () => {
-      console.log("Buscando itens inspectionáveis via RPC");
+      console.log("Buscando itens inspectionáveis");
       
-      const { data, error } = await supabase.rpc('get_itens_inspectionaveis');
+      const { data, error } = await supabase
+        .from('itens_inspectionaveis')
+        .select(`
+          *,
+          categorias_itens!inner (
+            nome
+          )
+        `)
+        .order('nome');
       
       if (error) {
         console.error("Erro ao buscar itens:", error);
@@ -47,7 +58,14 @@ export const useItensAdmin = () => {
       }
 
       console.log("Itens encontrados:", data);
-      return data as (ItemInspecionavel & { categoria_nome: string })[];
+      
+      // Transformar dados para incluir categoria_nome
+      const transformedData = data.map(item => ({
+        ...item,
+        categoria_nome: item.categorias_itens.nome
+      }));
+      
+      return transformedData as (ItemInspecionavel & { categoria_nome: string })[];
     },
   });
 
@@ -56,10 +74,14 @@ export const useItensAdmin = () => {
     mutationFn: async (data: CategoriaItemInsert) => {
       console.log("Criando categoria:", data);
       
-      const { data: result, error } = await supabase.rpc('create_categoria_item', {
-        p_nome: data.nome,
-        p_descricao: data.descricao || null,
-      });
+      const { data: result, error } = await supabase
+        .from('categorias_itens')
+        .insert({
+          nome: data.nome,
+          descricao: data.descricao || null,
+        })
+        .select()
+        .single();
 
       if (error) {
         console.error("Erro ao criar categoria:", error);
@@ -90,11 +112,13 @@ export const useItensAdmin = () => {
     mutationFn: async ({ id, data }: { id: string; data: CategoriaItemUpdate }) => {
       console.log("Atualizando categoria:", id, data);
       
-      const { error } = await supabase.rpc('update_categoria_item', {
-        p_id: id,
-        p_nome: data.nome,
-        p_descricao: data.descricao || null,
-      });
+      const { error } = await supabase
+        .from('categorias_itens')
+        .update({
+          nome: data.nome,
+          descricao: data.descricao || null,
+        })
+        .eq('id', id);
 
       if (error) {
         console.error("Erro ao atualizar categoria:", error);
@@ -125,10 +149,10 @@ export const useItensAdmin = () => {
     mutationFn: async ({ id, ativo }: { id: string; ativo: boolean }) => {
       console.log("Alterando status da categoria:", id, ativo);
       
-      const { error } = await supabase.rpc('toggle_categoria_item', {
-        p_id: id,
-        p_ativo: ativo,
-      });
+      const { error } = await supabase
+        .from('categorias_itens')
+        .update({ ativo })
+        .eq('id', id);
 
       if (error) {
         console.error("Erro ao alterar status da categoria:", error);
@@ -160,11 +184,15 @@ export const useItensAdmin = () => {
     mutationFn: async (data: ItemInspecionavelInsert) => {
       console.log("Criando item:", data);
       
-      const { data: result, error } = await supabase.rpc('create_item_inspecionavel', {
-        p_nome: data.nome,
-        p_descricao: data.descricao || null,
-        p_categoria_id: data.categoria_id,
-      });
+      const { data: result, error } = await supabase
+        .from('itens_inspectionaveis')
+        .insert({
+          nome: data.nome,
+          descricao: data.descricao || null,
+          categoria_id: data.categoria_id,
+        })
+        .select()
+        .single();
 
       if (error) {
         console.error("Erro ao criar item:", error);
@@ -195,12 +223,14 @@ export const useItensAdmin = () => {
     mutationFn: async ({ id, data }: { id: string; data: ItemInspecionavelUpdate }) => {
       console.log("Atualizando item:", id, data);
       
-      const { error } = await supabase.rpc('update_item_inspecionavel', {
-        p_id: id,
-        p_nome: data.nome,
-        p_descricao: data.descricao || null,
-        p_categoria_id: data.categoria_id,
-      });
+      const { error } = await supabase
+        .from('itens_inspectionaveis')
+        .update({
+          nome: data.nome,
+          descricao: data.descricao || null,
+          categoria_id: data.categoria_id,
+        })
+        .eq('id', id);
 
       if (error) {
         console.error("Erro ao atualizar item:", error);
@@ -231,10 +261,10 @@ export const useItensAdmin = () => {
     mutationFn: async ({ id, ativo }: { id: string; ativo: boolean }) => {
       console.log("Alterando status do item:", id, ativo);
       
-      const { error } = await supabase.rpc('toggle_item_inspecionavel', {
-        p_id: id,
-        p_ativo: ativo,
-      });
+      const { error } = await supabase
+        .from('itens_inspectionaveis')
+        .update({ ativo })
+        .eq('id', id);
 
       if (error) {
         console.error("Erro ao alterar status do item:", error);
@@ -259,29 +289,6 @@ export const useItensAdmin = () => {
       });
     },
   });
-
-  // Query para buscar itens por cômodo
-  const getComodoItens = (comodoId: string) => {
-    return useQuery({
-      queryKey: ["comodo-itens", comodoId],
-      queryFn: async () => {
-        console.log("Buscando itens do cômodo:", comodoId);
-        
-        const { data, error } = await supabase.rpc('get_comodos_itens_by_comodo', {
-          p_comodo_id: comodoId,
-        });
-        
-        if (error) {
-          console.error("Erro ao buscar itens do cômodo:", error);
-          throw error;
-        }
-
-        console.log("Itens do cômodo encontrados:", data);
-        return data;
-      },
-      enabled: !!comodoId,
-    });
-  };
 
   return {
     // Dados
@@ -314,8 +321,5 @@ export const useItensAdmin = () => {
     isCreatingItem: createItemMutation.isPending,
     isUpdatingItem: updateItemMutation.isPending,
     isTogglingItemStatus: toggleItemStatusMutation.isPending,
-    
-    // Hook para buscar itens do cômodo
-    getComodoItens,
   };
 };

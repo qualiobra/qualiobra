@@ -39,6 +39,9 @@ export const ComodoItensDialog = ({
   const [selectedItemId, setSelectedItemId] = useState<string>("");
   const [ordem, setOrdem] = useState<number>(1);
 
+  // Usar o comodo_master_id se disponível, senão usar o id do próprio cômodo
+  const comodoMasterId = comodo.comodo_master_id || comodo.id;
+
   const {
     comodoItens,
     isLoading: isLoadingItens,
@@ -48,7 +51,7 @@ export const ComodoItensDialog = ({
     isCreating,
     isDeleting,
     isTogglingObrigatorio,
-  } = useComodosItens(comodo.id);
+  } = useComodosItens(comodoMasterId);
 
   const { itens, isLoading: isLoadingAllItens } = useItensAdmin();
 
@@ -62,7 +65,7 @@ export const ComodoItensDialog = ({
     }
   }, [comodoItens]);
 
-  // Filtrar itens que ainda não estão associados ao cômodo
+  // Filtrar itens que ainda não estão associados ao cômodo e estão ativos
   const itensDisponiveis = itens.filter(
     item => !comodoItens.some(comodoItem => comodoItem.item_id === item.id) && item.ativo
   );
@@ -78,7 +81,7 @@ export const ComodoItensDialog = ({
     }
 
     createComodoItem({
-      comodo_id: comodo.id,
+      comodo_id: comodoMasterId,
       item_id: selectedItemId,
       obrigatorio: false,
       ordem: ordem,

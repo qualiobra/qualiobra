@@ -4,24 +4,41 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { ComodoItemWithDetails, ComodoItemInsert, ComodoItemUpdate } from "@/types/comodoItensTypes";
 
-export const useComodosItens = (comodoId?: string) => {
+export const useComodosItens = (comodoMasterId?: string) => {
   const queryClient = useQueryClient();
 
-  // Buscar itens de um cômodo específico
+  // Buscar itens de um cômodo master específico
   const {
     data: comodoItens = [],
     isLoading,
     error,
   } = useQuery({
-    queryKey: ["comodos-itens", comodoId],
+    queryKey: ["comodos-itens", comodoMasterId],
     queryFn: async () => {
-      if (!comodoId) return [];
+      if (!comodoMasterId) return [];
       
-      console.log("Buscando itens do cômodo via RPC:", comodoId);
+      console.log("Buscando itens do cômodo master:", comodoMasterId);
       
-      const { data, error } = await supabase.rpc('get_comodos_itens_by_comodo', {
-        p_comodo_id: comodoId
-      });
+      const { data, error } = await supabase
+        .from('comodos_itens')
+        .select(`
+          id,
+          comodo_master_id,
+          item_id,
+          obrigatorio_override,
+          ordem,
+          created_at,
+          itens_inspectionaveis!inner (
+            id,
+            nome,
+            descricao,
+            categorias_itens!inner (
+              nome
+            )
+          )
+        `)
+        .eq('comodo_master_id', comodoMasterId)
+        .order('ordem');
       
       if (error) {
         console.error("Erro ao buscar itens do cômodo:", error);
@@ -29,30 +46,49 @@ export const useComodosItens = (comodoId?: string) => {
       }
 
       console.log("Itens do cômodo encontrados:", data);
-      return data as ComodoItemWithDetails[];
+      
+      // Transformar dados para o formato esperado
+      const transformedData = data.map(item => ({
+        id: item.id,
+        comodo_id: item.comodo_master_id,
+        item_id: item.item_id,
+        obrigatorio: item.obrigatorio_override ?? true,
+        ordem: item.ordem,
+        created_at: item.created_at,
+        updated_at: item.created_at,
+        item_nome: item.itens_inspectionaveis.nome,
+        item_descricao: item.itens_inspectionaveis.descricao,
+        categoria_nome: item.itens_inspectionaveis.categorias_itens.nome
+      }));
+
+      return transformedData as ComodoItemWithDetails[];
     },
-    enabled: !!comodoId,
+    enabled: !!comodoMasterId,
   });
 
   // Criar associação cômodo-item
   const createComodoItemMutation = useMutation({
     mutationFn: async (data: ComodoItemInsert) => {
-      console.log("Criando associação cômodo-item via RPC:", data);
+      console.log("Criando associação cômodo-item:", data);
       
-      const { data: result, error } = await supabase.rpc('create_comodo_item', {
-        p_comodo_id: data.comodo_id,
-        p_item_id: data.item_id,
-        p_obrigatorio: data.obrigatorio || false,
-        p_ordem: data.ordem || 0
-      });
+      const { data: result, error } = await supabase
+        .from('comodos_itens')
+        .insert({
+          comodo_master_id: data.comodo_id,
+          item_id: data.item_id,
+          obrigatorio_override: data.obrigatorio,
+          ordem: data.ordem || 0
+        })
+        .select()
+        .single();
 
       if (error) {
         console.error("Erro ao criar associação:", error);
         throw error;
       }
 
-      console.log("Associação criada com ID:", result);
-      return { id: result, ...data };
+      console.log("Associação criada:", result);
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comodos-itens"] });
@@ -74,30 +110,25 @@ export const useComodosItens = (comodoId?: string) => {
   // Atualizar associação cômodo-item
   const updateComodoItemMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: ComodoItemUpdate }) => {
-      console.log("Atualizando associação cômodo-item via RPC:", id, data);
+      console.log("Atualizando associação cômodo-item:", id, data);
       
-      const currentItem = comodoItens.find(item => item.id === id);
-      if (!currentItem) {
-        throw new Error("Item não encontrado");
-      }
-
-      const { data: result, error } = await supabase.rpc('update_comodo_item', {
-        p_id: id,
-        p_obrigatorio: data.obrigatorio ?? currentItem.obrigatorio,
-        p_ordem: data.ordem ?? currentItem.ordem
-      });
+      const { data: result, error } = await supabase
+        .from('comodos_itens')
+        .update({
+          obrigatorio_override: data.obrigatorio,
+          ordem: data.ordem
+        })
+        .eq('id', id)
+        .select()
+        .single();
 
       if (error) {
         console.error("Erro ao atualizar associação:", error);
         throw error;
       }
 
-      if (!result) {
-        throw new Error("Associação não encontrada");
-      }
-
       console.log("Associação atualizada com sucesso");
-      return { id, ...data };
+      return result;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comodos-itens"] });
@@ -119,19 +150,16 @@ export const useComodosItens = (comodoId?: string) => {
   // Remover associação cômodo-item
   const deleteComodoItemMutation = useMutation({
     mutationFn: async (id: string) => {
-      console.log("Removendo associação cômodo-item via RPC:", id);
+      console.log("Removendo associação cômodo-item:", id);
       
-      const { data: result, error } = await supabase.rpc('delete_comodo_item', {
-        p_id: id
-      });
+      const { error } = await supabase
+        .from('comodos_itens')
+        .delete()
+        .eq('id', id);
 
       if (error) {
         console.error("Erro ao remover associação:", error);
         throw error;
-      }
-
-      if (!result) {
-        throw new Error("Associação não encontrada");
       }
 
       console.log("Associação removida com sucesso");
@@ -157,24 +185,22 @@ export const useComodosItens = (comodoId?: string) => {
   // Toggle obrigatório
   const toggleObrigatorioMutation = useMutation({
     mutationFn: async ({ id, obrigatorio }: { id: string; obrigatorio: boolean }) => {
-      console.log("Alterando obrigatoriedade via RPC:", id, obrigatorio);
+      console.log("Alterando obrigatoriedade:", id, obrigatorio);
       
-      const { data: result, error } = await supabase.rpc('toggle_comodo_item_obrigatorio', {
-        p_id: id,
-        p_obrigatorio: obrigatorio
-      });
+      const { data: result, error } = await supabase
+        .from('comodos_itens')
+        .update({ obrigatorio_override: obrigatorio })
+        .eq('id', id)
+        .select()
+        .single();
 
       if (error) {
         console.error("Erro ao alterar obrigatoriedade:", error);
         throw error;
       }
 
-      if (!result) {
-        throw new Error("Associação não encontrada");
-      }
-
       console.log("Obrigatoriedade alterada com sucesso");
-      return { id, obrigatorio };
+      return result;
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["comodos-itens"] });
