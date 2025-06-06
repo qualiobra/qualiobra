@@ -59,9 +59,9 @@ export const ComodoMasterSelector = ({
       <Label>Tipo de Cômodo</Label>
       <div className="flex gap-2">
         <Select
-          value={selectedMasterId || ""}
+          value={selectedMasterId || "custom"}
           onValueChange={(value) => {
-            if (value === "") {
+            if (value === "custom") {
               onMasterSelect(null);
             } else {
               const master = comodosmaster.find(m => m.id === value);
@@ -90,7 +90,7 @@ export const ComodoMasterSelector = ({
             </SelectValue>
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">Nenhum (personalizado)</SelectItem>
+            <SelectItem value="custom">Nenhum (personalizado)</SelectItem>
             {comodosmaster
               .filter(master => master.ativo)
               .map((master) => (
