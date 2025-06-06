@@ -2,7 +2,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, Edit, Trash2, Door } from "lucide-react";
+import { MoreHorizontal, Edit, Trash2, Home } from "lucide-react";
 import { ComodoTipologia } from "@/types/comodo";
 
 interface ComodoCardProps {
@@ -16,7 +16,7 @@ export const ComodoCard = ({ comodo, onEdit, onDelete }: ComodoCardProps) => {
     <Card className="hover:shadow-md transition-shadow">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-lg font-semibold flex items-center gap-2">
-          <Door className="h-5 w-5 text-primary" />
+          <Home className="h-5 w-5 text-primary" />
           {comodo.nome}
         </CardTitle>
         <DropdownMenu>

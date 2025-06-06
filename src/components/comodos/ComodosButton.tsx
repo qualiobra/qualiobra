@@ -1,6 +1,6 @@
 
 import { Button } from "@/components/ui/button";
-import { Door } from "lucide-react";
+import { Home } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 interface ComodosButtonProps {
@@ -19,7 +19,7 @@ export const ComodosButton = ({ obraId, tipologiaId, comodosCount = 0 }: Comodos
       onClick={() => navigate(`/obras/${obraId}/tipologias/${tipologiaId}/comodos`)}
       className="flex items-center gap-2"
     >
-      <Door className="h-4 w-4" />
+      <Home className="h-4 w-4" />
       Cômodos ({comodosCount})
     </Button>
   );

@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus, Door } from "lucide-react";
+import { Plus, Home } from "lucide-react";
 import { ComodoCard } from "./ComodoCard";
 import { ComodoDialog } from "./ComodoDialog";
 import { useComodosTipologia } from "@/hooks/useComodosTipologia";
@@ -88,7 +88,7 @@ export const ComodosList = ({ tipologiaId, tipologiaNome }: ComodosListProps) =>
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <Door className="h-6 w-6 text-primary" />
+            <Home className="h-6 w-6 text-primary" />
             Cômodos da Tipologia
           </h2>
           <p className="text-muted-foreground">{tipologiaNome}</p>
@@ -101,7 +101,7 @@ export const ComodosList = ({ tipologiaId, tipologiaNome }: ComodosListProps) =>
 
       {comodos.length === 0 ? (
         <div className="text-center py-12">
-          <Door className="mx-auto h-12 w-12 text-muted-foreground" />
+          <Home className="mx-auto h-12 w-12 text-muted-foreground" />
           <h3 className="mt-2 text-lg font-semibold">Nenhum cômodo cadastrado</h3>
           <p className="mt-1 text-muted-foreground">
             Comece criando o primeiro cômodo para esta tipologia.
