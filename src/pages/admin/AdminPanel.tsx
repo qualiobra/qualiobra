@@ -3,9 +3,15 @@ import { useAuth } from "@/context/SupabaseAuthContext";
 import { toast } from "@/hooks/use-toast";
 import { useUserRole, UserRole } from "@/context/UserRoleContext";
 import { useComodosAdmin } from "@/hooks/admin/useComodosAdmin";
+import { useItensAdmin } from "@/hooks/admin/useItensAdmin";
 import { ComodoFormDialog } from "@/components/admin/ComodoFormDialog";
 import { ComodosAdminTable } from "@/components/admin/ComodosAdminTable";
+import { CategoriaFormDialog } from "@/components/admin/CategoriaFormDialog";
+import { ItemFormDialog } from "@/components/admin/ItemFormDialog";
+import { CategoriasAdminTable } from "@/components/admin/CategoriasAdminTable";
+import { ItensAdminTable } from "@/components/admin/ItensAdminTable";
 import { ComodoFormData } from "@/components/admin/schemas/comodoFormSchema";
+import { ItemFormData, CategoriaFormData } from "@/components/admin/schemas/itemFormSchema";
 import { 
   Tabs, 
   TabsContent, 
@@ -47,7 +53,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { UserPlus, Users, Settings, MoreVertical, Pencil, Trash2, User, Home } from "lucide-react";
+import { UserPlus, Users, Settings, MoreVertical, Pencil, Trash2, User, Home, Package, Tag } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const AdminPanel = () => {
@@ -72,6 +78,31 @@ const AdminPanel = () => {
   
   const [isComodoDialogOpen, setIsComodoDialogOpen] = useState(false);
   const [editingComodo, setEditingComodo] = useState<any>(null);
+
+  // Estados para gerenciamento de itens
+  const {
+    categorias,
+    itens,
+    isLoadingCategorias,
+    isLoadingItens,
+    createCategoria,
+    createItem,
+    updateCategoria,
+    updateItem,
+    toggleCategoriaStatus,
+    toggleItemStatus,
+    isCreatingCategoria,
+    isCreatingItem,
+    isUpdatingCategoria,
+    isUpdatingItem,
+    isTogglingCategoriaStatus,
+    isTogglingItemStatus,
+  } = useItensAdmin();
+
+  const [isCategoriaDialogOpen, setIsCategoriaDialogOpen] = useState(false);
+  const [isItemDialogOpen, setIsItemDialogOpen] = useState(false);
+  const [editingCategoria, setEditingCategoria] = useState<any>(null);
+  const [editingItem, setEditingItem] = useState<any>(null);
   
   // Manipuladores para adicionar e editar perfis
   const handleAddRole = () => {
@@ -208,6 +239,62 @@ const AdminPanel = () => {
 
   const handleToggleComodoStatus = (id: string, ativo: boolean) => {
     toggleComodoStatus({ id, ativo });
+  };
+
+  // Manipuladores para categorias
+  const handleCreateCategoria = (data: CategoriaFormData) => {
+    createCategoria(data);
+    setIsCategoriaDialogOpen(false);
+  };
+
+  const handleEditCategoria = (categoria: any) => {
+    setEditingCategoria(categoria);
+    setIsCategoriaDialogOpen(true);
+  };
+
+  const handleUpdateCategoria = (data: CategoriaFormData) => {
+    if (editingCategoria) {
+      updateCategoria({ id: editingCategoria.id, data });
+      setIsCategoriaDialogOpen(false);
+      setEditingCategoria(null);
+    }
+  };
+
+  const handleCloseCategoriaDialog = () => {
+    setIsCategoriaDialogOpen(false);
+    setEditingCategoria(null);
+  };
+
+  const handleToggleCategoriaStatus = (id: string, ativo: boolean) => {
+    toggleCategoriaStatus({ id, ativo });
+  };
+
+  // Manipuladores para itens
+  const handleCreateItem = (data: ItemFormData) => {
+    createItem(data);
+    setIsItemDialogOpen(false);
+  };
+
+  const handleEditItem = (item: any) => {
+    setEditingItem(item);
+    setIsItemDialogOpen(true);
+  };
+
+  const handleUpdateItem = (data: ItemFormData) => {
+    if (editingItem) {
+      updateItem({ id: editingItem.id, data });
+      setIsItemDialogOpen(false);
+      setEditingItem(null);
+    }
+  };
+
+  const handleCloseItemDialog = () => {
+    setIsItemDialogOpen(false);
+    setEditingItem(null);
+  };
+
+  const handleToggleItemStatus = (id: string, ativo: boolean) => {
+    toggleItemStatus({ id, ativo });
   };
 
   return (
@@ -460,6 +547,7 @@ const AdminPanel = () => {
             <TabsList className="mb-4">
               <TabsTrigger value="geral">Geral</TabsTrigger>
               <TabsTrigger value="comodos">Cômodos</TabsTrigger>
+              <TabsTrigger value="itens">Itens</TabsTrigger>
             </TabsList>
 
             <TabsContent value="geral">
@@ -499,6 +587,94 @@ const AdminPanel = () => {
                 </CardContent>
               </Card>
             </TabsContent>
+
+            <TabsContent value="itens" className="space-y-4">
+              <Tabs defaultValue="categorias" className="mt-6">
+                <TabsList className="mb-4">
+                  <TabsTrigger value="categorias">Categorias</TabsTrigger>
+                  <TabsTrigger value="itens-lista">Itens Inspecionáveis</TabsTrigger>
+                </TabsList>
+
+                <TabsContent value="categorias" className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">Categorias de Itens</h3>
+                    
+                    <Button onClick={() => setIsCategoriaDialogOpen(true)}>
+                      <Tag className="mr-2 h-4 w-4" /> Nova Categoria
+                    </Button>
+                  </div>
+                  
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Categorias</CardTitle>
+                      <CardDescription>
+                        Gerencie as categorias de itens inspecionáveis.
+                      </CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <CategoriasAdminTable
+                        categorias={categorias}
+                        isLoading={isLoadingCategorias}
+                        onEdit={handleEditCategoria}
+                        onToggleStatus={handleToggleCategoriaStatus}
+                        isTogglingStatus={isTogglingCategoriaStatus}
+                      />
+                    </CardContent>
+                  </Card>
+                </TabsContent>
+
+                <TabsContent value="itens-lista" className="space-y-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <h3 className="text-lg font-semibold">Itens Inspecionáveis</h3>
+                    
+                    <Button 
+                      onClick={() => setIsItemDialogOpen(true)}
+                      disabled={categorias.filter(c => c.ativo).length === 0}
+                    >
+                      <Package className="mr-2 h-4 w-4" /> Novo Item
+                    </Button>
+                  </div>
+
+                  {categorias.filter(c => c.ativo).length === 0 && (
+                    <Card>
+                      <CardContent className="p-6">
+                        <div className="text-center">
+                          <p className="text-muted-foreground">
+                            É necessário criar pelo menos uma categoria ativa antes de criar itens inspecionáveis.
+                          </p>
+                          <Button 
+                            onClick={() => setIsCategoriaDialogOpen(true)}
+                            className="mt-4"
+                          >
+                            <Tag className="mr-2 h-4 w-4" /> Criar Primeira Categoria
+                          </Button>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                  
+                  {categorias.filter(c => c.ativo).length > 0 && (
+                    <Card>
+                      <CardHeader>
+                        <CardTitle>Itens Inspecionáveis</CardTitle>
+                        <CardDescription>
+                          Gerencie os itens que podem ser inspecionados no sistema.
+                        </CardDescription>
+                      </CardHeader>
+                      <CardContent>
+                        <ItensAdminTable
+                          itens={itens}
+                          isLoading={isLoadingItens}
+                          onEdit={handleEditItem}
+                          onToggleStatus={handleToggleItemStatus}
+                          isTogglingStatus={isTogglingItemStatus}
+                        />
+                      </CardContent>
+                    </Card>
+                  )}
+                </TabsContent>
+              </Tabs>
+            </TabsContent>
           </Tabs>
         </TabsContent>
       </Tabs>
@@ -510,6 +686,25 @@ const AdminPanel = () => {
         onSubmit={editingComodo ? handleUpdateComodo : handleCreateComodo}
         comodo={editingComodo}
         isLoading={isCreating || isUpdating}
+      />
+
+      {/* Dialog para criar/editar categorias */}
+      <CategoriaFormDialog
+        open={isCategoriaDialogOpen}
+        onOpenChange={handleCloseCategoriaDialog}
+        onSubmit={editingCategoria ? handleUpdateCategoria : handleCreateCategoria}
+        categoria={editingCategoria}
+        isLoading={isCreatingCategoria || isUpdatingCategoria}
+      />
+
+      {/* Dialog para criar/editar itens */}
+      <ItemFormDialog
+        open={isItemDialogOpen}
+        onOpenChange={handleCloseItemDialog}
+        onSubmit={editingItem ? handleUpdateItem : handleCreateItem}
+        item={editingItem}
+        categorias={categorias}
+        isLoading={isCreatingItem || isUpdatingItem}
       />
     </div>
   );
