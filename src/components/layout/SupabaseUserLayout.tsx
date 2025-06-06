@@ -1,5 +1,6 @@
 
 import { ReactNode } from "react";
+import { Outlet } from "react-router-dom";
 import SupabaseSiteHeader from "./SupabaseSiteHeader";
 
 interface SupabaseUserLayoutProps {
@@ -11,7 +12,7 @@ const SupabaseUserLayout = ({ children }: SupabaseUserLayoutProps) => {
     <div className="min-h-screen flex flex-col">
       <SupabaseSiteHeader />
       <main className="flex-1 container mx-auto px-4 py-6">
-        {children}
+        <Outlet />
       </main>
     </div>
   );

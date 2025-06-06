@@ -33,17 +33,17 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 
-                <Route element={<SupabaseUserLayout />}>
-                  <Route path="/dashboard" element={<Dashboard />} />
-                  <Route path="/obras" element={<Obras />} />
-                  <Route path="/obras/:obraId/tipologias" element={<TipologiasPage />} />
-                  <Route path="/obras/:obraId/tipologias/:tipologiaId/comodos" element={<ComodosPage />} />
-                  <Route path="/diagnostico" element={<Diagnostico />} />
-                  <Route path="/inspections" element={<Inspections />} />
-                  <Route path="/reports" element={<Reports />} />
-                  <Route path="/team" element={<Team />} />
-                  <Route path="/admin" element={<AdminPanel />} />
-                  <Route path="/coming-soon" element={<ComingSoon />} />
+                <Route path="/*" element={<SupabaseUserLayout><div /></SupabaseUserLayout>}>
+                  <Route path="dashboard" element={<Dashboard />} />
+                  <Route path="obras" element={<Obras />} />
+                  <Route path="obras/:obraId/tipologias" element={<TipologiasPage />} />
+                  <Route path="obras/:obraId/tipologias/:tipologiaId/comodos" element={<ComodosPage />} />
+                  <Route path="diagnostico" element={<Diagnostico />} />
+                  <Route path="inspections" element={<Inspections />} />
+                  <Route path="reports" element={<Reports />} />
+                  <Route path="team" element={<Team />} />
+                  <Route path="admin" element={<AdminPanel />} />
+                  <Route path="coming-soon" element={<ComingSoon />} />
                 </Route>
                 
                 <Route path="*" element={<NotFound />} />
