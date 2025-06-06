@@ -3,12 +3,12 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import { ComodoFormData } from "@/components/admin/schemas/comodoFormSchema";
-import { ComodoMaster, ComodoMasterInsert, ComodoMasterUpdate } from "@/types/comodoTypes";
+import { ComodoMaster } from "@/types/comodoTypes";
 
 export const useComodosAdmin = () => {
   const queryClient = useQueryClient();
 
-  // Buscar todos os cômodos
+  // Buscar todos os cômodos usando RPC
   const {
     data: comodos = [],
     isLoading,
@@ -16,25 +16,13 @@ export const useComodosAdmin = () => {
   } = useQuery({
     queryKey: ["comodos-master"],
     queryFn: async () => {
-      console.log("Buscando cômodos master...");
+      console.log("Buscando cômodos master via RPC...");
       
-      // Usar query SQL direta para acessar a tabela comodos_master
       const { data, error } = await supabase.rpc('get_comodos_master');
       
       if (error) {
-        // Fallback: tentar query SQL direta se a RPC não existir
-        const { data: fallbackData, error: fallbackError } = await supabase
-          .from('comodos_master' as any)
-          .select('*')
-          .order('nome');
-          
-        if (fallbackError) {
-          console.error("Erro ao buscar cômodos:", fallbackError);
-          throw fallbackError;
-        }
-        
-        console.log("Cômodos encontrados (fallback):", fallbackData);
-        return fallbackData as ComodoMaster[];
+        console.error("Erro ao buscar cômodos:", error);
+        throw error;
       }
 
       console.log("Cômodos encontrados:", data);
@@ -42,30 +30,24 @@ export const useComodosAdmin = () => {
     },
   });
 
-  // Criar novo cômodo
+  // Criar novo cômodo usando RPC
   const createComodoMutation = useMutation({
     mutationFn: async (data: ComodoFormData) => {
-      console.log("Criando cômodo:", data);
+      console.log("Criando cômodo via RPC:", data);
       
-      const insertData: ComodoMasterInsert = {
-        nome: data.nome,
-        descricao: data.descricao || null,
-        icone: data.icone,
-        ativo: true
-      };
-
-      const { data: result, error } = await supabase
-        .from('comodos_master' as any)
-        .insert([insertData])
-        .select()
-        .single();
+      const { data: result, error } = await supabase.rpc('create_comodo_master', {
+        p_nome: data.nome,
+        p_descricao: data.descricao || null,
+        p_icone: data.icone
+      });
 
       if (error) {
         console.error("Erro ao criar cômodo:", error);
         throw error;
       }
 
-      return result as ComodoMaster;
+      console.log("Cômodo criado com ID:", result);
+      return { id: result, ...data } as ComodoMaster;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comodos-master"] });
@@ -84,30 +66,29 @@ export const useComodosAdmin = () => {
     },
   });
 
-  // Atualizar cômodo existente
+  // Atualizar cômodo existente usando RPC
   const updateComodoMutation = useMutation({
     mutationFn: async ({ id, data }: { id: string; data: ComodoFormData }) => {
-      console.log("Atualizando cômodo:", id, data);
+      console.log("Atualizando cômodo via RPC:", id, data);
       
-      const updateData: ComodoMasterUpdate = {
-        nome: data.nome,
-        descricao: data.descricao || null,
-        icone: data.icone
-      };
-
-      const { data: result, error } = await supabase
-        .from('comodos_master' as any)
-        .update(updateData)
-        .eq('id', id)
-        .select()
-        .single();
+      const { data: result, error } = await supabase.rpc('update_comodo_master', {
+        p_id: id,
+        p_nome: data.nome,
+        p_descricao: data.descricao || null,
+        p_icone: data.icone
+      });
 
       if (error) {
         console.error("Erro ao atualizar cômodo:", error);
         throw error;
       }
 
-      return result as ComodoMaster;
+      if (!result) {
+        throw new Error("Cômodo não encontrado");
+      }
+
+      console.log("Cômodo atualizado com sucesso");
+      return { id, ...data } as ComodoMaster;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["comodos-master"] });
@@ -126,24 +107,27 @@ export const useComodosAdmin = () => {
     },
   });
 
-  // Ativar/desativar cômodo (soft delete)
+  // Ativar/desativar cômodo usando RPC
   const toggleComodoStatusMutation = useMutation({
     mutationFn: async ({ id, ativo }: { id: string; ativo: boolean }) => {
-      console.log("Alterando status do cômodo:", id, ativo);
+      console.log("Alterando status do cômodo via RPC:", id, ativo);
       
-      const { data: result, error } = await supabase
-        .from('comodos_master' as any)
-        .update({ ativo })
-        .eq('id', id)
-        .select()
-        .single();
+      const { data: result, error } = await supabase.rpc('toggle_comodo_master', {
+        p_id: id,
+        p_ativo: ativo
+      });
 
       if (error) {
         console.error("Erro ao alterar status do cômodo:", error);
         throw error;
       }
 
-      return result as ComodoMaster;
+      if (!result) {
+        throw new Error("Cômodo não encontrado");
+      }
+
+      console.log("Status do cômodo alterado com sucesso");
+      return { id, ativo };
     },
     onSuccess: (_, variables) => {
       queryClient.invalidateQueries({ queryKey: ["comodos-master"] });

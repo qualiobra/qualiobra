@@ -282,7 +282,35 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      create_comodo_master: {
+        Args: { p_nome: string; p_descricao: string; p_icone: string }
+        Returns: string
+      }
+      get_comodos_master: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          id: string
+          nome: string
+          descricao: string
+          icone: string
+          ativo: boolean
+          created_at: string
+          updated_at: string
+        }[]
+      }
+      toggle_comodo_master: {
+        Args: { p_id: string; p_ativo: boolean }
+        Returns: boolean
+      }
+      update_comodo_master: {
+        Args: {
+          p_id: string
+          p_nome: string
+          p_descricao: string
+          p_icone: string
+        }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
