@@ -66,20 +66,6 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "comodos_itens_comodo_id_fkey"
-            columns: ["comodo_id"]
-            isOneToOne: false
-            referencedRelation: "comodos_master"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "comodos_itens_item_id_fkey"
-            columns: ["item_id"]
-            isOneToOne: false
-            referencedRelation: "itens_inspectionaveis"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "fk_comodos_itens_comodo"
             columns: ["comodo_id"]
             isOneToOne: false

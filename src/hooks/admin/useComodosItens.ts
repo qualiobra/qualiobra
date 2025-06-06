@@ -1,4 +1,3 @@
-
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
@@ -22,17 +21,13 @@ export const useComodosItens = (comodoId?: string) => {
       const { data, error } = await supabase
         .from('comodos_itens')
         .select(`
-          id,
-          comodo_id,
-          item_id,
-          obrigatorio,
-          ordem,
-          created_at,
-          itens_inspectionaveis!comodos_itens_item_id_fkey (
+          *,
+          itens_inspectionaveis!fk_comodos_itens_item (
             id,
             nome,
             descricao,
-            categorias_itens!inner (
+            categoria_id,
+            categorias_itens (
               nome
             )
           )
