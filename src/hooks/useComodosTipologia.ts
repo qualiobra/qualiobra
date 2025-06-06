@@ -32,9 +32,16 @@ export const useComodosTipologia = (tipologiaId?: string) => {
   // Criar cômodo
   const createComodo = useMutation({
     mutationFn: async (data: CreateComodoData) => {
+      console.log('Criando cômodo com dados:', data);
+      
       const { data: comodo, error } = await supabase
         .from('comodos_tipologia')
-        .insert(data)
+        .insert({
+          tipologia_id: data.tipologia_id,
+          nome: data.nome,
+          descricao: data.descricao,
+          comodo_master_id: data.comodo_master_id,
+        })
         .select()
         .single();
 
@@ -68,10 +75,16 @@ export const useComodosTipologia = (tipologiaId?: string) => {
   // Atualizar cômodo
   const updateComodo = useMutation({
     mutationFn: async (data: UpdateComodoData) => {
+      console.log('Atualizando cômodo com dados:', data);
+      
       const { id, ...updateData } = data;
       const { data: comodo, error } = await supabase
         .from('comodos_tipologia')
-        .update(updateData)
+        .update({
+          nome: updateData.nome,
+          descricao: updateData.descricao,
+          comodo_master_id: updateData.comodo_master_id,
+        })
         .eq('id', id)
         .select()
         .single();

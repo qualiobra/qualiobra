@@ -116,6 +116,7 @@ export type Database = {
       }
       comodos_tipologia: {
         Row: {
+          comodo_master_id: string | null
           created_at: string
           descricao: string | null
           id: string
@@ -124,6 +125,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          comodo_master_id?: string | null
           created_at?: string
           descricao?: string | null
           id?: string
@@ -132,6 +134,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          comodo_master_id?: string | null
           created_at?: string
           descricao?: string | null
           id?: string
@@ -140,6 +143,13 @@ export type Database = {
           updated_at?: string
         }
         Relationships: [
+          {
+            foreignKeyName: "comodos_tipologia_comodo_master_id_fkey"
+            columns: ["comodo_master_id"]
+            isOneToOne: false
+            referencedRelation: "comodos_master"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "fk_comodos_tipologia_tipologia_id"
             columns: ["tipologia_id"]
