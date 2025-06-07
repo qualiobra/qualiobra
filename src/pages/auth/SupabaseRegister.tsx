@@ -1,60 +1,58 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/SupabaseAuthContext";
+import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Eye, EyeOff, Mail, Lock, User, ArrowLeft } from "lucide-react";
+import { User, Mail, Lock, Phone, ArrowLeft } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const SupabaseRegister = () => {
-  const { signUp } = useAuth();
+  const { signUp, user, loading } = useSupabaseAuth();
   const navigate = useNavigate();
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    telefone: ""
+  });
   const [isLoading, setIsLoading] = useState(false);
-  const [firstNameError, setFirstNameError] = useState("");
-  const [lastNameError, setLastNameError] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Redirecionar se o usuário já estiver logado
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/dashboard');
+    }
+  }, [user, loading, navigate]);
 
   const validateForm = () => {
-    let isValid = true;
-    setFirstNameError("");
-    setLastNameError("");
-    setEmailError("");
-    setPasswordError("");
+    const newErrors: Record<string, string> = {};
 
-    if (!firstName.trim()) {
-      setFirstNameError("Nome é obrigatório");
-      isValid = false;
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = "Nome é obrigatório";
+    }
+    if (!formData.lastName.trim()) {
+      newErrors.lastName = "Sobrenome é obrigatório";
+    }
+    if (!formData.email.trim()) {
+      newErrors.email = "E-mail é obrigatório";
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "E-mail inválido";
+    }
+    if (!formData.password) {
+      newErrors.password = "Senha é obrigatória";
+    } else if (formData.password.length < 6) {
+      newErrors.password = "Senha deve ter pelo menos 6 caracteres";
+    }
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = "Senhas não coincidem";
     }
 
-    if (!lastName.trim()) {
-      setLastNameError("Sobrenome é obrigatório");
-      isValid = false;
-    }
-
-    if (!email.trim()) {
-      setEmailError("E-mail é obrigatório");
-      isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(email)) {
-      setEmailError("E-mail inválido");
-      isValid = false;
-    }
-
-    if (!password) {
-      setPasswordError("Senha é obrigatória");
-      isValid = false;
-    } else if (password.length < 8) {
-      setPasswordError("A senha deve ter pelo menos 8 caracteres");
-      isValid = false;
-    }
-
-    return isValid;
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -66,30 +64,27 @@ const SupabaseRegister = () => {
 
     try {
       setIsLoading(true);
+      console.log('Tentando criar conta para:', formData.email);
       
-      const userData = {
-        first_name: firstName,
-        last_name: lastName,
-      };
-
-      const { data, error } = await signUp(email, password, userData);
+      const { data, error } = await signUp(formData.email, formData.password, {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        telefone: formData.telefone
+      });
       
       if (error) {
-        console.error("Erro no cadastro:", error);
+        console.error("Erro no registro:", error);
         
         if (error.message.includes("User already registered")) {
-          setEmailError("Este e-mail já está cadastrado");
           toast({
-            title: "E-mail já cadastrado",
-            description: "Este e-mail já possui uma conta. Tente fazer login.",
+            title: "Usuário já existe",
+            description: "Este e-mail já está cadastrado. Tente fazer login.",
             variant: "destructive",
           });
-        } else if (error.message.includes("Password")) {
-          setPasswordError(error.message);
         } else {
           toast({
             title: "Erro no cadastro",
-            description: error.message || "Ocorreu um erro durante o cadastro",
+            description: error.message || "Ocorreu um erro ao criar a conta",
             variant: "destructive",
           });
         }
@@ -97,15 +92,17 @@ const SupabaseRegister = () => {
       }
 
       if (data.user) {
+        console.log('Conta criada com sucesso, usuário:', data.user);
         toast({
-          title: "Conta criada com sucesso!",
-          description: "Verifique seu e-mail para confirmar sua conta antes de fazer login.",
+          title: "Conta criada com sucesso",
+          description: "Verifique seu e-mail para confirmar a conta.",
         });
-        navigate("/login");
+        // Redirecionar para o dashboard após registro bem-sucedido
+        navigate('/dashboard');
       }
       
     } catch (err: any) {
-      console.error("Erro inesperado no cadastro:", err);
+      console.error("Erro inesperado no registro:", err);
       toast({
         title: "Erro no cadastro",
         description: "Ocorreu um erro inesperado. Tente novamente.",
@@ -116,8 +113,28 @@ const SupabaseRegister = () => {
     }
   };
 
+  const handleInputChange = (field: string, value: string) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
+    // Limpar erro do campo quando o usuário começar a digitar
+    if (errors[field]) {
+      setErrors(prev => ({ ...prev, [field]: "" }));
+    }
+  };
+
+  // Mostrar loading enquanto verifica a autenticação
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Verificando autenticação...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 px-4 py-12">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 px-4 py-8">
       <div className="w-full max-w-md">
         <div className="flex justify-center mb-8">
           <img 
@@ -128,7 +145,7 @@ const SupabaseRegister = () => {
         </div>
         
         <div className="bg-white p-8 rounded-lg shadow-md">
-          <h1 className="text-2xl font-bold text-gray-900 text-center mb-6">Criar conta</h1>
+          <h1 className="text-2xl font-bold text-gray-900 text-center mb-6">Criar Conta no QualiObra</h1>
           
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
@@ -140,27 +157,29 @@ const SupabaseRegister = () => {
                   </div>
                   <Input
                     id="firstName"
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    className={`pl-10 ${firstNameError ? 'border-red-500' : ''}`}
-                    placeholder="Nome"
+                    type="text"
+                    value={formData.firstName}
+                    onChange={(e) => handleInputChange("firstName", e.target.value)}
+                    className={`pl-10 ${errors.firstName ? 'border-red-500' : ''}`}
+                    placeholder="Seu nome"
                     disabled={isLoading}
                   />
                 </div>
-                {firstNameError && <p className="text-sm text-red-500">{firstNameError}</p>}
+                {errors.firstName && <p className="text-sm text-red-500">{errors.firstName}</p>}
               </div>
-              
+
               <div className="space-y-1">
                 <label htmlFor="lastName" className="text-sm font-medium text-gray-700">Sobrenome</label>
                 <Input
                   id="lastName"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  className={`${lastNameError ? 'border-red-500' : ''}`}
-                  placeholder="Sobrenome"
+                  type="text"
+                  value={formData.lastName}
+                  onChange={(e) => handleInputChange("lastName", e.target.value)}
+                  className={`${errors.lastName ? 'border-red-500' : ''}`}
+                  placeholder="Seu sobrenome"
                   disabled={isLoading}
                 />
-                {lastNameError && <p className="text-sm text-red-500">{lastNameError}</p>}
+                {errors.lastName && <p className="text-sm text-red-500">{errors.lastName}</p>}
               </div>
             </div>
             
@@ -173,14 +192,32 @@ const SupabaseRegister = () => {
                 <Input
                   id="email"
                   type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className={`pl-10 ${emailError ? 'border-red-500' : ''}`}
+                  value={formData.email}
+                  onChange={(e) => handleInputChange("email", e.target.value)}
+                  className={`pl-10 ${errors.email ? 'border-red-500' : ''}`}
                   placeholder="seu@email.com"
                   disabled={isLoading}
                 />
               </div>
-              {emailError && <p className="text-sm text-red-500">{emailError}</p>}
+              {errors.email && <p className="text-sm text-red-500">{errors.email}</p>}
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="telefone" className="text-sm font-medium text-gray-700">Telefone (opcional)</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Phone className="h-5 w-5 text-gray-400" />
+                </div>
+                <Input
+                  id="telefone"
+                  type="tel"
+                  value={formData.telefone}
+                  onChange={(e) => handleInputChange("telefone", e.target.value)}
+                  className="pl-10"
+                  placeholder="(11) 99999-9999"
+                  disabled={isLoading}
+                />
+              </div>
             </div>
             
             <div className="space-y-1">
@@ -191,38 +228,46 @@ const SupabaseRegister = () => {
                 </div>
                 <Input
                   id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className={`pl-10 ${passwordError ? 'border-red-500' : ''}`}
-                  placeholder="Senha (mínimo 8 caracteres)"
+                  type="password"
+                  value={formData.password}
+                  onChange={(e) => handleInputChange("password", e.target.value)}
+                  className={`pl-10 ${errors.password ? 'border-red-500' : ''}`}
+                  placeholder="Sua senha"
                   disabled={isLoading}
                 />
-                <button
-                  type="button"
-                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
-                  onClick={() => setShowPassword(!showPassword)}
-                >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5 text-gray-400" />
-                  ) : (
-                    <Eye className="h-5 w-5 text-gray-400" />
-                  )}
-                </button>
               </div>
-              {passwordError && <p className="text-sm text-red-500">{passwordError}</p>}
+              {errors.password && <p className="text-sm text-red-500">{errors.password}</p>}
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="confirmPassword" className="text-sm font-medium text-gray-700">Confirmar Senha</label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="h-5 w-5 text-gray-400" />
+                </div>
+                <Input
+                  id="confirmPassword"
+                  type="password"
+                  value={formData.confirmPassword}
+                  onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
+                  className={`pl-10 ${errors.confirmPassword ? 'border-red-500' : ''}`}
+                  placeholder="Confirme sua senha"
+                  disabled={isLoading}
+                />
+              </div>
+              {errors.confirmPassword && <p className="text-sm text-red-500">{errors.confirmPassword}</p>}
             </div>
             
-            <Button type="submit" className="w-full mt-6" disabled={isLoading}>
-              {isLoading ? "Criando conta..." : "Criar conta"}
+            <Button type="submit" className="w-full" disabled={isLoading}>
+              {isLoading ? "Criando conta..." : "Criar Conta"}
             </Button>
           </form>
           
-          <div className="mt-6 text-center space-y-2">
+          <div className="mt-6 text-center">
             <div className="text-sm text-gray-600">
               Já tem uma conta?{" "}
               <Link to="/login" className="text-primary hover:underline font-medium">
-                Entrar
+                Faça login
               </Link>
             </div>
           </div>

@@ -16,6 +16,7 @@ import SupabaseRegister from "./pages/auth/SupabaseRegister";
 import { UserRoleProvider } from "./context/UserRoleContext";
 import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
 import SupabaseUserLayout from "./components/layout/SupabaseUserLayout";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import {
   QueryClient,
   QueryClientProvider,
@@ -37,7 +38,11 @@ function App() {
                 <Route path="/login" element={<SupabaseLogin />} />
                 <Route path="/register" element={<SupabaseRegister />} />
                 
-                <Route path="/*" element={<SupabaseUserLayout />}>
+                <Route path="/*" element={
+                  <ProtectedRoute>
+                    <SupabaseUserLayout />
+                  </ProtectedRoute>
+                }>
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="obras" element={<Obras />} />
                   <Route path="obras/:obraId/tipologias" element={<TipologiasPage />} />

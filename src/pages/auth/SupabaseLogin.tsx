@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSupabaseAuth } from "@/hooks/useSupabaseAuth";
 import { Input } from "@/components/ui/input";
@@ -8,13 +8,20 @@ import { Lock, Mail, ArrowLeft } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 const SupabaseLogin = () => {
-  const { signIn } = useSupabaseAuth();
+  const { signIn, user, loading } = useSupabaseAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
+
+  // Redirecionar se o usuário já estiver logado
+  useEffect(() => {
+    if (!loading && user) {
+      navigate('/dashboard');
+    }
+  }, [user, loading, navigate]);
 
   const validateForm = () => {
     let isValid = true;
@@ -81,7 +88,8 @@ const SupabaseLogin = () => {
           title: "Login realizado com sucesso",
           description: "Bem-vindo de volta!",
         });
-        // O redirecionamento será feito automaticamente pelo AppContent
+        // Redirecionar para o dashboard após login bem-sucedido
+        navigate('/dashboard');
       }
       
     } catch (err: any) {
@@ -95,6 +103,18 @@ const SupabaseLogin = () => {
       setIsLoading(false);
     }
   };
+
+  // Mostrar loading enquanto verifica a autenticação
+  if (loading) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 px-4">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+          <p>Verificando autenticação...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-gray-50 px-4">
