@@ -1,4 +1,3 @@
-
 // Type definitions for Obra-related data structures
 export type ObraStatus = "planejamento" | "em_andamento" | "concluida" | "suspensa" | "arquivada";
 export type NivelPBQPH = "Nível A" | "Nível B" | "Não Aplicável";
@@ -51,5 +50,25 @@ export type Obra = {
   observacoesGerais?: string;
 };
 
-// Type definition for the gerarCodigoObra function
+/**
+ * Generates a unique project code for a new obra (construction project).
+ * 
+ * The function creates codes in the format: OBRA-YYYY-NNN where:
+ * - OBRA is a fixed prefix
+ * - YYYY is the current year (4 digits)
+ * - NNN is a sequential number padded to 3 digits (001, 002, etc.)
+ * 
+ * The function ensures uniqueness by finding the highest existing number
+ * for the current year and incrementing it by 1.
+ * 
+ * @returns {string} A unique project code (e.g., "OBRA-2024-001", "OBRA-2024-015")
+ * 
+ * @example
+ * // If no projects exist for 2024
+ * gerarCodigoObra(); // Returns "OBRA-2024-001"
+ * 
+ * @example
+ * // If projects OBRA-2024-001 through OBRA-2024-005 already exist
+ * gerarCodigoObra(); // Returns "OBRA-2024-006"
+ */
 export function gerarCodigoObra(): string;
