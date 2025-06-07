@@ -1,13 +1,8 @@
 
-import { ReactNode } from "react";
 import { Outlet } from "react-router-dom";
 import SupabaseSiteHeader from "./SupabaseSiteHeader";
 
-interface SupabaseUserLayoutProps {
-  children: ReactNode;
-}
-
-const SupabaseUserLayout = ({ children }: SupabaseUserLayoutProps) => {
+const SupabaseUserLayout = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <SupabaseSiteHeader />

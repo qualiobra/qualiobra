@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "./pages/Index";
@@ -33,7 +32,7 @@ function App() {
               <Routes>
                 <Route path="/" element={<Index />} />
                 
-                <Route path="/*" element={<SupabaseUserLayout><div /></SupabaseUserLayout>}>
+                <Route path="/*" element={<SupabaseUserLayout />}>
                   <Route path="dashboard" element={<Dashboard />} />
                   <Route path="obras" element={<Obras />} />
                   <Route path="obras/:obraId/tipologias" element={<TipologiasPage />} />
