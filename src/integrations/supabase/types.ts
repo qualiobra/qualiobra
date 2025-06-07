@@ -457,6 +457,38 @@ export type Database = {
           },
         ]
       }
+      role_permissions: {
+        Row: {
+          action: Database["public"]["Enums"]["app_action"]
+          created_at: string
+          id: string
+          module: Database["public"]["Enums"]["app_module"]
+          role_id: string | null
+        }
+        Insert: {
+          action: Database["public"]["Enums"]["app_action"]
+          created_at?: string
+          id?: string
+          module: Database["public"]["Enums"]["app_module"]
+          role_id?: string | null
+        }
+        Update: {
+          action?: Database["public"]["Enums"]["app_action"]
+          created_at?: string
+          id?: string
+          module?: Database["public"]["Enums"]["app_module"]
+          role_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "role_permissions_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "user_roles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tipologias: {
         Row: {
           created_at: string
@@ -517,6 +549,85 @@ export type Database = {
           role?: string
           token?: string
           used_at?: string | null
+        }
+        Relationships: []
+      }
+      user_role_assignments: {
+        Row: {
+          assigned_at: string
+          assigned_by: string | null
+          id: string
+          is_active: boolean
+          role_id: string | null
+          user_id: string | null
+        }
+        Insert: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          is_active?: boolean
+          role_id?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          assigned_at?: string
+          assigned_by?: string | null
+          id?: string
+          is_active?: boolean
+          role_id?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_role_assignments_assigned_by_fkey"
+            columns: ["assigned_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_role_assignments_role_id_fkey"
+            columns: ["role_id"]
+            isOneToOne: false
+            referencedRelation: "user_roles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "user_role_assignments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_roles: {
+        Row: {
+          created_at: string
+          description: string | null
+          display_name: string
+          id: string
+          is_active: boolean
+          name: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          display_name: string
+          id?: string
+          is_active?: boolean
+          name: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          display_name?: string
+          id?: string
+          is_active?: boolean
+          name?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
         }
         Relationships: []
       }
@@ -724,7 +835,23 @@ export type Database = {
       }
     }
     Enums: {
-      [_ in never]: never
+      app_action: "create" | "read" | "update" | "delete" | "approve" | "audit"
+      app_module:
+        | "usuarios"
+        | "obras"
+        | "fornecedores"
+        | "inspections"
+        | "reports"
+        | "diagnostico"
+        | "admin"
+      app_role:
+        | "admin"
+        | "engenheiro_rt"
+        | "mestre_obras"
+        | "trabalhador"
+        | "fornecedor"
+        | "cliente"
+        | "auditor"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -839,6 +966,26 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      app_action: ["create", "read", "update", "delete", "approve", "audit"],
+      app_module: [
+        "usuarios",
+        "obras",
+        "fornecedores",
+        "inspections",
+        "reports",
+        "diagnostico",
+        "admin",
+      ],
+      app_role: [
+        "admin",
+        "engenheiro_rt",
+        "mestre_obras",
+        "trabalhador",
+        "fornecedor",
+        "cliente",
+        "auditor",
+      ],
+    },
   },
 } as const

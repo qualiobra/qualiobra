@@ -3,9 +3,10 @@ import { useState } from "react";
 import { useAuth } from "@/context/SupabaseAuthContext";
 import { useSupabaseUsers } from "@/hooks/useSupabaseUsers";
 import { useUserInvites } from "@/hooks/useUserInvites";
+import { usePermissionCheck } from "@/hooks/usePermissionCheck";
 import { Navigate } from "react-router-dom";
 import { toast } from "@/hooks/use-toast";
-import { UserFormDialog } from "@/components/admin/UserFormDialog";
+import { EnhancedUserFormDialog } from "@/components/admin/EnhancedUserFormDialog";
 import { InviteUserDialog } from "@/components/admin/InviteUserDialog";
 import { UserInvitesTable } from "@/components/admin/UserInvitesTable";
 import { UserManagementHeader } from "@/components/admin/UserManagementHeader";
@@ -14,6 +15,7 @@ import { useUserManagementActions } from "@/components/admin/UserManagementActio
 
 const SupabaseUserManagement = () => {
   const { user, loading: authLoading } = useAuth();
+  const { isAdmin, canManageUsers } = usePermissionCheck(user?.id);
   const { 
     users, 
     isLoading: usersLoading, 
@@ -49,11 +51,8 @@ const SupabaseUserManagement = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const currentUserProfile = users.find(u => u.id === user.id);
-  const isAdmin = currentUserProfile?.role === 'admin';
-  
   // Check admin permissions only after we have user data
-  if (!usersLoading && !isAdmin) {
+  if (!usersLoading && !canManageUsers && !isAdmin) {
     toast({
       title: "Acesso Restrito",
       description: "Você não tem permissão para acessar esta página.",
@@ -122,7 +121,7 @@ const SupabaseUserManagement = () => {
         onAddUser={handleAddUser}
       />
       
-      <UserFormDialog
+      <EnhancedUserFormDialog
         isOpen={isDialogOpen}
         onOpenChange={setIsDialogOpen}
         editingUser={editingUser}

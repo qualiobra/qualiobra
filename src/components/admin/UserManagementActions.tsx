@@ -3,6 +3,8 @@ import { useState } from "react";
 import { toast } from "@/hooks/use-toast";
 import { Profile } from "@/hooks/useSupabaseUsers";
 import { UserFormData } from "@/components/admin/schemas/userFormSchema";
+import { usePermissionCheck } from "@/hooks/usePermissionCheck";
+import { useAuth } from "@/context/SupabaseAuthContext";
 
 interface UserManagementActionsProps {
   users: Profile[];
@@ -19,6 +21,8 @@ export const useUserManagementActions = ({
   deleteUser,
   refetch
 }: UserManagementActionsProps) => {
+  const { user } = useAuth();
+  const { isAdmin, canManageUsers } = usePermissionCheck(user?.id);
   const [editingUser, setEditingUser] = useState<Profile | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
@@ -56,6 +60,15 @@ export const useUserManagementActions = ({
   };
 
   const toggleUserStatus = (userProfile: Profile) => {
+    if (!canManageUsers()) {
+      toast({
+        title: "Permissão negada",
+        description: "Você não tem permissão para alterar status de usuários.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const newStatus = userProfile.status === "active" ? "inactive" : "active";
     updateUser({
       id: userProfile.id,
@@ -64,6 +77,15 @@ export const useUserManagementActions = ({
   };
 
   const handleDeleteUser = (userProfile: Profile) => {
+    if (!isAdmin()) {
+      toast({
+        title: "Permissão negada",
+        description: "Apenas administradores podem excluir usuários.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const userName = `${userProfile.first_name || ''} ${userProfile.last_name || ''}`.trim();
     
     if (window.confirm(`Tem certeza que deseja excluir o usuário ${userName}?`)) {
@@ -72,18 +94,45 @@ export const useUserManagementActions = ({
   };
 
   const handleEditUser = (userProfile: Profile) => {
+    if (!canManageUsers()) {
+      toast({
+        title: "Permissão negada",
+        description: "Você não tem permissão para editar usuários.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     console.log('Editing user:', userProfile);
     setEditingUser(userProfile);
     setIsDialogOpen(true);
   };
 
   const handleAddUser = () => {
+    if (!canManageUsers()) {
+      toast({
+        title: "Permissão negada",
+        description: "Você não tem permissão para criar usuários.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     console.log('Adding new user');
     setEditingUser(null);
     setIsDialogOpen(true);
   };
 
   const handleInviteUser = () => {
+    if (!canManageUsers()) {
+      toast({
+        title: "Permissão negada",
+        description: "Você não tem permissão para convidar usuários.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setIsInviteDialogOpen(true);
   };
 
@@ -122,6 +171,9 @@ export const useUserManagementActions = ({
     handleAddUser,
     handleInviteUser,
     handleManualRefresh,
-    setEditingUser
+    setEditingUser,
+    // Permission checks
+    canManageUsers: canManageUsers(),
+    isAdmin: isAdmin(),
   };
 };
