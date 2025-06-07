@@ -432,9 +432,27 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      v_comodos_tipologia_itens: {
+        Row: {
+          comodo_id: string | null
+          item_id: string | null
+          obrigatorio: boolean | null
+          ordem: number | null
+          origem: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
+      add_item_to_comodo_tipologia: {
+        Args: {
+          p_comodo_tipologia_id: string
+          p_item_id: string
+          p_obrigatorio?: boolean
+          p_ordem?: number
+        }
+        Returns: string
+      }
       create_categoria_item: {
         Args: { p_nome: string; p_descricao: string }
         Returns: string

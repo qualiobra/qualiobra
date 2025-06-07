@@ -22,7 +22,7 @@ import {
 import { useComodosItens } from "@/hooks/admin/useComodosItens";
 import { useItensAdmin } from "@/hooks/admin/useItensAdmin";
 import { ComodoTipologia } from "@/types/comodo";
-import { Settings, Plus, Trash2, GripVertical } from "lucide-react";
+import { Settings, Plus, Trash2, GripVertical, Layers } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface ComodoItensDialogProps {
@@ -98,6 +98,10 @@ export const ComodoItensDialog = ({
     deleteComodoItem(itemId);
   };
 
+  // Separar itens diretos e herdados
+  const itensDiretos = comodoItens.filter(item => item.origem === 'direto');
+  const itensHerdados = comodoItens.filter(item => item.origem === 'herdado');
+
   if (isLoadingItens || isLoadingAllItens) {
     return (
       <Dialog open={open} onOpenChange={onOpenChange}>
@@ -126,6 +130,14 @@ export const ComodoItensDialog = ({
           </DialogTitle>
           <DialogDescription>
             Adicione e configure os itens que devem ser inspecionados neste cômodo.
+            {comodo.comodo_master_id && (
+              <div className="mt-2 p-2 bg-blue-50 rounded-md border-l-4 border-blue-400">
+                <p className="text-sm text-blue-700">
+                  <Layers className="w-4 h-4 inline mr-1" />
+                  Este cômodo herda itens do padrão. Itens herdados são exibidos apenas para referência.
+                </p>
+              </div>
+            )}
           </DialogDescription>
         </DialogHeader>
 
@@ -193,61 +205,125 @@ export const ComodoItensDialog = ({
                 <p className="text-sm">Adicione itens usando o formulário acima.</p>
               </div>
             ) : (
-              <div className="space-y-2">
-                {comodoItens
-                  .sort((a, b) => a.ordem - b.ordem)
-                  .map((item) => (
-                    <div
-                      key={item.id}
-                      className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50"
-                    >
-                      <div className="flex items-center gap-4 flex-1">
-                        <div className="flex items-center gap-2 text-muted-foreground">
-                          <GripVertical className="h-4 w-4" />
-                          <span className="text-sm font-mono">{item.ordem}</span>
-                        </div>
-                        
-                        <div className="flex-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{item.item_nome}</span>
-                            <Badge variant="outline" className="text-xs">
-                              {item.categoria_nome}
-                            </Badge>
-                            {item.obrigatorio && (
-                              <Badge variant="destructive" className="text-xs">
-                                Obrigatório
-                              </Badge>
-                            )}
-                          </div>
-                          {item.item_descricao && (
-                            <p className="text-sm text-muted-foreground mt-1">
-                              {item.item_descricao}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-
-                      <div className="flex items-center gap-4">
-                        <div className="flex items-center space-x-2">
-                          <Switch
-                            checked={item.obrigatorio}
-                            onCheckedChange={() => handleToggleObrigatorio(item.id, item.obrigatorio)}
-                            disabled={isTogglingObrigatorio}
-                          />
-                          <Label className="text-sm">Obrigatório</Label>
-                        </div>
-                        
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => handleRemoveItem(item.id)}
-                          disabled={isDeleting}
+              <div className="space-y-4">
+                {/* Itens Diretos */}
+                {itensDiretos.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold text-green-700">
+                      Itens Específicos ({itensDiretos.length})
+                    </Label>
+                    {itensDiretos
+                      .sort((a, b) => a.ordem - b.ordem)
+                      .map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-4 border rounded-lg hover:bg-muted/50 border-green-200"
                         >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    </div>
-                  ))}
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <GripVertical className="h-4 w-4" />
+                              <span className="text-sm font-mono">{item.ordem}</span>
+                            </div>
+                            
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">{item.item_nome}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {item.categoria_nome}
+                                </Badge>
+                                {item.obrigatorio && (
+                                  <Badge variant="destructive" className="text-xs">
+                                    Obrigatório
+                                  </Badge>
+                                )}
+                                <Badge variant="default" className="text-xs bg-green-600">
+                                  Específico
+                                </Badge>
+                              </div>
+                              {item.item_descricao && (
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {item.item_descricao}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center space-x-2">
+                              <Switch
+                                checked={item.obrigatorio}
+                                onCheckedChange={() => handleToggleObrigatorio(item.id, item.obrigatorio)}
+                                disabled={isTogglingObrigatorio}
+                              />
+                              <Label className="text-sm">Obrigatório</Label>
+                            </div>
+                            
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleRemoveItem(item.id)}
+                              disabled={isDeleting}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+
+                {/* Itens Herdados */}
+                {itensHerdados.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold text-blue-700 flex items-center gap-2">
+                      <Layers className="w-4 h-4" />
+                      Itens Herdados do Padrão ({itensHerdados.length})
+                    </Label>
+                    {itensHerdados
+                      .sort((a, b) => a.ordem - b.ordem)
+                      .map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-4 border rounded-lg bg-blue-50 border-blue-200 opacity-75"
+                        >
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Layers className="h-4 w-4 text-blue-500" />
+                              <span className="text-sm font-mono">{item.ordem}</span>
+                            </div>
+                            
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">{item.item_nome}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {item.categoria_nome}
+                                </Badge>
+                                {item.obrigatorio && (
+                                  <Badge variant="destructive" className="text-xs">
+                                    Obrigatório
+                                  </Badge>
+                                )}
+                                <Badge variant="secondary" className="text-xs bg-blue-600 text-white">
+                                  Herdado
+                                </Badge>
+                              </div>
+                              {item.item_descricao && (
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {item.item_descricao}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-4">
+                            <span className="text-xs text-blue-600 italic">
+                              Herdado do padrão
+                            </span>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

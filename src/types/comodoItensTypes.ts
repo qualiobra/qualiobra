@@ -13,6 +13,7 @@ export interface ComodoItemWithDetails extends ComodoItem {
   item_nome: string;
   item_descricao: string | null;
   categoria_nome: string;
+  origem?: 'direto' | 'herdado'; // Adicionar informação sobre a origem
 }
 
 export interface ComodoItemInsert {
