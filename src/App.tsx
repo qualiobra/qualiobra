@@ -9,6 +9,7 @@ import Inspections from "./pages/Inspections";
 import Reports from "./pages/Reports";
 import Team from "./pages/Team";
 import AdminPanel from "./pages/admin/AdminPanel";
+import SupabaseUserManagement from "./pages/admin/SupabaseUserManagement";
 import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
 import SupabaseLogin from "./pages/auth/SupabaseLogin";
@@ -52,6 +53,7 @@ function App() {
                   <Route path="reports" element={<Reports />} />
                   <Route path="team" element={<Team />} />
                   <Route path="admin" element={<AdminPanel />} />
+                  <Route path="admin/user-management" element={<SupabaseUserManagement />} />
                   <Route path="coming-soon" element={<ComingSoon />} />
                 </Route>
                 

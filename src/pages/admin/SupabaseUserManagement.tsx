@@ -13,10 +13,10 @@ import { UsersDataTable } from "@/components/admin/UsersDataTable";
 import { useUserManagementActions } from "@/components/admin/UserManagementActions";
 
 const SupabaseUserManagement = () => {
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const { 
     users, 
-    isLoading, 
+    isLoading: usersLoading, 
     createUser, 
     updateUser, 
     deleteUser,
@@ -32,8 +32,35 @@ const SupabaseUserManagement = () => {
   
   const [searchTerm, setSearchTerm] = useState("");
   
-  const currentUserProfile = users.find(u => u.id === user?.id);
+  // Show loading while auth is loading
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-primary"></div>
+          <p className="mt-4 text-gray-600">Carregando...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if user is authenticated
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  const currentUserProfile = users.find(u => u.id === user.id);
   const isAdmin = currentUserProfile?.role === 'admin';
+  
+  // Check admin permissions only after we have user data
+  if (!usersLoading && !isAdmin) {
+    toast({
+      title: "Acesso Restrito",
+      description: "Você não tem permissão para acessar esta página.",
+      variant: "destructive",
+    });
+    return <Navigate to="/dashboard" replace />;
+  }
   
   const filteredUsers = users.filter(user => {
     if (!searchTerm) return true;
@@ -63,15 +90,6 @@ const SupabaseUserManagement = () => {
     deleteUser,
     refetch
   });
-  
-  if (!isLoading && !isAdmin) {
-    toast({
-      title: "Acesso Restrito",
-      description: "Você não tem permissão para acessar esta página.",
-      variant: "destructive",
-    });
-    return <Navigate to="/dashboard" replace />;
-  }
 
   const handleSendInvite = (email: string, role: string) => {
     createInvite({ email, role });
@@ -83,7 +101,8 @@ const SupabaseUserManagement = () => {
     }
   };
 
-  if (isLoading) {
+  // Show loading while users are being fetched
+  if (usersLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

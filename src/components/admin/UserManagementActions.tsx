@@ -24,6 +24,8 @@ export const useUserManagementActions = ({
   const [isInviteDialogOpen, setIsInviteDialogOpen] = useState(false);
 
   const onSubmit = (values: UserFormData) => {
+    console.log('Form submitted with values:', values);
+    
     if (editingUser) {
       updateUser({
         id: editingUser.id,
@@ -70,11 +72,13 @@ export const useUserManagementActions = ({
   };
 
   const handleEditUser = (userProfile: Profile) => {
+    console.log('Editing user:', userProfile);
     setEditingUser(userProfile);
     setIsDialogOpen(true);
   };
 
   const handleAddUser = () => {
+    console.log('Adding new user');
     setEditingUser(null);
     setIsDialogOpen(true);
   };
