@@ -22,7 +22,7 @@ import {
 import { useComodosItens } from "@/hooks/admin/useComodosItens";
 import { useItensAdmin } from "@/hooks/admin/useItensAdmin";
 import { ComodoTipologia } from "@/types/comodo";
-import { Settings, Plus, Trash2, GripVertical, Layers } from "lucide-react";
+import { Settings, Plus, Trash2, GripVertical, Layers, Lock } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
 
 interface ComodoItensDialogProps {
@@ -39,9 +39,6 @@ export const ComodoItensDialog = ({
   const [selectedItemId, setSelectedItemId] = useState<string>("");
   const [ordem, setOrdem] = useState<number>(1);
 
-  // Usar o comodo_master_id se disponível, senão usar o id do próprio cômodo
-  const comodoId = comodo.comodo_master_id || comodo.id;
-
   const {
     comodoItens,
     isLoading: isLoadingItens,
@@ -51,7 +48,7 @@ export const ComodoItensDialog = ({
     isCreating,
     isDeleting,
     isTogglingObrigatorio,
-  } = useComodosItens(comodoId);
+  } = useComodosItens(comodo.id);
 
   const { itens, isLoading: isLoadingAllItens } = useItensAdmin();
 
@@ -81,7 +78,7 @@ export const ComodoItensDialog = ({
     }
 
     createComodoItem({
-      comodo_id: comodoId,
+      comodo_tipologia_id: comodo.id,
       item_id: selectedItemId,
       obrigatorio: false,
       ordem: ordem,
@@ -144,7 +141,7 @@ export const ComodoItensDialog = ({
         <div className="space-y-6">
           {/* Adicionar novo item */}
           <div className="border rounded-lg p-4 space-y-4">
-            <Label className="text-base font-semibold">Adicionar Item</Label>
+            <Label className="text-base font-semibold">Adicionar Item Específico</Label>
             <div className="flex gap-4 items-end">
               <div className="flex-1">
                 <Label htmlFor="item-select">Item</Label>
@@ -206,6 +203,62 @@ export const ComodoItensDialog = ({
               </div>
             ) : (
               <div className="space-y-4">
+                {/* Itens Herdados */}
+                {itensHerdados.length > 0 && (
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold text-blue-700 flex items-center gap-2">
+                      <Layers className="w-4 h-4" />
+                      Itens Herdados do Padrão ({itensHerdados.length})
+                    </Label>
+                    {itensHerdados
+                      .sort((a, b) => a.ordem - b.ordem)
+                      .map((item) => (
+                        <div
+                          key={item.id}
+                          className="flex items-center justify-between p-4 border rounded-lg bg-blue-50 border-blue-200 opacity-75"
+                        >
+                          <div className="flex items-center gap-4 flex-1">
+                            <div className="flex items-center gap-2 text-muted-foreground">
+                              <Layers className="h-4 w-4 text-blue-500" />
+                              <span className="text-sm font-mono">{item.ordem}</span>
+                            </div>
+                            
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-medium">{item.item_nome}</span>
+                                <Badge variant="outline" className="text-xs">
+                                  {item.categoria_nome}
+                                </Badge>
+                                {item.obrigatorio && (
+                                  <Badge variant="destructive" className="text-xs">
+                                    Obrigatório
+                                  </Badge>
+                                )}
+                                <Badge variant="secondary" className="text-xs bg-blue-600 text-white">
+                                  Herdado
+                                </Badge>
+                              </div>
+                              {item.item_descricao && (
+                                <p className="text-sm text-muted-foreground mt-1">
+                                  {item.item_descricao}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-4">
+                            <div className="flex items-center gap-2 text-blue-600">
+                              <Lock className="h-4 w-4" />
+                              <span className="text-xs italic">
+                                Configuração herdada
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                )}
+
                 {/* Itens Diretos */}
                 {itensDiretos.length > 0 && (
                   <div className="space-y-2">
@@ -266,59 +319,6 @@ export const ComodoItensDialog = ({
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
-                          </div>
-                        </div>
-                      ))}
-                  </div>
-                )}
-
-                {/* Itens Herdados */}
-                {itensHerdados.length > 0 && (
-                  <div className="space-y-2">
-                    <Label className="text-sm font-semibold text-blue-700 flex items-center gap-2">
-                      <Layers className="w-4 h-4" />
-                      Itens Herdados do Padrão ({itensHerdados.length})
-                    </Label>
-                    {itensHerdados
-                      .sort((a, b) => a.ordem - b.ordem)
-                      .map((item) => (
-                        <div
-                          key={item.id}
-                          className="flex items-center justify-between p-4 border rounded-lg bg-blue-50 border-blue-200 opacity-75"
-                        >
-                          <div className="flex items-center gap-4 flex-1">
-                            <div className="flex items-center gap-2 text-muted-foreground">
-                              <Layers className="h-4 w-4 text-blue-500" />
-                              <span className="text-sm font-mono">{item.ordem}</span>
-                            </div>
-                            
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <span className="font-medium">{item.item_nome}</span>
-                                <Badge variant="outline" className="text-xs">
-                                  {item.categoria_nome}
-                                </Badge>
-                                {item.obrigatorio && (
-                                  <Badge variant="destructive" className="text-xs">
-                                    Obrigatório
-                                  </Badge>
-                                )}
-                                <Badge variant="secondary" className="text-xs bg-blue-600 text-white">
-                                  Herdado
-                                </Badge>
-                              </div>
-                              {item.item_descricao && (
-                                <p className="text-sm text-muted-foreground mt-1">
-                                  {item.item_descricao}
-                                </p>
-                              )}
-                            </div>
-                          </div>
-
-                          <div className="flex items-center gap-4">
-                            <span className="text-xs text-blue-600 italic">
-                              Herdado do padrão
-                            </span>
                           </div>
                         </div>
                       ))}

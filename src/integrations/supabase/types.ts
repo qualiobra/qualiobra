@@ -114,6 +114,51 @@ export type Database = {
         }
         Relationships: []
       }
+      comodos_master_itens: {
+        Row: {
+          comodo_master_id: string
+          created_at: string
+          id: string
+          item_id: string
+          obrigatorio: boolean
+          ordem: number
+          updated_at: string
+        }
+        Insert: {
+          comodo_master_id: string
+          created_at?: string
+          id?: string
+          item_id: string
+          obrigatorio?: boolean
+          ordem?: number
+          updated_at?: string
+        }
+        Update: {
+          comodo_master_id?: string
+          created_at?: string
+          id?: string
+          item_id?: string
+          obrigatorio?: boolean
+          ordem?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comodos_master_itens_comodo_master_id_fkey"
+            columns: ["comodo_master_id"]
+            isOneToOne: false
+            referencedRelation: "comodos_master"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comodos_master_itens_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "itens_inspectionaveis"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       comodos_tipologia: {
         Row: {
           comodo_master_id: string | null
@@ -155,6 +200,51 @@ export type Database = {
             columns: ["tipologia_id"]
             isOneToOne: false
             referencedRelation: "tipologias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      comodos_tipologia_itens: {
+        Row: {
+          comodo_tipologia_id: string
+          created_at: string
+          id: string
+          item_id: string
+          obrigatorio: boolean
+          ordem: number
+          updated_at: string
+        }
+        Insert: {
+          comodo_tipologia_id: string
+          created_at?: string
+          id?: string
+          item_id: string
+          obrigatorio?: boolean
+          ordem?: number
+          updated_at?: string
+        }
+        Update: {
+          comodo_tipologia_id?: string
+          created_at?: string
+          id?: string
+          item_id?: string
+          obrigatorio?: boolean
+          ordem?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comodos_tipologia_itens_comodo_tipologia_id_fkey"
+            columns: ["comodo_tipologia_id"]
+            isOneToOne: false
+            referencedRelation: "comodos_tipologia"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comodos_tipologia_itens_item_id_fkey"
+            columns: ["item_id"]
+            isOneToOne: false
+            referencedRelation: "itens_inspectionaveis"
             referencedColumns: ["id"]
           },
         ]
@@ -444,7 +534,25 @@ export type Database = {
       }
     }
     Functions: {
+      add_item_to_comodo_master: {
+        Args: {
+          p_comodo_master_id: string
+          p_item_id: string
+          p_obrigatorio?: boolean
+          p_ordem?: number
+        }
+        Returns: string
+      }
       add_item_to_comodo_tipologia: {
+        Args: {
+          p_comodo_tipologia_id: string
+          p_item_id: string
+          p_obrigatorio?: boolean
+          p_ordem?: number
+        }
+        Returns: string
+      }
+      add_item_to_comodo_tipologia_new: {
         Args: {
           p_comodo_tipologia_id: string
           p_item_id: string
@@ -489,6 +597,19 @@ export type Database = {
           updated_at: string
         }[]
       }
+      get_comodo_all_itens: {
+        Args: { p_comodo_tipologia_id: string }
+        Returns: {
+          id: string
+          item_id: string
+          obrigatorio: boolean
+          ordem: number
+          item_nome: string
+          item_descricao: string
+          categoria_nome: string
+          origem: string
+        }[]
+      }
       get_comodos_itens_by_comodo: {
         Args: { p_comodo_id: string }
         Returns: {
@@ -514,6 +635,36 @@ export type Database = {
           ativo: boolean
           created_at: string
           updated_at: string
+        }[]
+      }
+      get_comodos_master_itens: {
+        Args: { p_comodo_master_id: string }
+        Returns: {
+          id: string
+          comodo_master_id: string
+          item_id: string
+          obrigatorio: boolean
+          ordem: number
+          created_at: string
+          updated_at: string
+          item_nome: string
+          item_descricao: string
+          categoria_nome: string
+        }[]
+      }
+      get_comodos_tipologia_itens: {
+        Args: { p_comodo_tipologia_id: string }
+        Returns: {
+          id: string
+          comodo_tipologia_id: string
+          item_id: string
+          obrigatorio: boolean
+          ordem: number
+          created_at: string
+          updated_at: string
+          item_nome: string
+          item_descricao: string
+          categoria_nome: string
         }[]
       }
       get_itens_inspectionaveis: {
