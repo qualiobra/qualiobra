@@ -1,3 +1,4 @@
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { Toaster } from "@/components/ui/toaster";
 import Index from "./pages/Index";
@@ -10,6 +11,8 @@ import Team from "./pages/Team";
 import AdminPanel from "./pages/admin/AdminPanel";
 import ComingSoon from "./pages/ComingSoon";
 import NotFound from "./pages/NotFound";
+import SupabaseLogin from "./pages/auth/SupabaseLogin";
+import SupabaseRegister from "./pages/auth/SupabaseRegister";
 import { UserRoleProvider } from "./context/UserRoleContext";
 import { SupabaseAuthProvider } from "./context/SupabaseAuthContext";
 import SupabaseUserLayout from "./components/layout/SupabaseUserLayout";
@@ -31,6 +34,8 @@ function App() {
             <div className="min-h-screen bg-gray-50">
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/login" element={<SupabaseLogin />} />
+                <Route path="/register" element={<SupabaseRegister />} />
                 
                 <Route path="/*" element={<SupabaseUserLayout />}>
                   <Route path="dashboard" element={<Dashboard />} />
